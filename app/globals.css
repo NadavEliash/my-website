@@ -1,0 +1,39 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+html {
+  box-sizing: border-box;
+  height: 100%;
+}
+
+:root {
+  --foreground-rgb: 0, 0, 0;
+  --background-start-rgb: 214, 219, 220;
+  --background-end-rgb: 255, 255, 255;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --foreground-rgb: 5, 9, 37, 10;
+    --background-start-rgb: 0, 30, 90, 10;
+    --background-end-rgb: 6, 5, 12, 10;
+  }
+}
+
+body {
+  max-height: 100%;
+  color: rgb(var(--foreground-rgb));
+  background-image: url('assets/stars.jpg');
+  background: radial-gradient(circle at center,
+      rgb(var(--background-end-rgb)) 10%,
+      rgb(var(--background-start-rgb))
+    );
+    background-attachment: fixed;
+}
+
+@layer utilities {
+  .text-balance {
+    text-wrap: balance;
+  }
+}
