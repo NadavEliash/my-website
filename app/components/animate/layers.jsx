@@ -44,8 +44,8 @@ export default function Layers({
     const buttonsClass = "bg-white/20 p-2 rounded-md cursor-pointer hover:scale-110 transition-transform w-8 h-8"
 
     return (
-        <div className="p-4 bg-white/20 rounded-2xl flex flex-col gap-2 justify-between">
-            <h1 className={`text-center text-3xl text-slate-200 ${dongle.className}`}>Layers:</h1>
+        <div className="absolute right-8 md:static md:p-4 bg-white/20 rounded-2xl flex flex-col gap-2 justify-between">
+            <h1 className={`text-center text-xl text-black md:text-3xl md:text-slate-200 ${dongle.className}`}>Layers:</h1>
             <div className="flex-1 flex flex-col-reverse items-center overflow-auto">
                 {layers && layers.map((layer, idx) =>
                     <Layer
@@ -62,7 +62,7 @@ export default function Layers({
                     />
                 )}
             </div>
-            <div className="flex justify-around gap-2">
+            <div className="hidden md:flex justify-around gap-2">
                 <Plus className={buttonsClass} onClick={addLayer} />
                 <CopyPlus className={buttonsClass} onClick={copyLayer} />
                 <Trash2 className={buttonsClass} onClick={removeLayer} />

@@ -173,13 +173,15 @@ export default function Animate() {
     // STYLE CLASSES
 
     const framesButtonClass = "w-6 h-6 cursor-pointer hover:scale-110"
-    const actionButtonClass = "p-3 rounded-xl cursor-pointer"
+    const actionButtonClass = "p-2 md:p-3 rounded-xl cursor-pointer text-black/60 md:text-inherit"
 
     return (
         <main>
             <h1 className={`text-5xl text-slate-200 text-center my-2 ${sue_ellen.className}`}>{`Let's Animate!`}</h1>
-            <div id="drawing-bar" className="md:w-[80vw] h-[520px] mx-auto flex flex-col md:flex-row gap-2 mt-8">
-                <div id="drawing-options" className="px-8 py-4 bg-white/10 text-white/70 grid grid-cols-10 md:grid-cols-1 md:grid-rows-10 justify-items-center items-center gap-1 rounded-2xl">
+            <div id="drawing-bar" className="flex flex-col md:flex-row gap-2 mt-8">
+                <div id="action-buttons" 
+                className="absolute border-2 border-black/60 left-4 z-20 p-2 
+                md:static md:px-8 md:py-4 bg-white/10 text-white/70 grid grid-cols-1 grid-rows-10 justify-items-center items-center gap-1 rounded-2xl">
                     <div id="pencil" onClick={onDraw} className={`${actionButtonClass} ${action.isDraw ? 'bg-white/20' : ''}`}>
                         <Pencil />
                     </div>
@@ -225,7 +227,7 @@ export default function Animate() {
                         <Trash />
                     </div>
                 </div>
-                <div id="canvas-container" className="relative w-[100%] bg-white/20 p-6 rounded-2xl">
+                <div id="canvas-container" className="relative w-[100%] bg-white/20 rounded-2xl md:p-6">
                     {layers && layers.map((layer, idx) =>
                         <div key={idx}>
                             <DrawingCanvas
@@ -273,20 +275,20 @@ export default function Animate() {
                     loadImage={loadImage}
                 ></Layers>
             </div>
-            <Frames
-                frames={frames}
-                setFrames={setFrames}
-                currentFrameIdx={currentFrameIdx}
-                setCurrentFrameIdx={setCurrentFrameIdx}
-                canvasSize={canvasSize}
-                background={background}
-                clearCanvas={clearCanvas}
-                generateId={generateId}
-                loadImage={loadImage}
-                toggleAnimation={toggleAnimation}
-                isPlay={isPlay}
-                download={download}
-            ></Frames>
+                <Frames
+                    frames={frames}
+                    setFrames={setFrames}
+                    currentFrameIdx={currentFrameIdx}
+                    setCurrentFrameIdx={setCurrentFrameIdx}
+                    canvasSize={canvasSize}
+                    background={background}
+                    clearCanvas={clearCanvas}
+                    generateId={generateId}
+                    loadImage={loadImage}
+                    toggleAnimation={toggleAnimation}
+                    isPlay={isPlay}
+                    download={download}
+                ></Frames>
         </main>
     )
 }

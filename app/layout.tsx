@@ -23,7 +23,9 @@ export default function RootLayout({
       </head>
       <body className={`${roboto.className} text-white/80`}>
         <Navbar />
+        <main className="md:mt-16">
         {children}
+        </main>
       </body>
     </html>
   );

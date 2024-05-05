@@ -87,13 +87,13 @@ export default function Frame({
             <div key={frame} className="text-black">
                 <canvas ref={canvasRef} width={canvasSize.width} height={canvasSize.height}
                     className={`bg-white w-32 h-24 cursor-pointer rounded-lg hover:scale-105
-                                ${currentFrameIdx === idx ? 'border-4 border-pink-300 scale-105' : ''}`}
+                                ${currentFrameIdx === idx ? 'border-4 border-pink-300 scale-105' : 'border-2 border-black/60'}`}
                     onClick={() => switchFrame(idx)}
                     draggable
                     onDrag={() => onDrag(idx)}
                     onDragEnd={(e) => onDragEnd(e, idx)}>
                 </canvas>
-                <h1 className="text-white text-sm text-center p-2">
+                <h1 className="md:text-white text-sm text-center p-2">
                     {idx + 1}
                 </h1>
             </div>
