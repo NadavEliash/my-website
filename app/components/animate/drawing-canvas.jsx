@@ -17,6 +17,8 @@ export default function DrawingCanvas({
     const canvasRef = useRef()
 
     const [context, setContext] = useState(null)
+    const [screenWidth, setScreenWidth] = useState(800)
+    const [screenHeight, setScreenHeight] = useState(450)
     const [currentPath, setCurrentPath] = useState([])
     const [currentURL, setCurrentURL] = useState('')
     const [isDrawing, setIsDrawing] = useState(false)
@@ -25,6 +27,8 @@ export default function DrawingCanvas({
     const [drawingActions, setDrawingActions] = useState([])
 
     useEffect(() => {
+        getScreenSize()
+
         if (canvasRef.current) {
             const canvas = canvasRef.current
             canvas.width = canvasSize.width
@@ -283,16 +287,31 @@ export default function DrawingCanvas({
         newContext.stroke()
     }
 
+    const getScreenSize = () => {
+        const width = window.innerWidth
+        const height = window.innerHeight
+
+        if (width <= 768) {
+            setScreenWidth(width)
+            setScreenHeight(height)
+        }
+    }
+
     return (
         <canvas
             ref={canvasRef}
             onMouseDown={onDown}
+            onTouchStart={onDown}
             onMouseMove={onMove}
+            onTouchMove={onMove}
             onMouseUp={onUp}
+            onTouchEnd={onUp}
             onMouseOut={onUp}
-            className={`absolute left-1/2 -translate-x-1/2 top-1/2 -translate-y-1/2 w-[100%] md:w-fit rounded-md 
+            className={`absolute left-1/2 -translate-x-1/2 top-1/2 -translate-y-1/2 md:rounded-md md:max-w-[80vw] bg-white
             ${isTransform ? 'cursor-grab' : isDrawing ? 'cursor-none' : ''} 
-            ${currentLayerIdx === idx ? '' : 'pointer-events-none'}`}>
+            ${currentLayerIdx === idx ? '' : 'pointer-events-none'}`}
+            width={screenWidth}
+            height={screenHeight}>
         </canvas>
     )
 }

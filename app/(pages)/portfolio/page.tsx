@@ -104,8 +104,8 @@ export default function Portfolio() {
 
     const optionButtonsClass = "cursor-pointer w-8 h-8 bg-white/20 rounded-full p-2"
     return (
-        <div className="mt-[50lvh] -translate-y-1/2 mx-auto flex items-center justify-between w-10/12">
-            <div id="remote" className="w-[240px] py-16 bg-black/50 rounded-lg flex flex-col items-center gap-10 rotate-6 -skew-x-3 shadow-inner shadow-white/60">
+        <div className="md:mt-[50lvh] md:-translate-y-1/2 mx-auto flex flex-wrap flex-row items-center justify-between md:w-10/12">
+            <div id="remote" className="hidden md:flex w-[240px] py-16 bg-black/50 rounded-lg flex-col items-center gap-10 rotate-6 -skew-x-3 shadow-inner shadow-white/60">
                 <div className="relative grid grid-cols-3 grid-rows-3 gap-10 p-2 rounded-full items-center justify-items-center bg-white/20 shadow-inner shadow-white/40">
                     <Plus className={`${optionButtonsClass} col-start-2`} onClick={() => ToggleVolume(1)} />
                     <ChevronLeft className={`${optionButtonsClass} row-start-2`} onClick={() => updateCurrent(-1)} />
@@ -134,27 +134,33 @@ export default function Portfolio() {
                     </div>
                 </div>
             </div>
-            <div id="tv" className="relative w-[900px] h-[470px] max-w-[2/3vw] rounded-3xl border-[10px] border-r-[100px] border-gray-700 bg-gray-700">
-                <div className="absolute bg-gray-400 w-20 h-20 -top-12 left-1/2 -translate-x-1/2 rounded-full -z-10"></div>
-                <div className="absolute bg-gray-500 w-2 h-80 rotate-[60deg] -top-[200px] left-1/2 translate-x-[50px] -z-20"></div>
-                <div className="absolute bg-gray-500 w-2 h-80 -rotate-[60deg] -top-[200px] left-1/2 -translate-x-[50px] -z-20"></div>
-                <div className="absolute w-8 h-8 bg-pink-800 border-black border-2 rounded-2xl -right-[65px] bottom-2"></div>
-                <div className="absolute  -right-[65px] top-20 flex flex-col gap-4">
-                    <div className="w-8 h-5 bg-blue-200 border-2 rounded-xl"></div>
-                    <div className="w-8 h-5 bg-blue-600 border-2 rounded-xl"></div>
-                    <div className="w-8 h-5 bg-indigo-700 border-2 rounded-xl"></div>
-                    <div className="w-8 h-5 bg-violet-700 border-2 rounded-xl"></div>
-                    <div className="w-8 h-5 bg-purple-400 border-2 rounded-xl"></div>
+            <div id="tv" className="relative w-[900px] md:h-[470px] max-w-[2/3vw] rounded-3xl md:border-[10px] md:border-r-[100px] border-gray-700 bg-gray-700">
+                <div className="hidden md:block">
+                    <div className="absolute bg-gray-400 w-20 h-20 -top-12 left-1/2 -translate-x-1/2 rounded-full -z-10"></div>
+                    <div className="absolute bg-gray-500 w-2 h-80 rotate-[60deg] -top-[200px] left-1/2 translate-x-[50px] -z-20"></div>
+                    <div className="absolute bg-gray-500 w-2 h-80 -rotate-[60deg] -top-[200px] left-1/2 -translate-x-[50px] -z-20"></div>
+                    <div className="absolute w-8 h-8 bg-pink-800 border-black border-2 rounded-2xl -right-[65px] bottom-2"></div>
+                    <div className="absolute  -right-[65px] top-20 flex flex-col gap-4">
+                        <div className="w-8 h-5 bg-blue-200 border-2 rounded-xl"></div>
+                        <div className="w-8 h-5 bg-blue-600 border-2 rounded-xl"></div>
+                        <div className="w-8 h-5 bg-indigo-700 border-2 rounded-xl"></div>
+                        <div className="w-8 h-5 bg-violet-700 border-2 rounded-xl"></div>
+                        <div className="w-8 h-5 bg-purple-400 border-2 rounded-xl"></div>
+                    </div>
                 </div>
-                {!isLoad && <Image src={no_signal} alt="no-signal" className="absolute w-full border-black border-4 rounded-2xl z-10" priority={true} />}
+                {!isLoad && <Image src={no_signal} alt="no-signal" className="absolute w-full border-black md:border-4 md:rounded-2xl z-10" priority={true} />}
                 <video loop ref={videoRef} src={works[current].src}
-                    className="border-black border-4 rounded-2xl"
+                    className="border-black md:border-4 md:rounded-2xl"
                     onCanPlayThrough={playVideo}
                     onPointerDown={togglePlay} />
                 <div className="absolute right-6 top-6 z-10">
                     {volume === 0
                         ? <Volume2 className={`cursor-pointer w-8 h-8 text-black`} onClick={() => { ToggleVolume(+5) }} />
                         : <VolumeX className={`cursor-pointer w-8 h-8 text-black`} onClick={() => { ToggleVolume(0) }} />}
+                </div>
+                <div className="md:hidden w-full bg-black">
+                    <ChevronLeft className="absolute left-2 top-1/2 w-8 h-8 text-black/70" onClick={() => updateCurrent(-1)}/>
+                    <ChevronRight className="absolute right-2 top-1/2 w-8 h-8 text-black/70" onClick={() => updateCurrent(+1)}/>
                 </div>
                 <div className="absolute bottom-40 w-full h-[70%] pointer-events-none">
                     {showVolume && volumeDashes.length > 0 &&
@@ -165,14 +171,17 @@ export default function Portfolio() {
                             <h1 className="text-blue-900/90 font-bold text-center text-xl">VOL</h1>
                         </div>}
                 </div>
-                <div className="absolute bottom-0 rounded-b-[1.3rem] h-32 w-full overflow-hidden">
-                    {isInfo && <div className="absolute bottom-0 h-32 w-full bg-black/80 py-3 animate-slideUp">
+                <div id="info" className="hidden md:block absolute bottom-1 rounded-b-[1.3rem] h-32 w-full overflow-hidden">
+                    {isInfo && <div className="absolute bottom-0 h-24 w-full bg-black/80 py-3 animate-slideUp">
                         <h1 className="my-2 mx-6 text-xl">{works[current].title}</h1>
                     </div>}
-                    {!isInfo && <div className="absolute -bottom-32 h-32 w-full bg-black/80 py-3 animate-slideDown">
+                    {!isInfo && <div className="absolute -bottom-24 h-24 w-full bg-black/80 py-3 animate-slideDown">
                         <h1 className="my-2 mx-6 text-xl">{works[current].title}</h1>
                     </div>}
                 </div>
+            </div>
+            <div className="md:hidden">
+                <h1 className="my-2 mx-6 text-lg">{works[current].title}</h1>
             </div>
         </div>
     )

@@ -90,7 +90,7 @@ export default function Home() {
   useEffect(() => {
     setTimeout(() => {
       runText()
-    }, 2000);
+    }, 1000);
   }, [])
 
   const handleWheel = (ev: any) => {
@@ -129,13 +129,13 @@ export default function Home() {
 
   return (
     <main className={`${menlo.className} absolute left-0 top-0 h-dvh w-full -z-10`} onWheel={handleWheel}>
-      <div className="m-40 w-fit h-36 bg-black/40 rounded-lg border-2 border-white text-lg flex flex-col" >
+      <div className="mt-[40%] mx-4 md:m-40 md:w-fit md:h-36 bg-black/40 rounded-lg border-2 border-white text-lg flex flex-col" >
         <div className="w-full py-2 bg-white/10 flex items-center gap-2">
           <div className="w-3 h-3 ml-3 bg-red-500 rounded-full"></div>
           <div className="w-3 h-3 bg-yellow-500 rounded-full"></div>
           <div className="w-3 h-3 bg-green-500 rounded-full"></div>
         </div>
-        <div className="my-10 mx-5 text-xl w-[600px]">
+        <div className="my-10 mx-5 text-xl md:w-[600px]">
           {string.length && string.map((letter, idx) =>
             <p key={idx} className={`${letter.color} inline transition-all`}>
               {letter.str}
@@ -144,6 +144,7 @@ export default function Home() {
           <p className="inline animate-pulse">|</p>
         </div>
       </div>
+      
       {/* <div className="absolute left-1/2 -translate-x-1/2 top-1/2 -translate-y-1/2">
         <div>
           <Link href={views[currentView].href}>

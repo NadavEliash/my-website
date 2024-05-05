@@ -65,10 +65,10 @@ export default function Frames({
         clearCanvas()
     }
 
-    const framesButtonClass = "w-6 h-6 cursor-pointer hover:scale-110"
+    const framesButtonClass = "w-6 h-6 cursor-pointer hover:scale-110 text-black md:text-inherit"
 
     return (
-        <div id="frames-bar" className="w-[80vw] mx-auto flex flex-col gap-1">
+        <div id="frames-bar" className="absolute md:static bottom-12 left-1/2 -translate-x-1/2 md:translate-x-0 w-[80vw] flex flex-col gap-1 md:mx-auto z-20">
             <div id="frames-buttons" className="w-full bg-white/10 py-2 mt-4 text-white/70 flex gap-6 items-center rounded-t-2xl justify-center">
                 <div title="Add a blank frame" className={framesButtonClass} onClick={addFrame}>
                     <SquarePlus />
@@ -79,7 +79,7 @@ export default function Frames({
                 <div title="Remove frame" className={framesButtonClass} onClick={removeFrame}>
                     <SquareMinusIcon />
                 </div>
-                <div title="Clear scene" className={`${framesButtonClass} bg-white/70 rounded-full w-8 h-8 text-black/70 flex items-center justify-center`} onClick={clearAll}>
+                <div title="Clear scene" className={`${framesButtonClass} bg-red-500/70 rounded-full w-8 h-8 text-black/70 flex items-center justify-center`} onClick={clearAll}>
                     <Trash className='w-5 h-5' />
                 </div>
                 <div id='animation-options' className='flex gap-6 items-center justify-center'>
@@ -94,9 +94,11 @@ export default function Frames({
                     </div>
                 </div>
             </div>
-            <div id="frames-container" className="w-full h-40 bg-white/10 p-4 flex gap-2 items-center justify-center rounded-b-2xl">
-                <div className="w-8 py-4 mt-2 bg-slate-950 rounded-lg flex self-start" onClick={() => switchFrame('left')}><ChevronLeft className="w-10 h-10 text-white cursor-pointer" /></div>
-                <div id="frames" className="flex-1 gap-4 flex overflow-x-auto justify-start p-2">
+            <div id="frames-container" className="w-full h-40 md:bg-white/10 p-4 flex gap-2 items-center justify-center rounded-b-2xl">
+                <div className="hidden md:flex w-8 py-4 mt-2 bg-slate-950 rounded-lg self-start" onClick={() => switchFrame('left')}>
+                    <ChevronLeft className="w-10 h-10 text-white cursor-pointer" />
+                </div>
+                <div id="frames" className="flex-1 gap-2 md:gap-4 flex overflow-x-auto justify-start p-2">
                     {frames.length &&
                         frames.map((frame, idx) =>
                             <Frame key={idx}
@@ -113,7 +115,7 @@ export default function Frames({
                                 setImages={setImages}
                             />)}
                 </div>
-                <div className="w-8 py-4 mt-2 bg-slate-950 rounded-lg self-start flex justify-center" onClick={() => switchFrame('right')}><ChevronRight className="w-10 h-10 text-white cursor-pointer" /></div>
+                <div className="hidden md:flex w-8 py-4 mt-2 bg-slate-950 rounded-lg self-start justify-center" onClick={() => switchFrame('right')}><ChevronRight className="w-10 h-10 text-white cursor-pointer" /></div>
             </div>
         </div>
     )

@@ -100,7 +100,7 @@ export default function Layer({
         <div>
             <div key={idx} className="text-black p-1">
                 <canvas ref={canvasRef} width={canvasSize.width} height={canvasSize.height}
-                    className={`bg-white/90 w-28 h-20 rounded-lg ${idx > 0 ? 'hover:scale-105 cursor-pointer' : 'cursor-not-allowed'}
+                    className={`bg-white/90 w-16 h-12 md:w-28 md:h-20 rounded-lg ${idx > 0 ? 'hover:scale-105 cursor-pointer' : 'cursor-not-allowed'}
                                 ${currentLayerIdx === idx ? 'border-4 border-pink-300 scale-105' : ''}`}
                     draggable
                     onClick={() => {

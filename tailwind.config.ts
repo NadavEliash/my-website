@@ -31,12 +31,12 @@ const config: Config = {
           '100%': { left: '110%' },
         },
         slideUp: {
-          '0%': { bottom: '-128px' },
+          '0%': { bottom: '-96px' },
           '100%': { bottom: '0' },
         },
         slideDown: {
           '0%': { bottom: '0' },
-          '100%': { bottom: '-128px' },
+          '100%': { bottom: '-96px' },
         },
         opacity: {
           '0%': { opacity: '1' },
