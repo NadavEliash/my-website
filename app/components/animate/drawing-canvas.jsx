@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from "react"
 
 export default function DrawingCanvas({
+    screenSize,
     canvasSize,
     layers,
     setLayers,
@@ -17,8 +18,6 @@ export default function DrawingCanvas({
     const canvasRef = useRef()
 
     const [context, setContext] = useState(null)
-    const [screenWidth, setScreenWidth] = useState(800)
-    const [screenHeight, setScreenHeight] = useState(450)
     const [currentPath, setCurrentPath] = useState([])
     const [currentURL, setCurrentURL] = useState('')
     const [isDrawing, setIsDrawing] = useState(false)
@@ -27,16 +26,24 @@ export default function DrawingCanvas({
     const [drawingActions, setDrawingActions] = useState([])
 
     useEffect(() => {
-        getScreenSize()
-
         if (canvasRef.current) {
             const canvas = canvasRef.current
-            canvas.width = canvasSize.width
-            canvas.height = canvasSize.height
+
+            if (screenSize.width < 768) {
+                canvas.width = screenSize.width
+                canvas.height = screenSize.height
+            } else {
+                canvas.width = canvasSize.width
+                canvas.height = canvasSize.height
+            }
             const ctx = canvas.getContext('2d')
             setContext(ctx)
 
             redrawImage(layer.drawingActions)
+
+            canvas.addEventListener('touchStart', onDown, { passive: false })
+            canvas.addEventListener('touchmove', onMove, { passive: false })
+            canvas.addEventListener('touchEnd', onUp, { passive: false })
         }
     }, [])
 
@@ -65,6 +72,8 @@ export default function DrawingCanvas({
     // EVENT HANDLING
 
     const onDown = (e) => {
+        e.preventDefault()
+
         if (currentLayerIdx !== idx) return
         if (action.isDraw) startDrawing(e)
         if (action.isErase) startErasing(e)
@@ -72,6 +81,8 @@ export default function DrawingCanvas({
     }
 
     const onMove = (e) => {
+        e.preventDefault()
+
         if (currentLayerIdx !== idx) return
         if (action.isDraw) {
             draw(e)
@@ -287,31 +298,22 @@ export default function DrawingCanvas({
         newContext.stroke()
     }
 
-    const getScreenSize = () => {
-        const width = window.innerWidth
-        const height = window.innerHeight
-
-        if (width <= 768) {
-            setScreenWidth(width)
-            setScreenHeight(height)
-        }
-    }
-
     return (
         <canvas
             ref={canvasRef}
             onMouseDown={onDown}
-            onTouchStart={onDown}
             onMouseMove={onMove}
-            onTouchMove={onMove}
             onMouseUp={onUp}
-            onTouchEnd={onUp}
             onMouseOut={onUp}
-            className={`absolute left-1/2 -translate-x-1/2 top-1/2 -translate-y-1/2 md:rounded-md md:max-w-[80vw] bg-white
+            // onTouchStart={(e) => onDown(e)}
+            // onTouchMove={(e) => onMove(e)}
+            // onTouchEnd={onUp}
+            className={`absolute bg-gray-100 left-0 top-0 
+            md:left-1/2 md:-translate-x-1/2 md:top-1/2 md:-translate-y-1/2 md:rounded-md md:max-w-[60vw]
             ${isTransform ? 'cursor-grab' : isDrawing ? 'cursor-none' : ''} 
             ${currentLayerIdx === idx ? '' : 'pointer-events-none'}`}
-            width={screenWidth}
-            height={screenHeight}>
+            width={screenSize.width}
+            height={screenSize.height}>
         </canvas>
     )
 }

@@ -19,7 +19,10 @@ import {
     Trash,
     Undo,
     Palette,
-    Redo
+    Redo,
+    ChevronUp,
+    ChevronRight,
+    ChevronLeft
 } from "lucide-react"
 
 const sue_ellen = Sue_Ellen_Francisco({ subsets: ['latin'], weight: '400' })
@@ -27,6 +30,7 @@ const sue_ellen = Sue_Ellen_Francisco({ subsets: ['latin'], weight: '400' })
 export default function Animate() {
     const canvasSize = { width: 800, height: 450 }
 
+    const [screenSize, setScreenSize] = useState({ width: 0, height: 0 })
     const [action, setAction] = useState({ isDraw: true })
     const [layers, setLayers] = useState([])
     const [currentLayerIdx, setCurrentLayerIdx] = useState(1)
@@ -38,6 +42,8 @@ export default function Animate() {
     const [clear, setClear] = useState(false)
     const [isPlay, setIsPlay] = useState(false)
     const [isDownload, setIsDownload] = useState(false)
+
+    const [showBar, setShowBar] = useState('')
 
     const [styleBox, setStyleBox] = useState(false)
     const [bgBox, setBgBox] = useState(false)
@@ -60,6 +66,8 @@ export default function Animate() {
     }, [])
 
     useEffect(() => {
+        setScreenSize({ width: window.innerWidth, height: window.innerHeight })
+
         setActionHistory([])
         setLayers([{ id: generateId(), drawingActions: [] }, { id: generateId(), drawingActions: [] }])
         setCurrentLayerIdx(1)
@@ -90,7 +98,6 @@ export default function Animate() {
             }
         }
     }, [currentFrameIdx])
-
 
     // DRAWING OPTIONS
 
@@ -176,12 +183,13 @@ export default function Animate() {
     const actionButtonClass = "p-2 md:p-3 rounded-xl cursor-pointer text-black/60 md:text-inherit"
 
     return (
-        <main>
-            <h1 className={`text-5xl text-slate-200 text-center my-2 ${sue_ellen.className}`}>{`Let's Animate!`}</h1>
-            <div id="drawing-bar" className="flex flex-col md:flex-row gap-2 mt-8">
-                <div id="action-buttons" 
-                className="absolute border-2 border-black/60 left-4 z-20 p-2 
-                md:static md:px-8 md:py-4 bg-white/10 text-white/70 grid grid-cols-1 grid-rows-10 justify-items-center items-center gap-1 rounded-2xl">
+        <main className="bg-white md:bg-transparent h-svh py-6">
+            <h1 className={`text-5xl text-black md:text-slate-200 text-center ${sue_ellen.className}`}>{`Let's Animate!`}</h1>
+            <div id="drawing-bar" className="flex flex-col md:flex-row gap-2">
+                <ChevronRight className="md:hidden absolute left-0 top-1/2 -translate-y-1/2 w-6 h-20 text-black bg-gray-200 rounded-r-2xl z-30" onClick={() => setShowBar("actions")} />
+                <div id="action-buttons"
+                    className={`absolute border-2 border-black/60 ${showBar === "actions" ? 'left-2' : '-left-[80px]'} transition-all z-20 p-2 
+                            md:static md:px-8 md:py-4 bg-white/10 text-white/70 grid grid-cols-1 grid-rows-10 justify-items-center items-center gap-1 rounded-2xl`}>
                     <div id="pencil" onClick={onDraw} className={`${actionButtonClass} ${action.isDraw ? 'bg-white/20' : ''}`}>
                         <Pencil />
                     </div>
@@ -231,6 +239,7 @@ export default function Animate() {
                     {layers && layers.map((layer, idx) =>
                         <div key={idx}>
                             <DrawingCanvas
+                                screenSize={screenSize}
                                 canvasSize={canvasSize}
                                 layers={layers}
                                 setLayers={setLayers}
@@ -273,22 +282,26 @@ export default function Animate() {
                     generateId={generateId}
                     background={background}
                     loadImage={loadImage}
+                    showBar={showBar}
                 ></Layers>
+                <ChevronLeft className="md:hidden absolute right-0 top-1/3 -translate-y-1/2 w-6 h-20 text-black bg-gray-200 rounded-l-2xl z-20" onClick={() => setShowBar("layers")} />
             </div>
-                <Frames
-                    frames={frames}
-                    setFrames={setFrames}
-                    currentFrameIdx={currentFrameIdx}
-                    setCurrentFrameIdx={setCurrentFrameIdx}
-                    canvasSize={canvasSize}
-                    background={background}
-                    clearCanvas={clearCanvas}
-                    generateId={generateId}
-                    loadImage={loadImage}
-                    toggleAnimation={toggleAnimation}
-                    isPlay={isPlay}
-                    download={download}
-                ></Frames>
+            <Frames
+                frames={frames}
+                setFrames={setFrames}
+                currentFrameIdx={currentFrameIdx}
+                setCurrentFrameIdx={setCurrentFrameIdx}
+                canvasSize={canvasSize}
+                background={background}
+                clearCanvas={clearCanvas}
+                generateId={generateId}
+                loadImage={loadImage}
+                toggleAnimation={toggleAnimation}
+                isPlay={isPlay}
+                download={download}
+                showBar={showBar}
+            ></Frames>
+            <ChevronUp className="md:hidden absolute bottom-0 left-1/2 -translate-x-1/2 w-20 h-6 text-black bg-gray-200 rounded-t-2xl z-20" onClick={() => setShowBar("frames")} />
         </main>
     )
 }

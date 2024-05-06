@@ -8,7 +8,7 @@ export default function About() {
 
     return (
         <>
-            <div className="relative mt-16 mx-6 md:w-[600px] p-6 rounded-3xl bg-white/10">
+            <div className="relative mt-16 mx-6 bg-white/10 p-3 rounded-lg md:w-[600px] md:p-6 md:rounded-3xl">
                 <Image src={profile} alt="profile" width={100} height={100} className="rounded-full"></Image>
                 <p className="text-justify text-lg md:text-xl mt-4">
                     {`My name is Nadav Eliash.`}

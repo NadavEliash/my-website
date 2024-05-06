@@ -4,6 +4,7 @@ import WheelGuid from "@/app/components/guids/wheel-guid"
 import Loader from "@/app/components/loader"
 import { Smartphone, Tv2 } from "lucide-react"
 import { Fredoka } from "next/font/google"
+import Link from "next/link"
 import { TouchEventHandler, useEffect, useState } from "react"
 
 const fredoka = Fredoka({ weight: "400", subsets: ['hebrew'] })
@@ -99,11 +100,11 @@ export default function Projects() {
     }
 
     return (
-        <div className="w-full text-white" onWheel={handleWheel} onTouchStart={handleTouchStart} onTouchMove={handleTouch}>
+        <div className="w-full h-svh text-white" onWheel={handleWheel} onTouchStart={handleTouchStart} onTouchMove={handleTouch}>
             {projects && projects.map((project, idx) =>
-                <div className={`${idx === currentView ? 'grid' : 'hidden'} ${isReplacing ? 'scale-0' : 'scale-100'} grid-cols-8 items-center transition-all duration-1000`} key={project.title}>
+                <div className={`${idx === currentView ? 'grid' : 'hidden'} ${isReplacing ? 'scale-0' : 'scale-100'} grid-cols-8 items-center transition-all duration-1000 mt-10`} key={project.title}>
                     <div className="col-span-8 md:col-span-2 px-8 md:pl-32 flex flex-col gap-2">
-                        <h1 className={`text-6xl pl-10 my-6 ${fredoka.className}`}>{project.title}</h1>
+                        <h1 className={`text-6xl mx-auto my-6 ${fredoka.className}`}>{project.title}</h1>
                         {project.description.map((line, idx) => <h2 key={idx} className="text-xl">{line}</h2>)}
                     </div>
                     <div className={`hidden md:block col-span-6 justify-self-center relative opacity-90 shadow-xl shadow-white/30 scale-y-[0.7] scale-x-[0.8]
@@ -115,6 +116,8 @@ export default function Projects() {
                         </div>}
                         <iframe src={project.src} onLoad={onLoad} className={`w-full h-full border-[20px] border-black bg-white ${wideScreen ? 'rounded-2xl' : 'rounded-[3rem]'}`}></iframe>
                     </div>
+                    <Link href={project.src} target="_blank"
+                    className="md:hidden col-span-4 col-start-3 bg-white/10 text-center rounded-full p-3 mt-10">Open in a new tab</Link>
                 </div>)}
             <div className="hidden absolute left-[55vw] bottom-20 w-32 h-12 bg-white/20 rounded-full md:flex items-center justify-between p-3 cursor-pointer" onClick={() => setWideScreen(!wideScreen)}>
                 <Smartphone className="w-6 h-6" />

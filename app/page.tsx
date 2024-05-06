@@ -128,8 +128,8 @@ export default function Home() {
   }
 
   return (
-    <main className={`${menlo.className} absolute left-0 top-0 h-dvh w-full -z-10`} onWheel={handleWheel}>
-      <div className="mt-[40%] mx-4 md:m-40 md:w-fit md:h-36 bg-black/40 rounded-lg border-2 border-white text-lg flex flex-col" >
+    <main className={`${menlo.className} absolute left-0 top-0 h-svh w-full px-2 -z-10`} onWheel={handleWheel}>
+      <div className="mt-[40%] md:m-40 md:w-fit md:h-36 bg-black/40 rounded-lg border-2 border-white text-lg flex flex-col" >
         <div className="w-full py-2 bg-white/10 flex items-center gap-2">
           <div className="w-3 h-3 ml-3 bg-red-500 rounded-full"></div>
           <div className="w-3 h-3 bg-yellow-500 rounded-full"></div>

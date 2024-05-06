@@ -162,7 +162,7 @@ export default function Portfolio() {
                     <ChevronLeft className="absolute left-2 top-1/2 w-8 h-8 text-black/70" onClick={() => updateCurrent(-1)}/>
                     <ChevronRight className="absolute right-2 top-1/2 w-8 h-8 text-black/70" onClick={() => updateCurrent(+1)}/>
                 </div>
-                <div className="absolute bottom-40 w-full h-[70%] pointer-events-none">
+                <div className="hidden md:block absolute bottom-40 w-full h-[70%] pointer-events-none">
                     {showVolume && volumeDashes.length > 0 &&
                         <div className="absolute right-6 bottom-0 flex flex-col gap-1 items-center justify-end">
                             {volumeDashes.map(dash =>

@@ -41,11 +41,11 @@ export default function Navbar() {
 
     return (
         <>
-            <nav className={`${display ? 'flex' : 'hidden'} absolute top-0 left-0 z-50 w-full h-full py-3 flex-col items-start gap-1 bg-white/10 text-2xl ${dongle.className} 
-            md:bg-transparent md:flex md:flex-row md:h-fit`} onClick={()=>setDisplay(!display)}>
+            <nav className={`${display ? 'flex' : 'hidden'} absolute top-0 left-0 z-50 w-full h-full flex-col items-start bg-white/30 text-2xl ${dongle.className} 
+            md:py-3 md:bg-transparent md:flex md:flex-row md:h-fit md:gap-4`} onClick={()=>setDisplay(!display)}>
                 {pages.map(page =>
                     <Link key={page.href} href={page.href} title={page.icon ? page.title : ''}
-                        className="p-1 h-10 ml-2 px-4 flex bg-white/80 w-full md:w-fit md:bg-white/10 rounded-lg hover:bg-white/20 cursor-pointer text-center text-white/85">
+                        className="py-1 px-4 h-20 flex items-center bg-slate-300 shadow-black shadow-md w-full md:h-10 md:w-fit md:bg-white/10 md:rounded-lg hover:bg-white/20 cursor-pointer text-center text-white/85">
                         {page.icon
                             ? page.icon
                             : <h1 className="mt-[3px] text-black/80 md:text-inherit">{page.title}</h1>}

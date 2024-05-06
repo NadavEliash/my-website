@@ -16,8 +16,16 @@ export default function Frames({
     loadImage,
     isPlay,
     toggleAnimation,
-    download
+    download,
+    showBar
 }) {
+
+    const [mobileDisplay, setMobileDisplay] = useState(false)
+
+    useEffect(() => {
+        showBar === "frames" ? setMobileDisplay(true) : setMobileDisplay(false)
+    }, [showBar])
+
     const addFrame = () => {
         const newFrame = { id: generateId(), layers: [{ id: generateId(), drawingActions: [] }, { id: generateId(), drawingActions: [] }] }
         frames.splice(currentFrameIdx + 1, 0, newFrame)
@@ -68,7 +76,7 @@ export default function Frames({
     const framesButtonClass = "w-6 h-6 cursor-pointer hover:scale-110 text-black md:text-inherit"
 
     return (
-        <div id="frames-bar" className="absolute md:static bottom-12 left-1/2 -translate-x-1/2 md:translate-x-0 w-[80vw] flex flex-col gap-1 md:mx-auto z-20">
+        <div id="frames-bar" className={`absolute md:static ${mobileDisplay ? 'bottom-2' : '-bottom-[250px]'} transition-all left-1/2 -translate-x-1/2 md:translate-x-0 w-[80vw] flex flex-col gap-1 md:mx-auto z-20`}>
             <div id="frames-buttons" className="w-full bg-white/10 py-2 mt-4 text-white/70 flex gap-6 items-center rounded-t-2xl justify-center">
                 <div title="Add a blank frame" className={framesButtonClass} onClick={addFrame}>
                     <SquarePlus />
@@ -79,7 +87,7 @@ export default function Frames({
                 <div title="Remove frame" className={framesButtonClass} onClick={removeFrame}>
                     <SquareMinusIcon />
                 </div>
-                <div title="Clear scene" className={`${framesButtonClass} bg-red-500/70 rounded-full w-8 h-8 text-black/70 flex items-center justify-center`} onClick={clearAll}>
+                <div title="Clear scene" className={`${framesButtonClass} md:bg-red-500/70 rounded-full w-8 h-8 text-black/70 flex items-center justify-center`} onClick={clearAll}>
                     <Trash className='w-5 h-5' />
                 </div>
                 <div id='animation-options' className='flex gap-6 items-center justify-center'>
