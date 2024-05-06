@@ -76,7 +76,7 @@ export default function Frames({
     const framesButtonClass = "w-6 h-6 cursor-pointer hover:scale-110 text-black md:text-inherit"
 
     return (
-        <div id="frames-bar" className={`absolute md:static ${mobileDisplay ? 'bottom-2' : '-bottom-[250px]'} transition-all left-1/2 -translate-x-1/2 md:translate-x-0 w-[80vw] flex flex-col gap-1 md:mx-auto z-20`}>
+        <div id="frames-bar" className={`absolute md:static ${mobileDisplay ? 'bottom-2' : '-bottom-[250px]'} transition-all duration-700 left-1/2 -translate-x-1/2 md:translate-x-0 w-[80vw] flex flex-col gap-1 md:mx-auto z-20`}>
             <div id="frames-buttons" className="w-full bg-white/10 py-2 mt-4 text-white/70 flex gap-6 items-center rounded-t-2xl justify-center">
                 <div title="Add a blank frame" className={framesButtonClass} onClick={addFrame}>
                     <SquarePlus />

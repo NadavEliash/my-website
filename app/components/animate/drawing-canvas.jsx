@@ -1,7 +1,6 @@
 import { useEffect, useRef, useState } from "react"
 
 export default function DrawingCanvas({
-    screenSize,
     canvasSize,
     layers,
     setLayers,
@@ -29,21 +28,21 @@ export default function DrawingCanvas({
         if (canvasRef.current) {
             const canvas = canvasRef.current
 
-            if (screenSize.width < 768) {
-                canvas.width = screenSize.width
-                canvas.height = screenSize.height
-            } else {
-                canvas.width = canvasSize.width
-                canvas.height = canvasSize.height
-            }
+            canvas.width = canvasSize.width
+            canvas.height = canvasSize.height
             const ctx = canvas.getContext('2d')
             setContext(ctx)
 
             redrawImage(layer.drawingActions)
+        }
+    }, [])
 
-            canvas.addEventListener('touchStart', onDown, { passive: false })
-            canvas.addEventListener('touchmove', onMove, { passive: false })
-            canvas.addEventListener('touchEnd', onUp, { passive: false })
+    useEffect(() => {
+        if (canvasRef.current) {
+            const canvas = canvasRef.current
+            canvas.addEventListener('touchstart', onTouchStart, { passive: false })
+            canvas.addEventListener('touchmove', onTouchMove, { passive: false })
+            canvas.addEventListener('touchend', onTouchEnd, { passive: false })
         }
     }, [])
 
@@ -72,8 +71,6 @@ export default function DrawingCanvas({
     // EVENT HANDLING
 
     const onDown = (e) => {
-        e.preventDefault()
-
         if (currentLayerIdx !== idx) return
         if (action.isDraw) startDrawing(e)
         if (action.isErase) startErasing(e)
@@ -81,8 +78,6 @@ export default function DrawingCanvas({
     }
 
     const onMove = (e) => {
-        e.preventDefault()
-
         if (currentLayerIdx !== idx) return
         if (action.isDraw) {
             draw(e)
@@ -104,32 +99,65 @@ export default function DrawingCanvas({
         if (action.isTranslate || action.isRotate || action.isScale) endTransform(e)
     }
 
+    const onTouchStart = (e) => {
+        e.preventDefault()
+        if (currentLayerIdx !== idx) return
+        if (canvasRef.current) {
+            if (action.isDraw) startDrawing(e, true)
+        }
+    }
+
+    const onTouchMove = (e) => {
+        e.preventDefault()
+        draw(e, true)
+    }
+
+    const onTouchEnd = (e) => {
+        e.preventDefault()
+        endDrawing(e, true)
+    }
+
     // ACTIONS
 
-    const startDrawing = (e) => {
-        if (context && action.isDraw) {
-            context.beginPath()
-            context.moveTo(e.nativeEvent.offsetX, e.nativeEvent.offsetY)
+    const startDrawing = (e, mobile = false) => {
+        if (canvasRef.current && action.isDraw) {
+            const ctx = canvasRef.current.getContext('2d')
+            ctx.beginPath()
+
+            if (!mobile) {
+                ctx.moveTo(e.nativeEvent.offsetX, e.nativeEvent.offsetY)
+            } else {
+                ctx.moveTo(e.touches[0].clientX, e.touches[0].clientY)
+            }
             setIsDrawing(true)
         }
     }
 
-    const draw = (e) => {
-        if (!context || !isDrawing) return
-        context.lineCap = 'round'
-        context.lineJoin = 'bevel'
-        context.lineWidth = styles.lineWidth
-        context.strokeStyle = styles.strokeStyle
+    const draw = (e, mobile = false) => {
+        if (!canvasRef.current || !mobile && !isDrawing) return
+        const ctx = canvasRef.current.getContext('2d')
+        ctx.lineCap = 'round'
+        ctx.lineJoin = 'bevel'
+        ctx.lineWidth = styles.lineWidth
+        ctx.strokeStyle = styles.strokeStyle
 
-        context.lineTo(e.nativeEvent.offsetX, e.nativeEvent.offsetY)
-        context.stroke()
-        setCurrentPath([...currentPath, { x: e.nativeEvent.offsetX, y: e.nativeEvent.offsetY }])
+        if (!mobile) {
+            ctx.lineTo(e.nativeEvent.offsetX, e.nativeEvent.offsetY)
+            ctx.stroke()
+            setCurrentPath([...currentPath, { x: e.nativeEvent.offsetX, y: e.nativeEvent.offsetY }])
+        } else {
+            console.log('move')
+            ctx.lineTo(e.touches[0].clientX, e.touches[0].clientY)
+            ctx.stroke()
+            setCurrentPath([...currentPath, { x: e.touches[0].clientX, y: e.touches[0].clientY }])
+        }
     }
 
-    const endDrawing = (e) => {
+    const endDrawing = (e, mobile = false) => {
         if (!isDrawing) return
         setIsDrawing(false)
-        context && context.closePath()
+        const ctx = canvasRef.current.getContext('2d')
+        ctx.closePath()
         if (currentPath.length > 0) {
             drawPath(currentPath)
             const url = canvasRef.current.toDataURL()
@@ -305,15 +333,12 @@ export default function DrawingCanvas({
             onMouseMove={onMove}
             onMouseUp={onUp}
             onMouseOut={onUp}
-            // onTouchStart={(e) => onDown(e)}
-            // onTouchMove={(e) => onMove(e)}
-            // onTouchEnd={onUp}
             className={`absolute bg-gray-100 left-0 top-0 
-            md:left-1/2 md:-translate-x-1/2 md:top-1/2 md:-translate-y-1/2 md:rounded-md md:max-w-[60vw]
+            md:left-1/2 md:-translate-x-1/2 md:top-1/2 md:-translate-y-1/2 md:rounded-md
             ${isTransform ? 'cursor-grab' : isDrawing ? 'cursor-none' : ''} 
             ${currentLayerIdx === idx ? '' : 'pointer-events-none'}`}
-            width={screenSize.width}
-            height={screenSize.height}>
+            width={canvasSize.width}
+            height={canvasSize.height}>
         </canvas>
     )
 }

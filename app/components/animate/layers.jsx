@@ -52,7 +52,7 @@ export default function Layers({
     const buttonsClass = "bg-white/20 p-2 rounded-md cursor-pointer hover:scale-110 transition-transform w-8 h-8"
 
     return (
-        <div className={`absolute ${mobileDisplay?'right-2':'-right-[80px]'} transition-all md:static md:p-4 bg-white/20 rounded-2xl flex flex-col gap-2 justify-between`}>
+        <div className={`absolute ${mobileDisplay?'right-2':'-right-[80px]'} transition-all duration-700 top-20 md:static md:p-4 bg-white/20 rounded-2xl flex flex-col gap-2 justify-between`}>
             <h1 className={`text-center text-xl text-black md:text-3xl md:text-slate-200 ${dongle.className}`}>Layers:</h1>
             <div className="flex-1 flex flex-col-reverse items-center overflow-auto">
                 {layers && layers.map((layer, idx) =>

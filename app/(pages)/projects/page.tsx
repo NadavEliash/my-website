@@ -100,10 +100,10 @@ export default function Projects() {
     }
 
     return (
-        <div className="w-full h-svh text-white" onWheel={handleWheel} onTouchStart={handleTouchStart} onTouchMove={handleTouch}>
+        <div className="w-full h-lvh text-white" onWheel={handleWheel} onTouchStart={handleTouchStart} onTouchMove={handleTouch}>
             {projects && projects.map((project, idx) =>
-                <div className={`${idx === currentView ? 'grid' : 'hidden'} ${isReplacing ? 'scale-0' : 'scale-100'} grid-cols-8 items-center transition-all duration-1000 mt-10`} key={project.title}>
-                    <div className="col-span-8 md:col-span-2 px-8 md:pl-32 flex flex-col gap-2">
+                <div className={`${idx === currentView ? 'grid' : 'hidden'} ${isReplacing ? 'scale-0' : 'scale-100'} grid-cols-8 items-center transition-all duration-1000`} key={project.title}>
+                    <div className="col-span-8 md:col-span-2 px-8 md:pl-32 flex flex-col gap-2 mt-10">
                         <h1 className={`text-6xl mx-auto my-6 ${fredoka.className}`}>{project.title}</h1>
                         {project.description.map((line, idx) => <h2 key={idx} className="text-xl">{line}</h2>)}
                     </div>

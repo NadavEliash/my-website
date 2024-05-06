@@ -28,9 +28,8 @@ import {
 const sue_ellen = Sue_Ellen_Francisco({ subsets: ['latin'], weight: '400' })
 
 export default function Animate() {
-    const canvasSize = { width: 800, height: 450 }
 
-    const [screenSize, setScreenSize] = useState({ width: 0, height: 0 })
+    const [canvasSize, setCanvasSize] = useState({ width: 800, height: 450 })
     const [action, setAction] = useState({ isDraw: true })
     const [layers, setLayers] = useState([])
     const [currentLayerIdx, setCurrentLayerIdx] = useState(1)
@@ -66,8 +65,16 @@ export default function Animate() {
     }, [])
 
     useEffect(() => {
-        setScreenSize({ width: window.innerWidth, height: window.innerHeight })
+        const width = window.innerWidth
+        const height = window.innerHeight
 
+        if (width < 768) setCanvasSize({ width, height })
+        if (width > 768) setCanvasSize({ width: 600, height: 450 })
+        if (width > 1024) setCanvasSize({ width: 800, height: 450 })
+
+    }, [])
+
+    useEffect(() => {
         setActionHistory([])
         setLayers([{ id: generateId(), drawingActions: [] }, { id: generateId(), drawingActions: [] }])
         setCurrentLayerIdx(1)
@@ -183,12 +190,12 @@ export default function Animate() {
     const actionButtonClass = "p-2 md:p-3 rounded-xl cursor-pointer text-black/60 md:text-inherit"
 
     return (
-        <main className="bg-white md:bg-transparent h-svh py-6">
-            <h1 className={`text-5xl text-black md:text-slate-200 text-center ${sue_ellen.className}`}>{`Let's Animate!`}</h1>
+        <main className="bg-white md:bg-transparent h-svh md:py-6">
+            <h1 className={`hidden md:block md:text-slate-200 text-center ${sue_ellen.className}`}>{`Let's Animate!`}</h1>
             <div id="drawing-bar" className="flex flex-col md:flex-row gap-2">
                 <ChevronRight className="md:hidden absolute left-0 top-1/2 -translate-y-1/2 w-6 h-20 text-black bg-gray-200 rounded-r-2xl z-30" onClick={() => setShowBar("actions")} />
                 <div id="action-buttons"
-                    className={`absolute border-2 border-black/60 ${showBar === "actions" ? 'left-2' : '-left-[80px]'} transition-all z-20 p-2 
+                    className={`absolute border-2 top-20 border-black/60 ${showBar === "actions" ? 'left-2' : '-left-[80px]'} transition-all duration-700 z-20 p-2 
                             md:static md:px-8 md:py-4 bg-white/10 text-white/70 grid grid-cols-1 grid-rows-10 justify-items-center items-center gap-1 rounded-2xl`}>
                     <div id="pencil" onClick={onDraw} className={`${actionButtonClass} ${action.isDraw ? 'bg-white/20' : ''}`}>
                         <Pencil />
@@ -239,7 +246,6 @@ export default function Animate() {
                     {layers && layers.map((layer, idx) =>
                         <div key={idx}>
                             <DrawingCanvas
-                                screenSize={screenSize}
                                 canvasSize={canvasSize}
                                 layers={layers}
                                 setLayers={setLayers}
