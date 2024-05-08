@@ -49,10 +49,11 @@ export default function Layers({
         setCurrentLayerIdx(prev => prev > 1 ? prev - 1 : 1)
     }
 
-    const buttonsClass = "bg-white/20 p-2 rounded-md cursor-pointer hover:scale-110 transition-transform w-8 h-8"
+    const buttonsClass = "md:bg-white/20 p-1 lg:p-2 rounded-md cursor-pointer hover:scale-110 transition-transform w-6 h-6 lg:w-8 lg:h-8"
 
     return (
-        <div className={`absolute ${mobileDisplay?'right-2':'-right-[80px]'} transition-all duration-700 top-20 md:static md:p-4 bg-white/20 rounded-2xl flex flex-col gap-2 justify-between`}>
+        <div className={`absolute ${mobileDisplay?'right-0':'-right-[100px]'} transition-all duration-700 top-20 bg-gray-300/60 rounded-l-2xl flex flex-col gap-2 justify-between 
+        md:static md:p-1 md:py-2 lg:p-4 md:bg-white/20 md:rounded-2xl`}>
             <h1 className={`text-center text-xl text-black md:text-3xl md:text-slate-200 ${dongle.className}`}>Layers:</h1>
             <div className="flex-1 flex flex-col-reverse items-center overflow-auto">
                 {layers && layers.map((layer, idx) =>
@@ -70,7 +71,7 @@ export default function Layers({
                     />
                 )}
             </div>
-            <div className="hidden md:flex justify-around gap-2">
+            <div className="text-black md:text-white flex justify-around md:gap-2">
                 <Plus className={buttonsClass} onClick={addLayer} />
                 <CopyPlus className={buttonsClass} onClick={copyLayer} />
                 <Trash2 className={buttonsClass} onClick={removeLayer} />

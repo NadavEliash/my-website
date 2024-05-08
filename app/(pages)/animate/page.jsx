@@ -184,23 +184,31 @@ export default function Animate() {
         setIsDownload(true)
     }
 
-    // STYLE CLASSES
+    // STYLE CLASSES AND EXPERIENCE FUNCTIONALITY
+
+    const handleBars = (bar) => {
+        setTimeout(() => {
+            showBar === bar
+                ? setShowBar('')
+                : setShowBar(bar)
+        }, 100);
+    }
 
     const framesButtonClass = "w-6 h-6 cursor-pointer hover:scale-110"
     const actionButtonClass = "p-2 md:p-3 rounded-xl cursor-pointer text-black/60 md:text-inherit"
 
     return (
         <main className="bg-white md:bg-transparent h-svh md:py-6">
-            <h1 className={`hidden md:block md:text-slate-200 text-center ${sue_ellen.className}`}>{`Let's Animate!`}</h1>
-            <div id="drawing-bar" className="flex flex-col md:flex-row gap-2">
-                <ChevronRight className="md:hidden absolute left-0 top-1/2 -translate-y-1/2 w-6 h-20 text-black bg-gray-200 rounded-r-2xl z-30" onClick={() => setShowBar("actions")} />
+            <h1 className={`hidden md:block md:my-10 text-slate-200 text-center text-5xl ${sue_ellen.className}`}>{`Let's Animate!`}</h1>
+            <div id="drawing-bar" className="flex flex-row justify-center md:gap-1 lg:gap-2">
+                <ChevronRight className="md:hidden absolute left-0 top-24 -translate-y-1/2 w-8 h-16 p-1 text-black bg-gray-200/80 rounded-r-2xl z-30" onClick={() => handleBars("actions")} />
                 <div id="action-buttons"
-                    className={`absolute border-2 top-20 border-black/60 ${showBar === "actions" ? 'left-2' : '-left-[80px]'} transition-all duration-700 z-20 p-2 
-                            md:static md:px-8 md:py-4 bg-white/10 text-white/70 grid grid-cols-1 grid-rows-10 justify-items-center items-center gap-1 rounded-2xl`}>
-                    <div id="pencil" onClick={onDraw} className={`${actionButtonClass} ${action.isDraw ? 'bg-white/20' : ''}`}>
+                    className={`absolute top-32 rounded-r-3xl bg-gray-300/60 ${showBar === "actions" ? 'left-0' : '-left-[80px]'} transition-all duration-700 p-2 z-30 
+                            md:static md:px-3 lg:px-8 md:py-4 md:bg-white/10 text-white/70 grid grid-cols-1 grid-rows-10 justify-items-center items-center gap-1 md:rounded-2xl`}>
+                    <div id="pencil" onClick={onDraw} className={`${actionButtonClass} ${action.isDraw ? 'bg-white/60 md:bg-white/20' : ''}`}>
                         <Pencil />
                     </div>
-                    <div id="erase" onClick={onErase} className={`${actionButtonClass} ${action.isErase ? 'bg-white/20' : ''}`}>
+                    <div id="erase" onClick={onErase} className={`${actionButtonClass} ${action.isErase ? 'bg-white/60 md:bg-white/20' : ''}`}>
                         <Eraser />
                     </div>
                     {styleBox && <div className="absolute left-0 top-0 w-[100vw] h-[100vh] bg-slate-300/10 z-20" onClick={() => setStyleBox(false)}></div>}
@@ -223,26 +231,26 @@ export default function Animate() {
                                 setBackground={setBackground}
                             />}
                     </div>
-                    <div title="Translate" className={`${actionButtonClass} ${action.isTranslate ? 'bg-white/20' : ''}`} onClick={() => setAction({ isTranslate: true })}>
+                    <div title="Translate" className={`${actionButtonClass} ${action.isTranslate ? 'bg-white/60 md:bg-white/20' : ''}`} onClick={() => setAction({ isTranslate: true })}>
                         <Move />
                     </div>
-                    <div title="Rotate" className={`${actionButtonClass}  ${action.isRotate ? 'bg-white/20' : ''}`} onClick={() => setAction({ isRotate: true })}>
+                    <div title="Rotate" className={`${actionButtonClass}  ${action.isRotate ? 'bg-white/60 md:bg-white/20' : ''}`} onClick={() => setAction({ isRotate: true })}>
                         <RefreshCw />
                     </div>
-                    <div title="Scale" className={`${actionButtonClass} ${action.isScale ? 'bg-white/20' : ''}`} onClick={() => setAction({ isScale: true })}>
+                    <div title="Scale" className={`${actionButtonClass} ${action.isScale ? 'bg-white/60 md:bg-white/20' : ''}`} onClick={() => setAction({ isScale: true })}>
                         <Expand />
                     </div>
-                    <div title="Undo" className={`${actionButtonClass} active:bg-white/20`} onClick={undo}>
+                    <div title="Undo" className={`${actionButtonClass} active:bg-white/60 md:active:bg-white/20`} onClick={undo}>
                         <Undo />
                     </div>
-                    <div title="Redo" className={`${actionButtonClass} active:bg-white/20`} onClick={redo}>
+                    <div title="Redo" className={`${actionButtonClass} active:bg-white/60 md:active:bg-white/20`} onClick={redo}>
                         <Redo />
                     </div>
-                    <div title="Clear canvas" className={`${actionButtonClass} active:bg-white/20`} onClick={clearCanvas}>
+                    <div title="Clear canvas" className={`${actionButtonClass} active:bg-white/60 md:active:bg-white/20`} onClick={clearCanvas}>
                         <Trash />
                     </div>
                 </div>
-                <div id="canvas-container" className="relative w-[100%] bg-white/20 rounded-2xl md:p-6">
+                <div id="canvas-container" className="relative w-[100%] md:max-w-[640px] lg:max-w-[840px] bg-white/20 rounded-2xl">
                     {layers && layers.map((layer, idx) =>
                         <div key={idx}>
                             <DrawingCanvas
@@ -290,7 +298,7 @@ export default function Animate() {
                     loadImage={loadImage}
                     showBar={showBar}
                 ></Layers>
-                <ChevronLeft className="md:hidden absolute right-0 top-1/3 -translate-y-1/2 w-6 h-20 text-black bg-gray-200 rounded-l-2xl z-20" onClick={() => setShowBar("layers")} />
+                <ChevronLeft className="md:hidden absolute right-0 top-1/3 -translate-y-1/2 w-6 h-20 text-black bg-gray-200 rounded-l-2xl z-20" onClick={() => handleBars("layers")} />
             </div>
             <Frames
                 frames={frames}
@@ -307,7 +315,7 @@ export default function Animate() {
                 download={download}
                 showBar={showBar}
             ></Frames>
-            <ChevronUp className="md:hidden absolute bottom-0 left-1/2 -translate-x-1/2 w-20 h-6 text-black bg-gray-200 rounded-t-2xl z-20" onClick={() => setShowBar("frames")} />
+            <ChevronUp className="md:hidden absolute bottom-0 left-1/2 -translate-x-1/2 w-20 h-6 text-black bg-gray-200 rounded-t-2xl z-20" onClick={() => handleBars("frames")} />
         </main>
     )
 }

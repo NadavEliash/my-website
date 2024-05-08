@@ -58,7 +58,7 @@ export default function Layer({
         if (context) {
             const image = await loadImage("https://www.svgrepo.com/show/351866/chess-board.svg")
             context.globalAlpha = 0.05
-            context.drawImage(image, 0, 0)
+            context.drawImage(image, 0, 0, canvasSize.width, canvasSize.height)
         }
     }
 
@@ -100,7 +100,7 @@ export default function Layer({
         <div>
             <div key={idx} className="text-black p-1">
                 <canvas ref={canvasRef} width={canvasSize.width} height={canvasSize.height}
-                    className={`bg-white/90 w-16 h-12 md:w-28 md:h-20 rounded-lg ${idx > 0 ? 'hover:scale-105 cursor-pointer' : 'cursor-not-allowed'}
+                    className={`bg-white/90 w-12 h-16 md:w-16 md:h-12 lg:w-28 lg:h-20 rounded-lg ${idx > 0 ? 'hover:scale-105 cursor-pointer' : 'cursor-not-allowed'}
                                 ${currentLayerIdx === idx ? 'border-4 border-pink-300 scale-105' : ''}`}
                     draggable
                     onClick={() => {
@@ -111,7 +111,7 @@ export default function Layer({
                     onDrag={() => onDrag(idx)}
                     onDragEnd={(e) => onDragEnd(e, idx)}>
                 </canvas>
-                <h1 className="text-white text-sm text-center p-2">
+                <h1 className="md:text-white text-sm text-center p-2">
                     {idx === 0 ? 'BG' : idx < 10 ? '0' + idx : idx}
                 </h1>
             </div>

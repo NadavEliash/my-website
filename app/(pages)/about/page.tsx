@@ -23,17 +23,17 @@ export default function About() {
                     {`I love to solve problems, and enthusiast to learn and understand how things works. those things were driven me to learn coding.`}
                 </p>
             </div>
-            <div className="absolute opacity-80 top-4 flex gap-2 flex-col right-2 md:static md:flex-row md:mx-10 md:mt-10">
+            <div className="absolute opacity-1 top-4 flex gap-2 flex-col right-2 md:static md:flex-row md:mx-10 md:mt-10">
                 <Link href="https://www.linkedin.com/in/nadav-eliash/">
                     <Image src="https://www.svgrepo.com/show/452051/linkedin.svg" alt="linkedin" width={60} height={60}></Image>
                 </Link>
-                <Link href="https://github.com/NadavEliash" className="bg-black/50 rounded-full">
+                <Link href="https://github.com/NadavEliash" className="bg-gray-900 rounded-full">
                     <Image src="https://www.svgrepo.com/show/452211/github.svg" alt="github" width={60} height={60}></Image>
                 </Link>
-                <Link href="https://drive.google.com/file/d/1ZaJTI-GByj5o4FIRtB2yXsgm92WZ_dIa/view?usp=sharing" className="flex flex-col items-center w-14 h-14 px-3 py-1 bg-white/30 rounded-full">
-                    <Image src="https://www.svgrepo.com/show/384666/career-detail-document-file-info-job.svg" alt="CV" width={60} height={60}>
+                <Link href="https://drive.google.com/file/d/1ZaJTI-GByj5o4FIRtB2yXsgm92WZ_dIa/view?usp=sharing" className="flex flex-col items-center w-14 h-14 px-3 py-1 bg-white/20 rounded-full">
+                    <Image src="https://www.svgrepo.com/show/384666/career-detail-document-file-info-job.svg" alt="CV" width={60} height={60} className="invert">
                     </Image>
-                    <h1 className="text-sm text-black font-bold">CV</h1>
+                    <h1 className="text-sm text-white">cv</h1>
                 </Link>
             </div>
         </>

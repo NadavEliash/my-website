@@ -119,10 +119,10 @@ export default function Projects() {
                     <Link href={project.src} target="_blank"
                     className="md:hidden col-span-4 col-start-3 bg-white/10 text-center rounded-full p-3 mt-10">Open in a new tab</Link>
                 </div>)}
-            <div className="hidden absolute left-[55vw] bottom-20 w-32 h-12 bg-white/20 rounded-full md:flex items-center justify-between p-3 cursor-pointer" onClick={() => setWideScreen(!wideScreen)}>
+            <div className="hidden md:flex absolute left-[55vw] bottom-20 w-32 h-12 bg-white/20 rounded-full items-center justify-between p-3 cursor-pointer" onClick={() => setWideScreen(!wideScreen)}>
                 <Smartphone className="w-6 h-6" />
                 <Tv2 className="w-6 h-6" />
-                <div className={`absolute ${wideScreen ? 'left-[84px]' : 'left-[1px]'} transition-all duration-200 w-10 h-10 rounded-full bg-white/20`}></div>
+                <div className={`absolute ${wideScreen ? 'left-[84px]' : 'left-[4px]'} transition-all duration-200 w-10 h-10 rounded-full bg-white/20`}></div>
             </div>
             <div className="hidden md:block">
                 <WheelGuid guidDisplay={guidDisplay} />

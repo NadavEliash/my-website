@@ -23,6 +23,7 @@ export default function DrawingCanvas({
     const [isTransform, setIsTransform] = useState(false)
     const [transformGap, setTransformGap] = useState({ x: 0, y: 0 })
     const [drawingActions, setDrawingActions] = useState([])
+    const [canvasAction, setCanvasAction] = useState({ isDraw: true })
 
     useEffect(() => {
         if (canvasRef.current) {
@@ -40,9 +41,9 @@ export default function DrawingCanvas({
     useEffect(() => {
         if (canvasRef.current) {
             const canvas = canvasRef.current
-            canvas.addEventListener('touchstart', onTouchStart, { passive: false })
-            canvas.addEventListener('touchmove', onTouchMove, { passive: false })
-            canvas.addEventListener('touchend', onTouchEnd, { passive: false })
+            canvas.addEventListener('touchstart', (e) => onDown(e, true), { passive: false })
+            canvas.addEventListener('touchmove', (e) => onMove(e, true), { passive: false })
+            canvas.addEventListener('touchend', (e) => onUp(e), { passive: false })
         }
     }, [])
 
@@ -70,51 +71,36 @@ export default function DrawingCanvas({
 
     // EVENT HANDLING
 
-    const onDown = (e) => {
+    const onDown = (e, mobile = false) => {
+        e.preventDefault()
         if (currentLayerIdx !== idx) return
-        if (action.isDraw) startDrawing(e)
-        if (action.isErase) startErasing(e)
-        if (action.isTranslate || action.isRotate || action.isScale) startTransform(e)
+        if (action.isDraw) startDrawing(e, mobile)
+        if (action.isErase) startErasing(e, mobile)
+        if (action.isTranslate || action.isRotate || action.isScale) startTransform(e, mobile)
     }
 
-    const onMove = (e) => {
+    const onMove = (e, mobile = false) => {
+        e.preventDefault()
         if (currentLayerIdx !== idx) return
         if (action.isDraw) {
-            draw(e)
+            draw(e, mobile)
         } else if (action.isErase) {
-            erase(e)
+            erase(e, mobile)
         } else if (action.isTranslate) {
-            translate(e)
+            translate(e, mobile)
         } else if (action.isRotate) {
-            rotate(e)
+            rotate(e, mobile)
         } else if (action.isScale) {
-            scale(e)
+            scale(e, mobile)
         }
     }
 
-    const onUp = (e) => {
-        if (currentLayerIdx !== idx) return
-        if (action.isDraw) endDrawing(e)
-        if (action.isErase) endErasing(e)
-        if (action.isTranslate || action.isRotate || action.isScale) endTransform(e)
-    }
-
-    const onTouchStart = (e) => {
+    const onUp = (e, mobile = false) => {
         e.preventDefault()
         if (currentLayerIdx !== idx) return
-        if (canvasRef.current) {
-            if (action.isDraw) startDrawing(e, true)
-        }
-    }
-
-    const onTouchMove = (e) => {
-        e.preventDefault()
-        draw(e, true)
-    }
-
-    const onTouchEnd = (e) => {
-        e.preventDefault()
-        endDrawing(e, true)
+        if (action.isDraw) endDrawing(e, mobile)
+        if (action.isErase) endErasing(e, mobile)
+        if (action.isTranslate || action.isRotate || action.isScale) endTransform(e, mobile)
     }
 
     // ACTIONS
@@ -146,14 +132,13 @@ export default function DrawingCanvas({
             ctx.stroke()
             setCurrentPath([...currentPath, { x: e.nativeEvent.offsetX, y: e.nativeEvent.offsetY }])
         } else {
-            console.log('move')
             ctx.lineTo(e.touches[0].clientX, e.touches[0].clientY)
             ctx.stroke()
             setCurrentPath([...currentPath, { x: e.touches[0].clientX, y: e.touches[0].clientY }])
         }
     }
 
-    const endDrawing = (e, mobile = false) => {
+    const endDrawing = (e) => {
         if (!isDrawing) return
         setIsDrawing(false)
         const ctx = canvasRef.current.getContext('2d')
@@ -166,16 +151,20 @@ export default function DrawingCanvas({
         setCurrentPath([])
     }
 
-    const startErasing = (e) => {
+    const startErasing = (e, mobile) => {
+        console.log('erase')
+
         if (context && action.isErase) {
             setIsDrawing(true)
         }
     }
 
-    const erase = (e) => {
+    const erase = (e, mobile = false) => {
         if (!context || !isDrawing) return
         const newContext = canvasRef.current.getContext('2d')
-        newContext.clearRect(e.nativeEvent.offsetX - 6, e.nativeEvent.offsetY - 6, 12, 12)
+        mobile
+            ? newContext.clearRect(e.touches[0].clientX - 6, e.touches[0].clientY - 6, 12, 12)
+            : newContext.clearRect(e.nativeEvent.offsetX - 6, e.nativeEvent.offsetY - 6, 12, 12)
 
         // newContext.save()
         // newContext.arc(e.nativeEvent.offsetX, e.nativeEvent.offsetY, 10, 0, Math.PI * 2)
@@ -190,14 +179,14 @@ export default function DrawingCanvas({
         setDrawingActions([{ url, isPath: false }, ...drawingActions])
     }
 
-    const startTransform = async (e) => {
+    const startTransform = async (e, mobile = false) => {
         setIsTransform(true)
         setTransformGap({ x: e.nativeEvent.offsetX, y: e.nativeEvent.offsetY })
         const newURL = await redrawImage()
         setCurrentURL(newURL)
     }
 
-    const translate = async (e) => {
+    const translate = async (e, mobile = false) => {
         if (!isTransform || !drawingActions.length || !currentURL) return
 
         const gapX = e.nativeEvent.offsetX - transformGap.x
@@ -216,7 +205,7 @@ export default function DrawingCanvas({
         }
     }
 
-    const rotate = async (e) => {
+    const rotate = async (e, mobile = false) => {
         if (!isTransform || !drawingActions.length) return
 
         const gapX = e.nativeEvent.offsetX - transformGap.x
@@ -236,7 +225,7 @@ export default function DrawingCanvas({
         }
     }
 
-    const scale = async (e) => {
+    const scale = async (e, mobile = false) => {
         if (!isTransform || !drawingActions.length) return
 
         const gapX = e.nativeEvent.offsetX - transformGap.x
@@ -256,7 +245,7 @@ export default function DrawingCanvas({
         }
     }
 
-    const endTransform = (e) => {
+    const endTransform = (e, mobile = false) => {
         if (!isTransform || !drawingActions.length) return
         setIsTransform(false)
         setTransformGap({ x: 0, y: 0 })
@@ -333,9 +322,9 @@ export default function DrawingCanvas({
             onMouseMove={onMove}
             onMouseUp={onUp}
             onMouseOut={onUp}
-            className={`absolute bg-gray-100 left-0 top-0 
-            md:left-1/2 md:-translate-x-1/2 md:top-1/2 md:-translate-y-1/2 md:rounded-md
-            ${isTransform ? 'cursor-grab' : isDrawing ? 'cursor-none' : ''} 
+            className={`absolute bg-white left-0 top-0 
+            md:left-1/2 md:-translate-x-1/2 md:top-1/2 md:-translate-y-1/2 md:rounded-md 
+            ${isTransform ? 'cursor-grab' : isDrawing ? 'cursor-cell' : ''} 
             ${currentLayerIdx === idx ? '' : 'pointer-events-none'}`}
             width={canvasSize.width}
             height={canvasSize.height}>

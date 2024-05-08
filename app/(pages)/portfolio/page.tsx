@@ -105,35 +105,6 @@ export default function Portfolio() {
     const optionButtonsClass = "cursor-pointer w-8 h-8 bg-white/20 rounded-full p-2"
     return (
         <div className="md:mt-[50lvh] md:-translate-y-1/2 mx-auto flex flex-wrap flex-row items-center justify-between md:w-10/12">
-            <div id="remote" className="hidden md:flex w-[240px] py-16 bg-black/50 rounded-lg flex-col items-center gap-10 rotate-6 -skew-x-3 shadow-inner shadow-white/60">
-                <div className="relative grid grid-cols-3 grid-rows-3 gap-10 p-2 rounded-full items-center justify-items-center bg-white/20 shadow-inner shadow-white/40">
-                    <Plus className={`${optionButtonsClass} col-start-2`} onClick={() => ToggleVolume(1)} />
-                    <ChevronLeft className={`${optionButtonsClass} row-start-2`} onClick={() => updateCurrent(-1)} />
-                    <div className={`absolute left-1/2 -translate-x-1/2 top-1/2 -translate-y-1/2 rounded-full w-24 h-24 p-5 cursor-pointer active:bg-white/20 border-4 border-black`} onClick={togglePlay}>
-                        {isPlay
-                            ? <Pause className="w-full h-full" />
-                            : <Play className="w-full h-full" />}
-                    </div>
-                    <ChevronRight className={`${optionButtonsClass} row-start-2 col-start-3`} onClick={() => updateCurrent(+1)} />
-                    <Minus className={`${optionButtonsClass} row-start-3 col-start-2`} onClick={() => ToggleVolume(-1)} />
-                </div>
-                <div className="w-3/4 flex justify-between">
-                    <div className="bg-white/20 rounded-full flex-col items-center justify-center p-2 gap-5 shadow-inner shadow-white/40">
-                        <Plus className="cursor-pointer" onClick={() => ToggleVolume(1)} />
-                        <div className="text-center my-3">VOL</div>
-                        <Minus className="cursor-pointer" onClick={() => ToggleVolume(-1)} />
-                    </div>
-                    <div className="flex flex-col justify-between p-2">
-                        <VolumeX className="bg-white/20 w-10 h-10 rounded-full p-2 shadow-inner shadow-white/40 cursor-pointer" onClick={() => { ToggleVolume(0) }} />
-                        <Info className="bg-white/20 w-10 h-10 rounded-full p-2 shadow-inner shadow-white/40 cursor-pointer" onClick={() => { setIsInfo(!isInfo) }} />
-                    </div>
-                    <div className="bg-white/20 rounded-full flex-col items-center justify-center p-2 gap-5 shadow-inner shadow-white/40">
-                        <Plus className="cursor-pointer" onClick={() => updateCurrent(+1)} />
-                        <div className="text-center my-3">CH</div>
-                        <Minus className="cursor-pointer" onClick={() => updateCurrent(-1)} />
-                    </div>
-                </div>
-            </div>
             <div id="tv" className="relative w-[900px] md:h-[470px] max-w-[2/3vw] rounded-3xl md:border-[10px] md:border-r-[100px] border-gray-700 bg-gray-700">
                 <div className="hidden md:block">
                     <div className="absolute bg-gray-400 w-20 h-20 -top-12 left-1/2 -translate-x-1/2 rounded-full -z-10"></div>
@@ -178,6 +149,35 @@ export default function Portfolio() {
                     {!isInfo && <div className="absolute -bottom-24 h-24 w-full bg-black/80 py-3 animate-slideDown">
                         <h1 className="my-2 mx-6 text-xl">{works[current].title}</h1>
                     </div>}
+                </div>
+            </div>
+            <div id="remote" className="hidden md:flex w-[240px] py-16 bg-black/50 rounded-lg flex-col items-center gap-10 -rotate-6 shadow-inner shadow-white/60">
+                <div className="relative grid grid-cols-3 grid-rows-3 gap-10 p-2 rounded-full items-center justify-items-center bg-white/20 shadow-inner shadow-white/40">
+                    <Plus className={`${optionButtonsClass} col-start-2`} onClick={() => ToggleVolume(1)} />
+                    <ChevronLeft className={`${optionButtonsClass} row-start-2`} onClick={() => updateCurrent(-1)} />
+                    <div className={`absolute left-1/2 -translate-x-1/2 top-1/2 -translate-y-1/2 rounded-full w-24 h-24 p-5 cursor-pointer active:bg-white/20 border-4 border-black`} onClick={togglePlay}>
+                        {isPlay
+                            ? <Pause className="w-full h-full" />
+                            : <Play className="w-full h-full" />}
+                    </div>
+                    <ChevronRight className={`${optionButtonsClass} row-start-2 col-start-3`} onClick={() => updateCurrent(+1)} />
+                    <Minus className={`${optionButtonsClass} row-start-3 col-start-2`} onClick={() => ToggleVolume(-1)} />
+                </div>
+                <div className="w-3/4 flex justify-between">
+                    <div className="bg-white/20 rounded-full flex-col items-center justify-center p-2 gap-5 shadow-inner shadow-white/40">
+                        <Plus className="cursor-pointer" onClick={() => ToggleVolume(1)} />
+                        <div className="text-center my-3">VOL</div>
+                        <Minus className="cursor-pointer" onClick={() => ToggleVolume(-1)} />
+                    </div>
+                    <div className="flex flex-col justify-between p-2">
+                        <VolumeX className="bg-white/20 w-10 h-10 rounded-full p-2 shadow-inner shadow-white/40 cursor-pointer" onClick={() => { ToggleVolume(0) }} />
+                        <Info className="bg-white/20 w-10 h-10 rounded-full p-2 shadow-inner shadow-white/40 cursor-pointer" onClick={() => { setIsInfo(!isInfo) }} />
+                    </div>
+                    <div className="bg-white/20 rounded-full flex-col items-center justify-center p-2 gap-5 shadow-inner shadow-white/40">
+                        <Plus className="cursor-pointer" onClick={() => updateCurrent(+1)} />
+                        <div className="text-center my-3">CH</div>
+                        <Minus className="cursor-pointer" onClick={() => updateCurrent(-1)} />
+                    </div>
                 </div>
             </div>
             <div className="md:hidden">
