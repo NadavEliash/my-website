@@ -23,7 +23,6 @@ export default function DrawingCanvas({
     const [isTransform, setIsTransform] = useState(false)
     const [transformGap, setTransformGap] = useState({ x: 0, y: 0 })
     const [drawingActions, setDrawingActions] = useState([])
-    const [canvasAction, setCanvasAction] = useState({ isDraw: true })
 
     useEffect(() => {
         if (canvasRef.current) {
@@ -107,7 +106,7 @@ export default function DrawingCanvas({
 
     const startDrawing = (e, mobile = false) => {
         if (canvasRef.current && action.isDraw) {
-            const ctx = canvasRef.current.getContext('2d')
+            const ctx = canvasRef.current.getContext('2d')            
             ctx.beginPath()
 
             if (!mobile) {
@@ -316,18 +315,20 @@ export default function DrawingCanvas({
     }
 
     return (
-        <canvas
-            ref={canvasRef}
-            onMouseDown={onDown}
-            onMouseMove={onMove}
-            onMouseUp={onUp}
-            onMouseOut={onUp}
-            className={`absolute bg-white left-0 top-0 
+        <>
+            <canvas
+                ref={canvasRef}
+                onMouseDown={onDown}
+                onMouseMove={onMove}
+                onMouseUp={onUp}
+                onMouseOut={onUp}
+                className={`absolute left-0 top-0 
             md:left-1/2 md:-translate-x-1/2 md:top-1/2 md:-translate-y-1/2 md:rounded-md 
             ${isTransform ? 'cursor-grab' : isDrawing ? 'cursor-cell' : ''} 
             ${currentLayerIdx === idx ? '' : 'pointer-events-none'}`}
-            width={canvasSize.width}
-            height={canvasSize.height}>
-        </canvas>
+                width={canvasSize.width}
+                height={canvasSize.height}>
+            </canvas>
+        </>
     )
 }
