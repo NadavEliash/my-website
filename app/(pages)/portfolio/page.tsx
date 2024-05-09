@@ -102,10 +102,10 @@ export default function Portfolio() {
         else setVolume(0)
     }
 
-    const optionButtonsClass = "cursor-pointer w-8 h-8 bg-white/20 rounded-full p-2"
+    const optionButtonsClass = "hidden 2xl:block cursor-pointer w-8 h-8 bg-white/20 rounded-full p-2"
     return (
         <div className="md:mt-[50lvh] md:-translate-y-1/2 mx-auto flex flex-wrap flex-row items-center justify-between md:w-10/12">
-            <div id="tv" className="relative w-[900px] md:h-[470px] max-w-[2/3vw] rounded-3xl md:border-[10px] md:border-r-[100px] border-gray-700 bg-gray-700">
+            <div id="tv" className="relative mx-auto w-[900px] md:h-[470px] max-w-[2/3vw] rounded-3xl md:border-[10px] md:border-r-[100px] border-gray-700 bg-gray-700">
                 <div className="hidden md:block">
                     <div className="absolute bg-gray-400 w-20 h-20 -top-12 left-1/2 -translate-x-1/2 rounded-full -z-10"></div>
                     <div className="absolute bg-gray-500 w-2 h-80 rotate-[60deg] -top-[200px] left-1/2 translate-x-[50px] -z-20"></div>
@@ -121,7 +121,7 @@ export default function Portfolio() {
                 </div>
                 {!isLoad && <Image src={no_signal} alt="no-signal" className="absolute w-full border-black md:border-4 md:rounded-2xl z-10" priority={true} />}
                 <video loop ref={videoRef} src={works[current].src}
-                    className="border-black md:border-4 md:rounded-2xl"
+                    className="border-black md:border-4 md:rounded-2xl w-full"
                     onCanPlayThrough={playVideo}
                     onPointerDown={togglePlay} />
                 <div className="absolute right-6 top-6 z-10">
@@ -129,10 +129,10 @@ export default function Portfolio() {
                         ? <Volume2 className={`cursor-pointer w-8 h-8 text-black`} onClick={() => { ToggleVolume(+5) }} />
                         : <VolumeX className={`cursor-pointer w-8 h-8 text-black`} onClick={() => { ToggleVolume(0) }} />}
                 </div>
-                <div className="md:hidden w-full bg-black">
-                    <ChevronLeft className="absolute left-2 top-1/2 w-8 h-8 text-black/70" onClick={() => updateCurrent(-1)}/>
-                    <ChevronRight className="absolute right-2 top-1/2 w-8 h-8 text-black/70" onClick={() => updateCurrent(+1)}/>
-                </div>
+                {/* <div className="md:hidden w-full bg-black">
+                    <ChevronLeft className="absolute left-2 top-1/2 w-8 h-8 text-black/70" onClick={() => updateCurrent(-1)} />
+                    <ChevronRight className="absolute right-2 top-1/2 w-8 h-8 text-black/70" onClick={() => updateCurrent(+1)} />
+                </div> */}
                 <div className="hidden md:block absolute bottom-40 w-full h-[70%] pointer-events-none">
                     {showVolume && volumeDashes.length > 0 &&
                         <div className="absolute right-6 bottom-0 flex flex-col gap-1 items-center justify-end">
@@ -150,38 +150,43 @@ export default function Portfolio() {
                         <h1 className="my-2 mx-6 text-xl">{works[current].title}</h1>
                     </div>}
                 </div>
+                <div className="md:hidden absolute bottom-0 translate-y-full w-full bg-black/80">
+                    <h1 className="my-2 text-lg text-center">{works[current].title}</h1>
+                </div>
             </div>
-            <div id="remote" className="hidden md:flex w-[240px] py-16 bg-black/50 rounded-lg flex-col items-center gap-10 -rotate-6 shadow-inner shadow-white/60">
-                <div className="relative grid grid-cols-3 grid-rows-3 gap-10 p-2 rounded-full items-center justify-items-center bg-white/20 shadow-inner shadow-white/40">
-                    <Plus className={`${optionButtonsClass} col-start-2`} onClick={() => ToggleVolume(1)} />
+            <div id="remote" className="absolute top-1/2 -translate-y-1/2 md:static mt-10 mx-auto flex flex-col p-2 w-full md:max-w-[500px] bg-black/60 sm:rounded-full 2xl:rounded-lg items-center shadow-inner sm:shadow-white/60 overflow-hidden
+            2xl:gap-10 2xl:-rotate-6 2xl:flex-col 2xl:py-16 2xl:w-[240px]">
+                <div className="2xl:relative rounded-full 2xl:bg-white/20 2xl:shadow-inner shadow-white/40
+                 2xl:grid 2xl:grid-cols-3 2xl:grid-rows-3 2xl:gap-10 2xl:items-center 2xl:justify-items-center 2xl:p-2">
                     <ChevronLeft className={`${optionButtonsClass} row-start-2`} onClick={() => updateCurrent(-1)} />
-                    <div className={`absolute left-1/2 -translate-x-1/2 top-1/2 -translate-y-1/2 rounded-full w-24 h-24 p-5 cursor-pointer active:bg-white/20 border-4 border-black`} onClick={togglePlay}>
+                    <ChevronRight className={`${optionButtonsClass} row-start-2 col-start-3`} onClick={() => updateCurrent(+1)} />
+
+                    <div className={`rounded-full cursor-pointer active:bg-white/20 2xl:border-4 border-black p-1 w-10 h-10 mr-2 
+                    2xl:absolute 2xl:left-1/2 2xl:-translate-x-1/2 2xl:top-1/2 2xl:-translate-y-1/2 2xl:w-24 2xl:h-24 2xl:p-5`}
+                        onClick={togglePlay}>
                         {isPlay
                             ? <Pause className="w-full h-full" />
                             : <Play className="w-full h-full" />}
                     </div>
-                    <ChevronRight className={`${optionButtonsClass} row-start-2 col-start-3`} onClick={() => updateCurrent(+1)} />
                     <Minus className={`${optionButtonsClass} row-start-3 col-start-2`} onClick={() => ToggleVolume(-1)} />
+                    <Plus className={`${optionButtonsClass} col-start-2`} onClick={() => ToggleVolume(1)} />
                 </div>
-                <div className="w-3/4 flex justify-between">
-                    <div className="bg-white/20 rounded-full flex-col items-center justify-center p-2 gap-5 shadow-inner shadow-white/40">
-                        <Plus className="cursor-pointer" onClick={() => ToggleVolume(1)} />
-                        <div className="text-center my-3">VOL</div>
-                        <Minus className="cursor-pointer" onClick={() => ToggleVolume(-1)} />
+                <div className="flex gap-1 items-center">
+                    <div className="bg-white/20 rounded-full flex 2xl:flex-col items-center justify-center h-[44px] p-2 gap-5 2xl:shadow-inner shadow-white/40">
+                        <Plus className="cursor-pointer w-4 h-4" onClick={() => ToggleVolume(1)} />
+                        <div className="text-center 2xl:my-3">VOL</div>
+                        <Minus className="cursor-pointer w-4 h-4" onClick={() => ToggleVolume(-1)} />
                     </div>
-                    <div className="flex flex-col justify-between p-2">
+                    <div className="flex 2xl:flex-col justify-between p-2 gap-2">
                         <VolumeX className="bg-white/20 w-10 h-10 rounded-full p-2 shadow-inner shadow-white/40 cursor-pointer" onClick={() => { ToggleVolume(0) }} />
                         <Info className="bg-white/20 w-10 h-10 rounded-full p-2 shadow-inner shadow-white/40 cursor-pointer" onClick={() => { setIsInfo(!isInfo) }} />
                     </div>
-                    <div className="bg-white/20 rounded-full flex-col items-center justify-center p-2 gap-5 shadow-inner shadow-white/40">
-                        <Plus className="cursor-pointer" onClick={() => updateCurrent(+1)} />
-                        <div className="text-center my-3">CH</div>
-                        <Minus className="cursor-pointer" onClick={() => updateCurrent(-1)} />
+                    <div className="bg-white/20 rounded-full flex flex-row-reverse 2xl:flex-col items-center justify-center h-[44px] p-2 gap-5 2xl:shadow-inner shadow-white/40">
+                        <Plus className="cursor-pointer w-4 h-4" onClick={() => updateCurrent(+1)} />
+                        <div className="text-center 2xl:my-3">CH</div>
+                        <Minus className="cursor-pointer w-4 h-4" onClick={() => updateCurrent(-1)} />
                     </div>
                 </div>
-            </div>
-            <div className="md:hidden">
-                <h1 className="my-2 mx-6 text-lg">{works[current].title}</h1>
             </div>
         </div>
     )

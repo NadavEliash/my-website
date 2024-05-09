@@ -119,7 +119,7 @@ export default function Home() {
       color: "text-yellow-400"
     },
     {
-      str: `+Please use the mouse-wheel or swipe to switch cards`,
+      str: `+Please use the mouse-wheel or swipe to switch between the content references`,
       color: "text-emerald-400"
     }
   ]
@@ -149,15 +149,17 @@ export default function Home() {
   const handleTouchEnd = (e: any) => {
     if (!touchStart || !touchEnd) return
 
-    if (touchStart! - touchEnd! > 0) {
-      if (touchStart! - touchEnd! > 30) {
-        setCurrentPage(currentPage + 1 < pages.length ? currentPage + 1 : 0)
-      }
-    } else {
-      if (touchEnd! - touchStart! > 30) {
-        setCurrentPage(currentPage - 1 < 0 ? pages.length - 1 : currentPage - 1)
-      }
-    }
+    setTimeout(() => {
+      if (touchStart! - touchEnd! > 0) {
+        if (touchStart! - touchEnd! > 30) {
+          setCurrentPage(currentPage + 1 < pages.length ? currentPage + 1 : 0)
+        }
+      } else {
+        if (touchEnd! - touchStart! > 30) {
+          setCurrentPage(currentPage - 1 < 0 ? pages.length - 1 : currentPage - 1)
+        }
+      }   
+    }, 200)
   }
 
   const runText = () => {
@@ -186,7 +188,7 @@ export default function Home() {
       onTouchStart={handleTouchStart}
       onTouchMove={handleTouchMove}
       onTouchEnd={handleTouchEnd}>
-      <div className="mt-[15%] md:mt-20 md:m-10 md:w-fit h-[300px] md:h-[210px] bg-black/40 rounded-lg border-2 border-white text-lg flex flex-col" >
+      <div className="mt-[15%] md:mt-20 md:m-10 md:w-fit h-[240px] md:h-[210px] bg-black/40 rounded-lg border-2 border-white text-lg flex flex-col" >
         <div className="w-full py-2 bg-white/10 flex items-center gap-2">
           <div className="w-3 h-3 ml-3 bg-red-500 rounded-full"></div>
           <div className="w-3 h-3 bg-yellow-500 rounded-full"></div>
