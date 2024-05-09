@@ -10,9 +10,10 @@ import { ChevronDown, ChevronLeft, ChevronRight } from "lucide-react"
 
 import { StaticImageData } from "next/image";
 import profile from "../app/assets/profile.png"
-import animate from "../app/assets/animate.png"
-import projects from "../app/assets/projects.png"
-import animationPortfolio from "../app/assets/animationPortfolio.png"
+
+// import animate from "../app/assets/animate.png"
+// import projects from "../app/assets/projects.png"
+// import animationPortfolio from "../app/assets/animationPortfolio.png"
 
 
 // import SceneCanvas from "./components/home-scene/scene-canvas";
@@ -68,7 +69,7 @@ interface page {
   href: string
   headline: string
   description: string[]
-  img?: StaticImageData
+  img?: StaticImageData | string
   imgStyle?: string
 }
 
@@ -91,19 +92,19 @@ const pages: page[] = [
       'Allow the user to draw along layers and frames and create a classic animation clips',
       'Note that Mobile version still in progress.'
     ],
-    img: animate
+    img: 'https://res.cloudinary.com/dnvbfkgsb/image/upload/v1715255667/animate_wx43p9.png'
   },
   {
     href: 'projects',
     headline: 'My programming portfolio',
     description: ['An interactiv list That shows some apps I\'ve created.'],
-    img: projects
+    img: 'https://res.cloudinary.com/dnvbfkgsb/image/upload/v1715255669/projects_phuxww.png'
   },
   {
     href: 'portfolio',
     headline: 'Animation Portfolio',
     description: ['A selection of my animation works'],
-    img: animationPortfolio
+    img: 'https://res.cloudinary.com/dnvbfkgsb/image/upload/v1715255668/animationPortfolio_vkkod2.png'
   },
 ]
 
@@ -184,7 +185,7 @@ export default function Home() {
             {pages[currentPage].headline}
           </h1>
           {pages[currentPage].img &&
-            <Image src={pages[currentPage].img!} alt="img" className={`${pages[currentPage].imgStyle} my-4`} />}
+            <Image src={pages[currentPage].img!} alt="img" width={500} height={500} className={`${pages[currentPage].imgStyle} my-4`} />}
           <div className="mb-4">
             {pages[currentPage].description.map((line, idx) =>
               <p key={idx} className="text-justify">
