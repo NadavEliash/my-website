@@ -8,10 +8,10 @@ import { Sue_Ellen_Francisco } from 'next/font/google'
 import { ChevronLeft, ChevronRight } from "lucide-react"
 
 import { StaticImageData } from "next/image";
-import profile from "../app/assets/profile.png"
-import animate from "../app/animate.png"
-import projects from "../app/projects.png"
-import animationPortfolio from "../app/animationPortfolio.png"
+import profile from "./assets/profile.png"
+import animate from "./assets/animate.png"
+import projects from "./assets/projects.png"
+import animationPortfolio from "./assets/animationPortfolio.png"
 // import SceneCanvas from "./components/home-scene/scene-canvas";
 
 const menlo = localFont({ src: '../Menlo-Regular.ttf' })
@@ -21,45 +21,6 @@ interface line {
   str: string
   color: string
 }
-
-const text: line[] = [
-  {
-    str: "Hi there!",
-    color: "text-pink-300"
-  },
-  {
-    str: "+Welcome",
-    color: "text-blue-400"
-  },
-  {
-    str: ".to",
-    color: "text-yellow-100"
-  },
-  {
-    str: "(",
-    color: "text-yellow-400"
-  },
-  {
-    str: "{",
-    color: "text-pink-300"
-  },
-  {
-    str: " my_website ",
-    color: "text-sky-300"
-  },
-  {
-    str: "}",
-    color: "text-pink-300"
-  },
-  {
-    str: ")",
-    color: "text-yellow-400"
-  },
-  {
-    str: "+Use the mouse-wheel or swipe to switch cards",
-    color: "text-emerald-400"
-  }
-]
 
 interface page {
   href: string
@@ -124,6 +85,45 @@ export default function Home() {
     }, 1000);
   }, [])
 
+  const text: line[] = [
+    {
+      str: "Hi there!",
+      color: "text-pink-300"
+    },
+    {
+      str: "+Welcome",
+      color: "text-blue-400"
+    },
+    {
+      str: ".to",
+      color: "text-yellow-100"
+    },
+    {
+      str: "(",
+      color: "text-yellow-400"
+    },
+    {
+      str: "{",
+      color: "text-pink-300"
+    },
+    {
+      str: " my_website ",
+      color: "text-sky-300"
+    },
+    {
+      str: "}",
+      color: "text-pink-300"
+    },
+    {
+      str: ")",
+      color: "text-yellow-400"
+    },
+    {
+      str: `+Please use the mouse-wheel or swipe to switch cards`,
+      color: "text-emerald-400"
+    }
+  ]
+
   const handleWheel = (e: any) => {
     if (!isWheel) {
       setIsWheel(true)
@@ -147,10 +147,16 @@ export default function Home() {
   }
 
   const handleTouchEnd = (e: any) => {
-    if (touchStart! - touchEnd! > 50) {
-      setCurrentPage(currentPage + 1 < pages.length ? currentPage + 1 : 0)
-    } else if (touchStart! - touchEnd! < -50) {
-      setCurrentPage(currentPage - 1 < 0 ? pages.length - 1 : currentPage - 1)
+    if (!touchStart || !touchEnd) return
+
+    if (touchStart! - touchEnd! > 0) {
+      if (touchStart! - touchEnd! > 30) {
+        setCurrentPage(currentPage + 1 < pages.length ? currentPage + 1 : 0)
+      }
+    } else {
+      if (touchEnd! - touchStart! > 30) {
+        setCurrentPage(currentPage - 1 < 0 ? pages.length - 1 : currentPage - 1)
+      }
     }
   }
 
@@ -204,8 +210,10 @@ export default function Home() {
           <h1 className="text-2xl font-bold my-1 text-center">
             {pages[currentPage].headline}
           </h1>
-          {pages[currentPage].img &&
-            <Image src={pages[currentPage].img!} alt="img" className={`${pages[currentPage].imgStyle} my-4 rounded-lg`} />}
+          {pages.map((page, idx) =>
+            <Image key={idx} src={pages[currentPage].img!} alt="img" className={`${idx === currentPage ? '' : 'hidden'} ${pages[idx].imgStyle} my-4 rounded-lg`} />
+          )
+          }
           <div className="mb-4">
             {pages[currentPage].description.map((line, idx) =>
               <p key={idx} className="text-justify">
