@@ -5,17 +5,13 @@ import Link from "next/link";
 import Image from "next/image"
 import localFont from "next/font/local"
 import { Sue_Ellen_Francisco } from 'next/font/google'
-import SceneCanvas from "./components/home-scene/scene-canvas"
-import { ChevronDown, ChevronLeft, ChevronRight } from "lucide-react"
+import { ChevronLeft, ChevronRight } from "lucide-react"
 
 import { StaticImageData } from "next/image";
 import profile from "../app/assets/profile.png"
-
-// import animate from "../app/assets/animate.png"
-// import projects from "../app/assets/projects.png"
-// import animationPortfolio from "../app/assets/animationPortfolio.png"
-
-
+import animate from "../app/animate.png"
+import projects from "../app/projects.png"
+import animationPortfolio from "../app/animationPortfolio.png"
 // import SceneCanvas from "./components/home-scene/scene-canvas";
 
 const menlo = localFont({ src: '../Menlo-Regular.ttf' })
@@ -60,7 +56,7 @@ const text: line[] = [
     color: "text-yellow-400"
   },
   {
-    str: "+please use the mouse-wheel or swipe to navigate",
+    str: "+Use the mouse-wheel or swipe to switch cards",
     color: "text-emerald-400"
   }
 ]
@@ -79,7 +75,7 @@ const pages: page[] = [
     headline: '',
     description: [
       'My name is Nadav Eliash.',
-      'I\'m a Frontend / Fullstack Web Developer with experience in writing single-page-applications...'
+      'I\'m a Frontend / Fullstack Web Developer, with experience in writing a single page applications...'
     ],
     img: profile,
     imgStyle: "w-20 h-20"
@@ -92,19 +88,22 @@ const pages: page[] = [
       'Allow the user to draw along layers and frames and create a classic animation clips',
       'Note that Mobile version still in progress.'
     ],
-    img: 'https://res.cloudinary.com/dnvbfkgsb/image/upload/v1715255667/animate_wx43p9.png'
+    img: animate
+    // img: 'https://res.cloudinary.com/dnvbfkgsb/image/upload/v1715255667/animate_wx43p9.png'
   },
   {
     href: 'projects',
     headline: 'My programming portfolio',
     description: ['An interactiv list That shows some apps I\'ve created.'],
-    img: 'https://res.cloudinary.com/dnvbfkgsb/image/upload/v1715255669/projects_phuxww.png'
+    img: projects
+    // img: 'https://res.cloudinary.com/dnvbfkgsb/image/upload/v1715255669/projects_phuxww.png'
   },
   {
     href: 'portfolio',
     headline: 'Animation Portfolio',
     description: ['A selection of my animation works'],
-    img: 'https://res.cloudinary.com/dnvbfkgsb/image/upload/v1715255668/animationPortfolio_vkkod2.png'
+    img: animationPortfolio
+    // img: 'https://res.cloudinary.com/dnvbfkgsb/image/upload/v1715255668/animationPortfolio_vkkod2.png'
   },
 ]
 
@@ -148,9 +147,11 @@ export default function Home() {
   }
 
   const handleTouchEnd = (e: any) => {
-    touchStart! - touchEnd! > 0
-      ? setCurrentPage(currentPage + 1 < pages.length ? currentPage + 1 : 0)
-      : setCurrentPage(currentPage - 1 < 0 ? pages.length - 1 : currentPage - 1)
+    if (touchStart! - touchEnd! > 50) {
+      setCurrentPage(currentPage + 1 < pages.length ? currentPage + 1 : 0)
+    } else if (touchStart! - touchEnd! < -50) {
+      setCurrentPage(currentPage - 1 < 0 ? pages.length - 1 : currentPage - 1)
+    }
   }
 
   const runText = () => {
@@ -169,7 +170,7 @@ export default function Home() {
       const newLetter = { str: newString[i].str, color: newString[i].color }
       setTimeout(() => {
         setString(prev => [...prev, newLetter])
-      }, i * 100);
+      }, i * 70);
     }
   }
 
@@ -179,13 +180,13 @@ export default function Home() {
       onTouchStart={handleTouchStart}
       onTouchMove={handleTouchMove}
       onTouchEnd={handleTouchEnd}>
-      <div className="mt-[15%] md:mt-20 md:m-10 md:w-fit bg-black/40 rounded-lg border-2 border-white text-lg flex flex-col" >
+      <div className="mt-[15%] md:mt-20 md:m-10 md:w-fit h-[300px] md:h-[210px] bg-black/40 rounded-lg border-2 border-white text-lg flex flex-col" >
         <div className="w-full py-2 bg-white/10 flex items-center gap-2">
           <div className="w-3 h-3 ml-3 bg-red-500 rounded-full"></div>
           <div className="w-3 h-3 bg-yellow-500 rounded-full"></div>
           <div className="w-3 h-3 bg-green-500 rounded-full"></div>
         </div>
-        <div className="my-10 mx-5 text-xl md:w-[600px]">
+        <div className="my-10 mx-5 md:text-xl md:w-[600px]">
           {string.length && string.map((letter, idx) =>
             <p key={idx} className={`${letter.color} inline transition-all leading-8`}>
               {letter.str === '+' ? <br /> : letter.str}
@@ -203,8 +204,8 @@ export default function Home() {
           <h1 className="text-2xl font-bold my-1 text-center">
             {pages[currentPage].headline}
           </h1>
-          {pages[currentPage].img && 
-            <Image src={pages[currentPage].img!} alt="img" width={500} height={500} className={`${pages[currentPage].imgStyle} my-4 rounded-lg`} />}
+          {pages[currentPage].img &&
+            <Image src={pages[currentPage].img!} alt="img" className={`${pages[currentPage].imgStyle} my-4 rounded-lg`} />}
           <div className="mb-4">
             {pages[currentPage].description.map((line, idx) =>
               <p key={idx} className="text-justify">
@@ -216,7 +217,6 @@ export default function Home() {
           <ChevronRight className="mt-2 w-10 h-10 cursor-pointer" />
         </div>
       </div>
-      {/* <ChevronDown className="md:hidden absolute bottom-1 left-[45vw] w-10 h-10 animate-bounce cursor-pointer z-10" onClick={() => setCurrentPage(currentPage + 1 >= pages.length ? 0 : currentPage + 1)} /> */}
       {/* <SceneCanvas /> */}
     </main>
   );

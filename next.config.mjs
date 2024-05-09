@@ -2,7 +2,7 @@
 const nextConfig = {
     transpilePackages: ['three'],
     images: {
-        remotePatterns:[
+        remotePatterns: [
             {
                 hostname: "res.cloudinary.com"
             }
