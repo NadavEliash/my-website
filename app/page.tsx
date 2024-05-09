@@ -185,9 +185,9 @@ export default function Home() {
           <div className="w-3 h-3 bg-yellow-500 rounded-full"></div>
           <div className="w-3 h-3 bg-green-500 rounded-full"></div>
         </div>
-        <div className="my-10 mx-5 text-xl md:w-[600px] leading-5">
+        <div className="my-10 mx-5 text-xl md:w-[600px]">
           {string.length && string.map((letter, idx) =>
-            <p key={idx} className={`${letter.color} inline transition-all`}>
+            <p key={idx} className={`${letter.color} inline transition-all leading-8`}>
               {letter.str === '+' ? <br /> : letter.str}
             </p>
           )}
