@@ -78,7 +78,7 @@ const pages: page[] = [
     headline: '',
     description: [
       'My name is Nadav Eliash.',
-      'I\'m a Frontend / Full Stack Web Developer with experience in writing single-page-applications...'
+      'I\'m a Frontend / Fullstack Web Developer with experience in writing single-page-applications...'
     ],
     img: profile,
     imgStyle: "rounded-full w-20 h-20"
