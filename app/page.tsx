@@ -82,7 +82,7 @@ const pages: page[] = [
       'I\'m a Frontend / Fullstack Web Developer with experience in writing single-page-applications...'
     ],
     img: profile,
-    imgStyle: "rounded-full w-20 h-20"
+    imgStyle: "w-20 h-20"
   },
   {
     href: 'animate',
@@ -112,6 +112,8 @@ export default function Home() {
 
   const [currentPage, setCurrentPage] = useState(0)
   const [isWheel, setIsWheel] = useState(false)
+  const [touchStart, setTouchStart] = useState(null)
+  const [touchEnd, setTouchEnd] = useState(null)
   const [string, setString] = useState<line[]>([{
     str: '',
     color: ''
@@ -123,11 +125,11 @@ export default function Home() {
     }, 1000);
   }, [])
 
-  const handleWheel = (ev: any) => {
+  const handleWheel = (e: any) => {
     if (!isWheel) {
       setIsWheel(true)
 
-      ev.deltaY < 0 ?
+      e.deltaY < 0 ?
         setCurrentPage(currentPage + 1 < pages.length ? currentPage + 1 : 0)
         : setCurrentPage(currentPage - 1 < 0 ? pages.length - 1 : currentPage - 1)
 
@@ -137,6 +139,19 @@ export default function Home() {
     }
   }
 
+  const handleTouchStart = (e: any) => {
+    setTouchStart(e.targetTouches[0].clientX)
+  }
+
+  const handleTouchMove = (e: any) => {
+    setTouchEnd(e.targetTouches[0].clientX)
+  }
+
+  const handleTouchEnd = (e: any) => {
+    touchStart! - touchEnd! > 0
+      ? setCurrentPage(currentPage + 1 < pages.length ? currentPage + 1 : 0)
+      : setCurrentPage(currentPage - 1 < 0 ? pages.length - 1 : currentPage - 1)
+  }
 
   const runText = () => {
     const strLength = text.reduce((acc, current) => acc + current.str.length, 0)
@@ -159,14 +174,18 @@ export default function Home() {
   }
 
   return (
-    <main className={`${menlo.className} absolute left-0 top-0 h-svh w-full px-2 -z-10`} onWheel={handleWheel}>
+    <main className={`${menlo.className} absolute left-0 top-0 h-svh w-full px-2 -z-10`}
+      onWheel={handleWheel}
+      onTouchStart={handleTouchStart}
+      onTouchMove={handleTouchMove}
+      onTouchEnd={handleTouchEnd}>
       <div className="mt-[15%] md:mt-20 md:m-10 md:w-fit bg-black/40 rounded-lg border-2 border-white text-lg flex flex-col" >
         <div className="w-full py-2 bg-white/10 flex items-center gap-2">
           <div className="w-3 h-3 ml-3 bg-red-500 rounded-full"></div>
           <div className="w-3 h-3 bg-yellow-500 rounded-full"></div>
           <div className="w-3 h-3 bg-green-500 rounded-full"></div>
         </div>
-        <div className="my-10 mx-5 text-xl md:w-[600px] leading-4">
+        <div className="my-10 mx-5 text-xl md:w-[600px] leading-5">
           {string.length && string.map((letter, idx) =>
             <p key={idx} className={`${letter.color} inline transition-all`}>
               {letter.str === '+' ? <br /> : letter.str}
@@ -184,8 +203,8 @@ export default function Home() {
           <h1 className="text-2xl font-bold my-1 text-center">
             {pages[currentPage].headline}
           </h1>
-          {pages[currentPage].img &&
-            <Image src={pages[currentPage].img!} alt="img" width={500} height={500} className={`${pages[currentPage].imgStyle} my-4`} />}
+          {pages[currentPage].img && 
+            <Image src={pages[currentPage].img!} alt="img" width={500} height={500} className={`${pages[currentPage].imgStyle} my-4 rounded-lg`} />}
           <div className="mb-4">
             {pages[currentPage].description.map((line, idx) =>
               <p key={idx} className="text-justify">
@@ -197,7 +216,7 @@ export default function Home() {
           <ChevronRight className="mt-2 w-10 h-10 cursor-pointer" />
         </div>
       </div>
-      <ChevronDown className="md:hidden absolute bottom-1 left-[45vw] w-10 h-10 animate-bounce cursor-pointer z-10" onClick={() => setCurrentPage(currentPage + 1 >= pages.length ? 0 : currentPage + 1)} />
+      {/* <ChevronDown className="md:hidden absolute bottom-1 left-[45vw] w-10 h-10 animate-bounce cursor-pointer z-10" onClick={() => setCurrentPage(currentPage + 1 >= pages.length ? 0 : currentPage + 1)} /> */}
       {/* <SceneCanvas /> */}
     </main>
   );
