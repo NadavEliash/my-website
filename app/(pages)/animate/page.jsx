@@ -206,7 +206,7 @@ export default function Animate() {
         <>
             <div className="hidden md:block h-svh bg-white md:bg-transparent  md:py-6">
                 <h1 className={`hidden md:block md:mt-12 md:mb-2 text-slate-200 text-center text-5xl ${sue_ellen.className}`}>{`Let's Animate!`}</h1>
-                <h2 className="text-center text-lg mb-2">Animation app i've built, based on HTML Canvas and React</h2>
+                <h2 className="text-center text-lg mb-2">{'Animation app i\'ve built, based on HTML Canvas and React'}</h2>
                 <div id="drawing-bar" className="flex flex-row justify-center md:gap-1 lg:gap-2">
                     <ChevronRight className="md:hidden absolute left-0 top-24 -translate-y-1/2 w-8 h-16 p-1 text-black bg-gray-200/80 rounded-r-2xl z-30" onClick={() => handleBars("actions")} />
                     <div id="action-buttons"
@@ -325,10 +325,10 @@ export default function Animate() {
                 <ChevronUp className="md:hidden absolute bottom-0 left-1/2 -translate-x-1/2 w-20 h-6 text-black bg-gray-200 rounded-t-2xl z-20" onClick={() => handleBars("frames")} />
             </div>
             <div className="absolute left-0 top-1/2 -translate-y-1/2 md:hidden">
-            <img src="https://res.cloudinary.com/dnvbfkgsb/image/upload/v1715195077/openart-image_7VgoCkvW_1715194054464_raw_heduqs.jpg" alt="mobile version still not available" width={1080} height={1980}
-            className="">
-            </img>
-                        <h1 className="mx-6 mt-6 text-xl text-center"><span className="text-2xl">Sorry,</span><br />Still working on the mobile version.. <br />Try the Desktop version!</h1>
+                <img src="https://res.cloudinary.com/dnvbfkgsb/image/upload/v1715195077/openart-image_7VgoCkvW_1715194054464_raw_heduqs.jpg" alt="mobile version still not available" width={1080} height={1980}
+                    className="">
+                </img>
+                <h1 className="mx-6 mt-6 text-xl text-center"><span className="text-2xl">Sorry,</span><br />Still working on the mobile version.. <br />Try the Desktop version!</h1>
             </div>
         </>
     )
