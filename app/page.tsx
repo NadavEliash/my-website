@@ -5,7 +5,7 @@ import Link from "next/link";
 import Image from "next/image"
 import localFont from "next/font/local"
 import { Sue_Ellen_Francisco } from 'next/font/google'
-import { ChevronLeft, ChevronRight } from "lucide-react"
+import { ChevronLeft, ChevronRight, ChevronsLeft } from "lucide-react"
 
 import { StaticImageData } from "next/image";
 import profile from "./assets/profile.png"
@@ -45,26 +45,23 @@ const pages: page[] = [
     href: 'animate',
     headline: 'Go Animate!',
     description: [
-      'Animation app I built, using nextjs and HTML Canvas.',
-      'Allow the user to draw along layers and frames and create a classic animation clips',
-      'Note that Mobile version still in progress.'
+      'Animation app I built, based on HTML Canvas.',
+      'The app allow users to draw along frames and create a classic animation clips.',
+      '** The mobile version is still in progress.'
     ],
     img: animate
-    // img: 'https://res.cloudinary.com/dnvbfkgsb/image/upload/v1715255667/animate_wx43p9.png'
   },
   {
     href: 'projects',
     headline: 'My programming portfolio',
-    description: ['An interactiv list That shows some apps I\'ve created.'],
+    description: ['An interactiv list That shows selection of apps I\'ve created.'],
     img: projects
-    // img: 'https://res.cloudinary.com/dnvbfkgsb/image/upload/v1715255669/projects_phuxww.png'
   },
   {
     href: 'portfolio',
     headline: 'Animation Portfolio',
     description: ['A selection of my animation works'],
     img: animationPortfolio
-    // img: 'https://res.cloudinary.com/dnvbfkgsb/image/upload/v1715255668/animationPortfolio_vkkod2.png'
   },
 ]
 
@@ -74,6 +71,7 @@ export default function Home() {
   const [isWheel, setIsWheel] = useState(false)
   const [touchStart, setTouchStart] = useState(null)
   const [touchEnd, setTouchEnd] = useState(null)
+  const [swipeGuide, setSwipeGuide] = useState(true)
   const [string, setString] = useState<line[]>([{
     str: '',
     color: ''
@@ -83,6 +81,10 @@ export default function Home() {
     setTimeout(() => {
       runText()
     }, 1000);
+
+    setTimeout(() => {
+      setSwipeGuide(false)
+    }, 4000);
   }, [])
 
   const text: line[] = [
@@ -118,10 +120,10 @@ export default function Home() {
       str: ")",
       color: "text-yellow-400"
     },
-    {
-      str: `+Please use the mouse-wheel or swipe to switch between the content references`,
-      color: "text-emerald-400"
-    }
+    // {
+    //   str: `+Please use the mouse-wheel or swipe to switch between the content references`,
+    //   color: "text-emerald-400"
+    // }
   ]
 
   const handleWheel = (e: any) => {
@@ -158,7 +160,7 @@ export default function Home() {
         if (touchEnd! - touchStart! > 30) {
           setCurrentPage(currentPage - 1 < 0 ? pages.length - 1 : currentPage - 1)
         }
-      }   
+      }
     }, 200)
   }
 
@@ -188,7 +190,7 @@ export default function Home() {
       onTouchStart={handleTouchStart}
       onTouchMove={handleTouchMove}
       onTouchEnd={handleTouchEnd}>
-      <div className="mt-[15%] md:mt-20 md:m-10 md:w-fit h-[240px] md:h-[210px] bg-black/40 rounded-lg border-2 border-white text-lg flex flex-col" >
+      <div className="mt-[25%] md:mt-20 md:m-10 md:w-fit h-[180px] md:h-[210px] bg-black/40 rounded-lg border-2 border-white text-lg flex flex-col" >
         <div className="w-full py-2 bg-white/10 flex items-center gap-2">
           <div className="w-3 h-3 ml-3 bg-red-500 rounded-full"></div>
           <div className="w-3 h-3 bg-yellow-500 rounded-full"></div>
@@ -202,6 +204,11 @@ export default function Home() {
           )}
           <p className="inline animate-pulse">|</p>
         </div>
+      </div>
+
+      <div className={`absolute bottom-1/2 w-full left-0 md:hidden ${swipeGuide ? '' : 'opacity-0 animate-[opacity_2s_linear]'}`}>
+        <ChevronsLeft className="w-16 h-16 rotate-180 animate-swipe" />
+        <h1 className="absolute left-1/2 -translate-x-1/2 whitespace-nowrap top-5 text-sm">swipe to navigate, click to jump in</h1>
       </div>
 
       <div className="absolute left-1/2 -translate-x-1/2 top-1/2 md:-translate-y-1/3 flex items-center justify-center gap-8">

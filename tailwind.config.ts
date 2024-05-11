@@ -18,7 +18,8 @@ const config: Config = {
         slideRight: 'slideRight 3s ease-in-out infinite',
         slideUp: 'slideUp 1s ease-in-out',
         slideDown: 'slideDown 1s ease-in-out',
-        opacity: 'opacity 2s ease-in-out'
+        opacity: 'opacity 2s ease-in-out',
+        swipe: 'swipe 1s ease-in-out infinite'
       },
       keyframes: {
         pulse: {
@@ -41,6 +42,11 @@ const config: Config = {
         opacity: {
           '0%': { opacity: '1' },
           '100%': { opacity: '0' },
+        },
+        swipe: {
+          '0%': { marginLeft: '5vw', opacity: '0' },
+          '50%': { opacity: '1' },
+          '100%': { marginLeft: '70vw', opacity: '0' },
         }
       }
     },

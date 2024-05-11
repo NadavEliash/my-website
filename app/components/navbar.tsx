@@ -28,7 +28,7 @@ export default function Navbar() {
         {
             href: 'projects',
             icon: '',
-            title: 'More apps'
+            title: 'Code Portfolio'
         },
         {
             href: 'portfolio',

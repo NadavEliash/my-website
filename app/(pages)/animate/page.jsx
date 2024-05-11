@@ -205,7 +205,8 @@ export default function Animate() {
     return (
         <>
             <div className="hidden md:block h-svh bg-white md:bg-transparent  md:py-6">
-                <h1 className={`hidden md:block md:my-10 text-slate-200 text-center text-5xl ${sue_ellen.className}`}>{`Let's Animate!`}</h1>
+                <h1 className={`hidden md:block md:mt-12 md:mb-2 text-slate-200 text-center text-5xl ${sue_ellen.className}`}>{`Let's Animate!`}</h1>
+                <h2 className="text-center text-lg mb-2">Animation app i've built, based on HTML Canvas and React</h2>
                 <div id="drawing-bar" className="flex flex-row justify-center md:gap-1 lg:gap-2">
                     <ChevronRight className="md:hidden absolute left-0 top-24 -translate-y-1/2 w-8 h-16 p-1 text-black bg-gray-200/80 rounded-r-2xl z-30" onClick={() => handleBars("actions")} />
                     <div id="action-buttons"

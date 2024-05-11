@@ -93,7 +93,7 @@ export default function Frame({
                     onDrag={() => onDrag(idx)}
                     onDragEnd={(e) => onDragEnd(e, idx)}>
                 </canvas>
-                <h1 className="md:text-white text-sm text-center p-2">
+                <h1 className="md:text-white text-sm text-center pt-2">
                     {idx + 1}
                 </h1>
             </div>

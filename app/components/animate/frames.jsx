@@ -103,7 +103,7 @@ export default function Frames({
                     </div>
                 </div>
             </div>
-            <div id="frames-container" className="w-full h-40 md:bg-white/10 p-4 flex gap-2 items-center justify-center rounded-b-2xl">
+            <div id="frames-container" className="w-full h-36 md:bg-white/10 p-4 flex gap-2 items-center justify-center rounded-b-2xl">
                 <div className="hidden md:flex w-8 py-4 mt-2 bg-slate-950 rounded-lg self-start" onClick={() => switchFrame('left')}>
                     <ChevronLeft className="w-10 h-10 text-white cursor-pointer" />
                 </div>
