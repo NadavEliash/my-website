@@ -45,7 +45,7 @@ export default function Portfolio() {
 
     const works = [
         {
-            title: 'Cut-Out animation I made for "Miluimnikim" NGO, struggling BDS campaign',
+            title: 'Cut-Out animation I made for NGO, which struggling BDS campaign',
             src: 'https://res.cloudinary.com/dnvbfkgsb/video/upload/v1714028561/final_03_hvpkng.mp4'
         },
         {
@@ -129,10 +129,6 @@ export default function Portfolio() {
                         ? <Volume2 className={`cursor-pointer w-8 h-8 text-black`} onClick={() => { ToggleVolume(+5) }} />
                         : <VolumeX className={`cursor-pointer w-8 h-8 text-black`} onClick={() => { ToggleVolume(0) }} />}
                 </div>
-                {/* <div className="md:hidden w-full bg-black">
-                    <ChevronLeft className="absolute left-2 top-1/2 w-8 h-8 text-black/70" onClick={() => updateCurrent(-1)} />
-                    <ChevronRight className="absolute right-2 top-1/2 w-8 h-8 text-black/70" onClick={() => updateCurrent(+1)} />
-                </div> */}
                 <div className="hidden md:block absolute bottom-40 w-full h-[70%] pointer-events-none">
                     {showVolume && volumeDashes.length > 0 &&
                         <div className="absolute right-6 bottom-0 flex flex-col gap-1 items-center justify-end">
@@ -150,19 +146,19 @@ export default function Portfolio() {
                         <h1 className="my-2 mx-6 text-xl">{works[current].title}</h1>
                     </div>}
                 </div>
-                <div className="md:hidden absolute bottom-0 translate-y-full w-full bg-black/80">
-                    <h1 className="my-2 text-lg text-center">{works[current].title}</h1>
-                </div>
+                {isLoad && <div id="mobile-info" className="md:hidden absolute bottom-0 translate-y-full w-full">
+                    <h1 className="my-2 mx-2 text-lg text-center">{works[current].title}</h1>
+                </div>}
             </div>
-            <div id="remote" className="absolute top-1/2 md:static mt-10 mx-auto flex flex-col p-2 w-full md:max-w-[500px] bg-black/60 sm:rounded-full 
-            items-center shadow-inner sm:shadow-white/60 overflow-hidden
+            <div id="remote" className="absolute top-1/2 md:static mt-10 mx-auto flex flex-col items-center p-2 w-full md:max-w-[500px] md:bg-black/50
+            md:rounded-full shadow-inner md:shadow-white/60 overflow-hidden
             2xl:rounded-lg 2xl:gap-10 2xl:-rotate-6 2xl:flex-col 2xl:py-16 2xl:w-[240px]">
                 <div className="2xl:relative rounded-full 2xl:bg-white/20 2xl:shadow-inner shadow-white/40
                  2xl:grid 2xl:grid-cols-3 2xl:grid-rows-3 2xl:gap-10 2xl:items-center 2xl:justify-items-center 2xl:p-2">
                     <ChevronLeft className={`${optionButtonsClass} row-start-2`} onClick={() => updateCurrent(-1)} />
                     <ChevronRight className={`${optionButtonsClass} row-start-2 col-start-3`} onClick={() => updateCurrent(+1)} />
 
-                    <div className={`rounded-full cursor-pointer active:bg-white/50 border-black p-3 w-16 h-16 mr-2 bg-white/20 mb-2
+                    <div className={`rounded-full cursor-pointer active:bg-white/50 border-black p-3 w-16 h-16 mr-2 bg-white/20 my-2
                     2xl:m-0 2xl:border-4 2xl:absolute 2xl:left-1/2 2xl:-translate-x-1/2 2xl:top-1/2 2xl:-translate-y-1/2 2xl:w-24 2xl:h-24 2xl:p-5`}
                         onClick={togglePlay}>
                         {isPlay

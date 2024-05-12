@@ -71,7 +71,8 @@ export default function Home() {
   const [isWheel, setIsWheel] = useState(false)
   const [touchStart, setTouchStart] = useState(null)
   const [touchEnd, setTouchEnd] = useState(null)
-  const [swipeGuide, setSwipeGuide] = useState(true)
+  const [swipe, setSwipe] = useState(false)
+  const [swipeFade, setSwipeFade] = useState(false)
   const [string, setString] = useState<line[]>([{
     str: '',
     color: ''
@@ -83,8 +84,12 @@ export default function Home() {
     }, 1000);
 
     setTimeout(() => {
-      setSwipeGuide(false)
-    }, 4000);
+      setSwipe(true)
+    }, 4000)
+
+    setTimeout(() => {
+      setSwipeFade(true)
+    }, 8000)
   }, [])
 
   const text: line[] = [
@@ -206,7 +211,7 @@ export default function Home() {
         </div>
       </div>
 
-      <div className={`absolute bottom-1/2 w-full left-0 md:hidden ${swipeGuide ? '' : 'opacity-0 animate-[opacity_2s_linear]'}`}>
+      <div className={`absolute bottom-1/2 w-full left-0 md:hidden ${swipe && !swipeFade ? 'opacity-100' : 'opacity-0'} transition-opacity duration-1000 ${swipeFade ? 'animate-[opacity_2s_linear]' : ''}`}>
         <ChevronsLeft className="w-16 h-16 rotate-180 animate-swipe" />
         <h1 className="absolute left-1/2 -translate-x-1/2 whitespace-nowrap top-5 text-sm">swipe to navigate, click to jump in</h1>
       </div>

@@ -2,7 +2,7 @@
 
 import WheelGuid from "@/app/components/guids/wheel-guid"
 import Loader from "@/app/components/loader"
-import { Smartphone, Tv2 } from "lucide-react"
+import { ChevronsDown, Smartphone, Tv2 } from "lucide-react"
 import { Fredoka } from "next/font/google"
 import Link from "next/link"
 import { TouchEventHandler, useEffect, useState } from "react"
@@ -130,6 +130,10 @@ export default function Projects() {
             </div>
             <div className="hidden md:block">
                 <WheelGuid guidDisplay={guidDisplay} />
+            </div>
+            <div className="md:hidden absolute left-1/2 bottom-10 -translate-x-1/2 flex flex-col items-center gap-3 text-white/60">
+                <h1>Swipe to see more</h1>
+                <ChevronsDown className="animate-bounce w-12 h-12"/>
             </div>
         </div>
     )
