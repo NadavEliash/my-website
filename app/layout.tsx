@@ -27,7 +27,7 @@ export default function RootLayout({
         <link rel="icon" href="./assets/icon.svg" sizes="any" />
         <meta property="og:title" content="Nadav Eliash"/>
         <meta property="og:description" content="Frontend / Fullstack programmer, Designer and Animator"/>
-        <meta property="og:type" content="image"/>
+        <meta property="og:type" content="png"/>
         <meta property="og:image" content="./assets/profile.png" />
         <meta name="twitter:image" content="./assets/profile.png" />
       </head>
