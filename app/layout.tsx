@@ -24,8 +24,12 @@ export default function RootLayout({
   return (
     <html lang="en">
       <head>
-        <link rel="icon" href="icon.svg" sizes="any" />
+        <link rel="icon" href="./assets/icon.svg" sizes="any" />
+        <meta property="og:title" content="Nadav Eliash"/>
+        <meta property="og:description" content="Frontend / Fullstack programmer, Designer and Animator"/>
+        <meta property="og:type" content="image"/>
         <meta property="og:image" content="./assets/profile.png" />
+        <meta name="twitter:image" content="./assets/profile.png" />
       </head>
       <body className={`${roboto.className} text-white/80`}>
         <Navbar />
