@@ -13,7 +13,7 @@ export const metadata: Metadata = {
     default: "Nadav Eliash"
   },
   description: "Frontend / Fullstack programmer, Designer and Animator",
-  icons: "./assets/icon.svg"
+  
 }
 
 export default function RootLayout({
@@ -25,6 +25,7 @@ export default function RootLayout({
     <html lang="en">
       <head>
         <link rel="icon" href="icon.svg" sizes="any" />
+        <meta property="og:image" content="./assets/profile.png" />
       </head>
       <body className={`${roboto.className} text-white/80`}>
         <Navbar />
