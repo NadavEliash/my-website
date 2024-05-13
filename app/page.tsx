@@ -170,17 +170,15 @@ export default function Home() {
   const handleTouchEnd = (e: any) => {
     if (!touchStart || !touchEnd) return
 
-    setTimeout(() => {
-      if (touchStart! - touchEnd! > 0) {
-        if (touchStart! - touchEnd! > 30) {
-          setPages(+1)
-        }
-      } else {
-        if (touchEnd! - touchStart! > 30) {
-          setPages(-1)
-        }
+    if (touchStart! - touchEnd! > 0) {
+      if (touchStart! - touchEnd! > 30) {
+        setPages(+1)
       }
-    }, 200)
+    } else {
+      if (touchEnd! - touchStart! > 30) {
+        setPages(-1)
+      }
+    }
   }
 
   const runText = () => {
@@ -235,8 +233,8 @@ export default function Home() {
           <ChevronLeft className="mt-2 w-10 h-10 cursor-pointer" />
         </div>
         {pages.map((page, idx) =>
-          <Link href={page.href} key={idx} className={`absolute bottom-0 bg-white/10 w-[100%] md:w-[400px] h-[320px] rounded-2xl px-6 py-4 transition-all duration-1000
-          ${currentPage === idx ? 'left-1/2 -translate-x-1/2 md:left-[60px] opacity-100'
+          <Link href={page.href} key={idx} className={`absolute bottom-0 bg-white/10 w-[100%] md:w-[400px] h-[320px] rounded-2xl px-6 py-4 transition-all duration-500 
+          ${currentPage === idx ? 'left-1/2 -translate-x-1/2 md:left-[60px] md:translate-x-0 opacity-100'
               : nextPage === idx ? 'left-[400px] md:left-[520px] opacity-0'
                 : prevPage === idx ? '-left-[400px] opacity-0' : 'left-[100%] opacity-0'}
             `}>
