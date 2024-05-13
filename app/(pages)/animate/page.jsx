@@ -325,8 +325,8 @@ export default function Animate() {
                 <ChevronUp className="md:hidden absolute bottom-0 left-1/2 -translate-x-1/2 w-20 h-6 text-black bg-gray-200 rounded-t-2xl z-20" onClick={() => handleBars("frames")} />
             </div>
             <div className="absolute left-0 top-1/2 -translate-y-1/2 md:hidden">
-                <img src="https://res.cloudinary.com/dnvbfkgsb/image/upload/v1715195077/openart-image_7VgoCkvW_1715194054464_raw_heduqs.jpg" alt="mobile version still not available" width={1080} height={1980}
-                    className="">
+                <img src="https://res.cloudinary.com/dnvbfkgsb/image/upload/v1715596174/WIP.png" alt="mobile version still not available" width={1080} height={1980}
+                    className="opacity-100">
                 </img>
                 <h1 className="mx-6 mt-6 text-xl text-center"><span className="text-2xl">Sorry,</span><br />Still working on the mobile version.. <br />Try the Desktop version!</h1>
             </div>

@@ -104,7 +104,7 @@ export default function Portfolio() {
 
     const optionButtonsClass = "hidden 2xl:block cursor-pointer w-8 h-8 bg-white/20 rounded-full p-2"
     return (
-        <div className="md:mt-[50lvh] md:-translate-y-1/2 mx-auto flex flex-wrap flex-row items-center justify-between md:w-10/12">
+        <div className="md:mt-[25vh] mx-auto flex flex-wrap flex-row items-center justify-between md:w-10/12">
             <div id="tv" className="relative mx-auto w-[900px] md:h-[470px] max-w-[2/3vw] rounded-3xl md:border-[10px] md:border-r-[100px] border-gray-700 bg-gray-700">
                 <div className="hidden md:block">
                     <div className="absolute bg-gray-400 w-20 h-20 -top-12 left-1/2 -translate-x-1/2 rounded-full -z-10"></div>
@@ -150,16 +150,16 @@ export default function Portfolio() {
                     <h1 className="my-2 mx-2 text-lg text-center">{works[current].title}</h1>
                 </div>}
             </div>
-            <div id="remote" className="absolute top-1/2 md:static mt-10 mx-auto flex flex-col items-center p-2 w-full md:max-w-[500px] md:bg-black/50
+            <div id="remote" className="absolute top-1/2 md:relative mt-10 mx-auto flex flex-col items-center p-6 w-full md:max-w-[500px] md:bg-black/50
             md:rounded-full shadow-inner md:shadow-white/60 overflow-hidden
-            2xl:rounded-lg 2xl:gap-10 2xl:-rotate-6 2xl:flex-col 2xl:py-16 2xl:w-[240px]">
+            2xl:rounded-[70px] 2xl:gap-4 2xl:-rotate-[9deg] 2xl:flex-col 2xl:py-8 2xl:w-[240px]">
                 <div className="2xl:relative rounded-full 2xl:bg-white/20 2xl:shadow-inner shadow-white/40
                  2xl:grid 2xl:grid-cols-3 2xl:grid-rows-3 2xl:gap-10 2xl:items-center 2xl:justify-items-center 2xl:p-2">
                     <ChevronLeft className={`${optionButtonsClass} row-start-2`} onClick={() => updateCurrent(-1)} />
                     <ChevronRight className={`${optionButtonsClass} row-start-2 col-start-3`} onClick={() => updateCurrent(+1)} />
 
-                    <div className={`rounded-full cursor-pointer active:bg-white/50 border-black p-3 w-16 h-16 mr-2 bg-white/20 my-2
-                    2xl:m-0 2xl:border-4 2xl:absolute 2xl:left-1/2 2xl:-translate-x-1/2 2xl:top-1/2 2xl:-translate-y-1/2 2xl:w-24 2xl:h-24 2xl:p-5`}
+                    <div className={`absolute left-1/2 top-1 -translate-x-1/2 rounded-full cursor-pointer active:bg-white/50 border-black p-3 w-16 h-16 mr-2 bg-white/20 my-2
+                    2xl:top-1/2 2xl:-translate-y-1/2 2xl:m-0 2xl:border-4 2xl:w-24 2xl:h-24 2xl:p-5`}
                         onClick={togglePlay}>
                         {isPlay
                             ? <Pause className="w-full h-full" />
@@ -168,16 +168,19 @@ export default function Portfolio() {
                     <Minus className={`${optionButtonsClass} row-start-3 col-start-2`} onClick={() => ToggleVolume(-1)} />
                     <Plus className={`${optionButtonsClass} col-start-2`} onClick={() => ToggleVolume(1)} />
                 </div>
-                <div className="flex gap-1 items-center">
+
+                <div className="flex gap-24 md:gap-3 items-center">
                     <div className="bg-white/20 rounded-full flex 2xl:flex-col items-center justify-center h-[44px] w-32 2xl:h-fit 2xl:w-12 p-2 gap-5 2xl:shadow-inner shadow-white/40">
                         <Plus className="cursor-pointer w-4 h-4" onClick={() => ToggleVolume(1)} />
                         <div className="text-center 2xl:my-3">VOL</div>
                         <Minus className="cursor-pointer w-4 h-4" onClick={() => ToggleVolume(-1)} />
                     </div>
-                    <div className="flex 2xl:flex-col justify-between p-2 gap-2">
-                        <VolumeX className="bg-white/20 w-10 h-10 rounded-full p-2 shadow-inner shadow-white/40 cursor-pointer" onClick={() => { ToggleVolume(0) }} />
-                        <Info className="hidden md:block bg-white/20 w-10 h-10 rounded-full p-2 shadow-inner shadow-white/40 cursor-pointer" onClick={() => { setIsInfo(!isInfo) }} />
+                    
+                    <div className="2xl:bg-white/10 shadow-white/40 rounded-full hidden md:flex flex-row-reverse items-center justify-center h-[44px] gap-24 p-4 2xl:gap-12 2xl:shadow-inner 2xl:flex-col 2xl:w-12 2xl:h-fit">
+                        <Info className="w-8 h-8 cursor-pointer" onClick={() => { setIsInfo(!isInfo) }} />
+                        <VolumeX className="w-6 h-6 cursor-pointer" onClick={() => { ToggleVolume(0) }} />
                     </div>
+                    
                     <div className="bg-white/20 rounded-full flex flex-row-reverse 2xl:flex-col items-center justify-center h-[44px] w-32 2xl:w-12 2xl:h-fit p-2 gap-5 2xl:shadow-inner shadow-white/40">
                         <Plus className="cursor-pointer w-4 h-4" onClick={() => updateCurrent(+1)} />
                         <div className="text-center 2xl:my-3">CH</div>

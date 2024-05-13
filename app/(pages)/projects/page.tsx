@@ -45,11 +45,16 @@ export default function Projects() {
     const [isScroll, setIsScroll] = useState(false)
     const [touchStart, setTouchStart] = useState(null)
     const [guidDisplay, setGuidDisplay] = useState<boolean>(true)
+    const [fadeOut, setFadeOut] = useState<boolean>(false)
 
     useEffect(() => {
         setTimeout(() => {
             setGuidDisplay(false)
         }, 1000)
+        
+        setTimeout(() => {
+            setFadeOut(true)
+        }, 4000)
     }, [])
 
     const handleWheel = (ev: any) => {
@@ -132,10 +137,10 @@ export default function Projects() {
             <div className="hidden md:block">
                 <WheelGuid guidDisplay={guidDisplay} />
             </div>
-            <div className={`md:hidden absolute left-1/2 bottom-10 -translate-x-1/2 flex flex-col items-center gap-3 text-white ${guidDisplay ? '' : 'animate-[opacity_2s_ease-in-out] opacity-0'}`}>
+            <div className={`md:hidden absolute left-1/2 bottom-10 -translate-x-1/2 flex flex-col items-center gap-3 text-white ${fadeOut && 'animate-[opacity_.3s_linear] opacity-0'}`}>
                 <h1>Swipe to see more</h1>
                 {/* <ChevronsDown className="animate-bounce w-12 h-12" /> */}
-                <Image src={'https://www.svgrepo.com/show/409931/swipe-right.svg'} alt="swipe" width={40} height={40} className="rotate-[-120deg] -translate-x-[40px] opacity-0 animate-rotation invert" />
+                <Image src={'https://www.svgrepo.com/show/409928/swipe-left.svg'} alt="swipe" width={40} height={40} className="absolute left-2/3 -top-20 opacity-100 animate-rotation invert" />
             </div>
         </div>
     )

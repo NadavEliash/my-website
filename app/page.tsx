@@ -223,9 +223,10 @@ export default function Home() {
         </div>
       </div>
 
-      <div className={`absolute bottom-1/2 w-full left-0 md:hidden ${swipe && !swipeFade ? 'opacity-100' : 'opacity-0'} transition-opacity duration-1000 ${swipeFade ? 'animate-[opacity_2s_linear]' : ''}`}>
-        <ChevronsLeft className="w-16 h-16 rotate-180 animate-swipe" />
-        <h1 className="absolute left-1/2 -translate-x-1/2 whitespace-nowrap top-5 text-sm">swipe to navigate, click to jump in</h1>
+      <div className={`absolute bottom-1/2 w-full left-0 md:hidden ${swipe && !swipeFade ? 'opacity-100' : 'opacity-0'} transition-opacity duration-200 ${swipeFade ? 'animate-[opacity_.5s_linear]' : ''}`}>
+        <Image src={'https://www.svgrepo.com/show/409928/swipe-left.svg'} alt='swipe' width={50} height={50} className="absolute -top-4 w-10 h-10 invert animate-swipe" />
+        {/* <ChevronsLeft className="w-16 h-16 rotate-180 animate-swipe" /> */}
+        <h1 className="absolute left-1/2 -translate-x-1/2 whitespace-nowrap -top-10 text-sm">swipe to navigate, click to jump in</h1>
       </div>
 
       <div className="absolute bottom-4 md:bottom-60 left-1/2 -translate-x-1/2 w-[95vw] md:w-[520px] h-[320px] flex items-center justify-center gap-[460px] overflow-hidden">
