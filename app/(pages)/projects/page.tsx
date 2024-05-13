@@ -4,6 +4,7 @@ import WheelGuid from "@/app/components/guids/wheel-guid"
 import Loader from "@/app/components/loader"
 import { ChevronsDown, Smartphone, Tv2 } from "lucide-react"
 import { Fredoka } from "next/font/google"
+import Image from "next/image"
 import Link from "next/link"
 import { TouchEventHandler, useEffect, useState } from "react"
 
@@ -131,9 +132,10 @@ export default function Projects() {
             <div className="hidden md:block">
                 <WheelGuid guidDisplay={guidDisplay} />
             </div>
-            <div className="md:hidden absolute left-1/2 bottom-10 -translate-x-1/2 flex flex-col items-center gap-3 text-white/60">
+            <div className={`md:hidden absolute left-1/2 bottom-10 -translate-x-1/2 flex flex-col items-center gap-3 text-white ${guidDisplay ? '' : 'animate-[opacity_2s_ease-in-out] opacity-0'}`}>
                 <h1>Swipe to see more</h1>
-                <ChevronsDown className="animate-bounce w-12 h-12"/>
+                {/* <ChevronsDown className="animate-bounce w-12 h-12" /> */}
+                <Image src={'https://www.svgrepo.com/show/409931/swipe-right.svg'} alt="swipe" width={40} height={40} className="rotate-[-120deg] -translate-x-[40px] opacity-0 animate-rotation invert" />
             </div>
         </div>
     )

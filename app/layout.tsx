@@ -27,8 +27,8 @@ export default function RootLayout({
         <link rel="icon" href="./assets/icon.svg" sizes="any" />
         <meta property="og:title" content="Nadav Eliash"/>
         <meta property="og:description" content="Frontend / Fullstack programmer, Designer and Animator"/>
-        <meta property="og:type" content="png"/>
         <meta property="og:image" content="https://res.cloudinary.com/dnvbfkgsb/image/upload/v1715498035/light-bulb_vo7ulo.png" />
+        <meta property="og:type" content="png"/>
       </head>
       <body className={`${roboto.className} text-white/80`}>
         <Navbar />

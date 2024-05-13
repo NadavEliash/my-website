@@ -67,7 +67,9 @@ const pages: page[] = [
 
 export default function Home() {
 
+  const [prevPage, setPrevPage] = useState(pages.length - 1)
   const [currentPage, setCurrentPage] = useState(0)
+  const [nextPage, setNextPage] = useState(1)
   const [isWheel, setIsWheel] = useState(false)
   const [touchStart, setTouchStart] = useState(null)
   const [touchEnd, setTouchEnd] = useState(null)
@@ -125,19 +127,31 @@ export default function Home() {
       str: ")",
       color: "text-yellow-400"
     },
-    // {
-    //   str: `+Please use the mouse-wheel or swipe to switch between the content references`,
-    //   color: "text-emerald-400"
-    // }
   ]
+
+  const setPages = (val: number) => {
+    if (val > 0) {
+      const current = currentPage + 1 === pages.length ? 0 : currentPage + 1
+      setPrevPage(currentPage)
+      setCurrentPage(current)
+      setNextPage(current + 1 === pages.length ? 0 : current + 1)
+    } else {
+      const current = currentPage === 0 ? pages.length - 1 : currentPage - 1
+      setPrevPage(current - 1 < 0 ? pages.length - 1 : current - 1)
+      setCurrentPage(current)
+      setNextPage(currentPage)
+    }
+
+    console.log('prev: ', prevPage)
+    console.log('current: ', currentPage)
+    console.log('next: ', nextPage)
+  }
 
   const handleWheel = (e: any) => {
     if (!isWheel) {
       setIsWheel(true)
 
-      e.deltaY < 0 ?
-        setCurrentPage(currentPage + 1 < pages.length ? currentPage + 1 : 0)
-        : setCurrentPage(currentPage - 1 < 0 ? pages.length - 1 : currentPage - 1)
+      e.deltaY < 0 ? setPages(+1) : setPages(-1)
 
       setTimeout(() => {
         setIsWheel(false)
@@ -159,11 +173,11 @@ export default function Home() {
     setTimeout(() => {
       if (touchStart! - touchEnd! > 0) {
         if (touchStart! - touchEnd! > 30) {
-          setCurrentPage(currentPage + 1 < pages.length ? currentPage + 1 : 0)
+          setPages(+1)
         }
       } else {
         if (touchEnd! - touchStart! > 30) {
-          setCurrentPage(currentPage - 1 < 0 ? pages.length - 1 : currentPage - 1)
+          setPages(-1)
         }
       }
     }, 200)
@@ -216,26 +230,28 @@ export default function Home() {
         <h1 className="absolute left-1/2 -translate-x-1/2 whitespace-nowrap top-5 text-sm">swipe to navigate, click to jump in</h1>
       </div>
 
-      <div className="absolute left-1/2 -translate-x-1/2 top-1/2 md:-translate-y-1/3 flex items-center justify-center gap-8">
-        <div className="hidden md:block" onClick={() => setCurrentPage(currentPage - 1 < 0 ? pages.length - 1 : currentPage - 1)}>
+      <div className="absolute bottom-4 md:bottom-60 left-1/2 -translate-x-1/2 w-[95vw] md:w-[520px] h-[320px] flex items-center justify-center gap-[460px] overflow-hidden">
+        <div className="hidden md:block" onClick={() => setPages(-1)}>
           <ChevronLeft className="mt-2 w-10 h-10 cursor-pointer" />
         </div>
-        <Link href={pages[currentPage].href} className="bg-white/10 w-[95vw] md:w-[400px] h-[320px] rounded-2xl px-6 py-4">
-          <h1 className="text-2xl font-bold my-1 text-center">
-            {pages[currentPage].headline}
-          </h1>
-          {pages.map((page, idx) =>
-            <Image key={idx} src={pages[currentPage].img!} alt="img" className={`${idx === currentPage ? '' : 'hidden'} ${pages[idx].imgStyle} my-4 rounded-lg`} />
-          )
-          }
-          <div className="mb-4">
-            {pages[currentPage].description.map((line, idx) =>
-              <p key={idx} className="text-justify">
-                {line}
-              </p>
-            )}</div>
-        </Link>
-        <div className="hidden md:block" onClick={() => setCurrentPage(currentPage + 1 >= pages.length ? 0 : currentPage + 1)}>
+        {pages.map((page, idx) =>
+          <Link href={page.href} key={idx} className={`absolute bottom-0 bg-white/10 w-[100%] md:w-[400px] h-[320px] rounded-2xl px-6 py-4 transition-all duration-1000
+          ${currentPage === idx ? 'left-1/2 -translate-x-1/2 md:left-[60px] opacity-100'
+              : nextPage === idx ? 'left-[400px] md:left-[520px] opacity-0'
+                : prevPage === idx ? '-left-[400px] opacity-0' : 'left-[100%] opacity-0'}
+            `}>
+            <h1 className="text-2xl font-bold my-1 text-center">
+              {page.headline}
+            </h1>
+            <Image key={idx} src={page.img!} alt="img" className={`${page.imgStyle} my-4 rounded-lg`} />
+            <div className="mb-4">
+              {page.description.map((line, idx) =>
+                <p key={idx} className="text-justify">
+                  {line}
+                </p>
+              )}</div>
+          </Link>)}
+        <div className="hidden md:block" onClick={() => setPages(+1)}>
           <ChevronRight className="mt-2 w-10 h-10 cursor-pointer" />
         </div>
       </div>
