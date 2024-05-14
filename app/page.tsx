@@ -33,34 +33,37 @@ interface page {
 const pages: page[] = [
   {
     href: 'about',
-    headline: '',
+    headline: 'About me',
     description: [
       'My name is Nadav Eliash.',
-      'I\'m a Frontend / Fullstack Web Developer, with experience in writing a single page applications...'
+      'I\'m a Frontend / Fullstack Web Developer, with experience in writing a single page applications.',
+      'more...'
     ],
     img: profile,
-    imgStyle: "w-20 h-20"
+    imgStyle: "w-20 h-20 mt-10 ml-4"
   },
   {
     href: 'animate',
-    headline: 'Go Animate!',
+    headline: 'Animate Online',
     description: [
-      'Animation app I built, based on HTML Canvas.',
-      'The app allow users to draw along frames and create a classic animation clips.',
-      '** The mobile version is still in progress.'
+      'Animation app I built, based on HTML Canvas and React.',
+      'The app allows users to draw along frames and create animation clips.',
+      '** Mobile version still in progress.'
     ],
-    img: animate
+    img: animate,
+    imgStyle: "mt-10"
   },
   {
     href: 'projects',
-    headline: 'My programming portfolio',
+    headline: 'My Portfolio',
     description: ['An interactiv list That shows selection of apps I\'ve created.'],
-    img: projects
+    img: projects,
+    imgStyle: "h-[100%]"
   },
   {
     href: 'portfolio',
     headline: 'Animation Portfolio',
-    description: ['A selection of my animation works'],
+    description: ['Before I learn to code, I used to be an Animator. Here\'s a selection of my animation works'],
     img: animationPortfolio
   },
 ]
@@ -229,23 +232,23 @@ export default function Home() {
         <h1 className="absolute left-1/2 -translate-x-1/2 whitespace-nowrap -top-10 text-sm">swipe to navigate, click to jump in</h1>
       </div>
 
-      <div className="absolute bottom-4 md:bottom-60 left-1/2 -translate-x-1/2 w-[95vw] md:w-[520px] h-[320px] flex items-center justify-center gap-[460px] overflow-hidden">
+      <div className="absolute bottom-4 md:top-1/3 left-1/2 -translate-x-1/2 w-[95vw] md:w-[520px] h-[400px] max-h-[50%] flex items-center justify-center gap-[460px] overflow-hidden">
         <div className="hidden md:block" onClick={() => setPages(-1)}>
           <ChevronLeft className="mt-2 w-10 h-10 cursor-pointer" />
         </div>
         {pages.map((page, idx) =>
-          <Link href={page.href} key={idx} className={`absolute bottom-0 bg-white/10 w-[100%] md:w-[400px] h-[320px] rounded-2xl px-6 py-4 transition-all duration-500 
-          ${currentPage === idx ? 'left-1/2 -translate-x-1/2 md:left-[60px] md:translate-x-0 opacity-100'
+          <Link href={page.href} key={idx} className={`absolute bg-white/10 w-[100%] md:w-[360px] h-[400px] max-h-[100%] rounded-2xl p-3 transition-all duration-500 grid grid-rows-12
+          ${currentPage === idx ? 'left-1/2 -translate-x-1/2 md:left-[80px] md:translate-x-0 opacity-100'
               : nextPage === idx ? 'left-[400px] md:left-[520px] opacity-0'
                 : prevPage === idx ? '-left-[400px] opacity-0' : 'left-[100%] opacity-0'}
             `}>
-            <h1 className="text-2xl font-bold my-1 text-center">
+            <Image key={idx} src={page.img!} alt="img" className={`${page.imgStyle} rounded-lg row-span-6 max-h-[100%]`} />
+            <h1 className="text-lg font-bold mx-3 row-start-8">
               {page.headline}
             </h1>
-            <Image key={idx} src={page.img!} alt="img" className={`${page.imgStyle} my-4 rounded-lg`} />
-            <div className="mb-4">
+            <div className="row-span-5 mt-2">
               {page.description.map((line, idx) =>
-                <p key={idx} className="text-justify">
+                <p key={idx} className="text-sm text-justify mx-3">
                   {line}
                 </p>
               )}</div>

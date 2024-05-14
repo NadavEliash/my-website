@@ -134,13 +134,12 @@ export default function Projects() {
                 <Tv2 className="w-6 h-6" />
                 <div className={`absolute ${wideScreen ? 'left-[84px]' : 'left-[4px]'} transition-all duration-200 w-10 h-10 rounded-full bg-white/20`}></div>
             </div>
-            <div className="hidden md:block">
+            <div id="desktop-guid" className="hidden md:block">
                 <WheelGuid guidDisplay={guidDisplay} />
             </div>
-            <div className={`md:hidden absolute left-1/2 bottom-10 -translate-x-1/2 flex flex-col items-center gap-3 text-white ${fadeOut && 'animate-[opacity_.3s_linear] opacity-0'}`}>
+            <div id="swipe-guid" className={`md:hidden absolute left-1/2 bottom-10 -translate-x-1/2 flex flex-col items-center gap-3 text-white ${fadeOut && 'animate-[opacity_.3s_linear] opacity-0'}`}>
                 <h1>Swipe to see more</h1>
-                {/* <ChevronsDown className="animate-bounce w-12 h-12" /> */}
-                <Image src={'https://www.svgrepo.com/show/409928/swipe-left.svg'} alt="swipe" width={40} height={40} className="absolute left-2/3 -top-20 opacity-100 animate-rotation invert" />
+                <Image src={'https://www.svgrepo.com/show/409931/swipe-right.svg'} alt="swipe" width={40} height={40} className="absolute -top-20 opacity-100 animate-swipeDown invert" />
             </div>
         </div>
     )
