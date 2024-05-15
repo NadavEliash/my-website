@@ -8,7 +8,7 @@ import { Sue_Ellen_Francisco } from 'next/font/google'
 import { ChevronLeft, ChevronRight, ChevronsLeft } from "lucide-react"
 
 import { StaticImageData } from "next/image";
-import profile from "./assets/profile.png"
+import about from "./assets/about.png"
 import animate from "./assets/animate.png"
 import projects from "./assets/projects.png"
 import animationPortfolio from "./assets/animationPortfolio.png"
@@ -39,8 +39,7 @@ const pages: page[] = [
       'I\'m a Frontend / Fullstack Web Developer, with experience in writing a single page applications.',
       'more...'
     ],
-    img: profile,
-    imgStyle: "w-20 h-20 mt-10 ml-4"
+    img: about,
   },
   {
     href: 'animate',
@@ -51,19 +50,17 @@ const pages: page[] = [
       '** Mobile version still in progress.'
     ],
     img: animate,
-    imgStyle: "mt-10"
   },
   {
     href: 'projects',
     headline: 'My Portfolio',
     description: ['An interactiv list That shows selection of apps I\'ve created.'],
     img: projects,
-    imgStyle: "h-[100%]"
   },
   {
     href: 'portfolio',
     headline: 'Animation Portfolio',
-    description: ['Before I learn to code, I used to be an Animator. Here\'s a selection of my animation works'],
+    description: ['Before I learn code, I used to be an Animator. Here\'s a selection of my animation works.'],
     img: animationPortfolio
   },
 ]
@@ -144,10 +141,6 @@ export default function Home() {
       setCurrentPage(current)
       setNextPage(currentPage)
     }
-
-    console.log('prev: ', prevPage)
-    console.log('current: ', currentPage)
-    console.log('next: ', nextPage)
   }
 
   const handleWheel = (e: any) => {
@@ -216,7 +209,7 @@ export default function Home() {
           <div className="w-3 h-3 bg-yellow-500 rounded-full"></div>
           <div className="w-3 h-3 bg-green-500 rounded-full"></div>
         </div>
-        <div className="my-10 mx-5 md:text-xl md:w-[600px]">
+        <div className="mt-10 mx-5 md:text-xl md:w-[600px]">
           {string.length && string.map((letter, idx) =>
             <p key={idx} className={`${letter.color} inline transition-all leading-8`}>
               {letter.str === '+' ? <br /> : letter.str}
@@ -226,9 +219,8 @@ export default function Home() {
         </div>
       </div>
 
-      <div className={`absolute bottom-1/2 w-full left-0 md:hidden ${swipe && !swipeFade ? 'opacity-100' : 'opacity-0'} transition-opacity duration-200 ${swipeFade ? 'animate-[opacity_.5s_linear]' : ''}`}>
+      <div className={`absolute top-[calc(25%+150px)] w-full left-0 md:hidden ${swipe && !swipeFade ? 'opacity-100' : 'opacity-0'} transition-opacity duration-200 ${swipeFade ? 'animate-[opacity_.5s_linear]' : ''}`}>
         <Image src={'https://www.svgrepo.com/show/409928/swipe-left.svg'} alt='swipe' width={50} height={50} className="absolute -top-4 w-10 h-10 invert animate-swipe" />
-        {/* <ChevronsLeft className="w-16 h-16 rotate-180 animate-swipe" /> */}
         <h1 className="absolute left-1/2 -translate-x-1/2 whitespace-nowrap -top-10 text-sm">swipe to navigate, click to jump in</h1>
       </div>
 
@@ -237,12 +229,14 @@ export default function Home() {
           <ChevronLeft className="mt-2 w-10 h-10 cursor-pointer" />
         </div>
         {pages.map((page, idx) =>
-          <Link href={page.href} key={idx} className={`absolute bg-white/10 w-[100%] md:w-[360px] h-[400px] max-h-[100%] rounded-2xl p-3 transition-all duration-500 grid grid-rows-12
+          <Link href={page.href} key={idx} className={`absolute bg-white/10 w-[100%] max-w-[360px] md:w-[360px] h-[400px] max-h-[100%] rounded-2xl p-3 transition-all duration-500 grid grid-rows-12
           ${currentPage === idx ? 'left-1/2 -translate-x-1/2 md:left-[80px] md:translate-x-0 opacity-100'
               : nextPage === idx ? 'left-[400px] md:left-[520px] opacity-0'
                 : prevPage === idx ? '-left-[400px] opacity-0' : 'left-[100%] opacity-0'}
             `}>
-            <Image key={idx} src={page.img!} alt="img" className={`${page.imgStyle} rounded-lg row-span-6 max-h-[100%]`} />
+            <div className={`rounded-2xl row-span-6 border-[1px] border-white/50 overflow-hidden`}>
+              <Image key={idx} src={page.img!} alt="img" loading="eager" width={960} height={540} className={`${page.imgStyle} rounded-2xl`} />
+            </div>
             <h1 className="text-lg font-bold mx-3 row-start-8">
               {page.headline}
             </h1>

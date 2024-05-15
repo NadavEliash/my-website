@@ -8,7 +8,7 @@ export default function About() {
 
     return (
         <>
-            <div className="relative mt-16 mx-6 bg-white/10 p-3 rounded-lg md:w-[600px] md:p-6 md:rounded-3xl">
+            <div className="relative mt-20 w-[92vw] mx-auto bg-white/10 p-3 rounded-lg md:mt-32 md:w-[600px] md:p-6 md:rounded-3xl">
                 <Image src={profile} alt="profile" width={100} height={100} className="rounded-full"></Image>
                 <p className="text-justify text-lg md:text-xl mt-4">
                     {`My name is Nadav Eliash.`}
@@ -23,17 +23,17 @@ export default function About() {
                     {`I love to solve problems, and enthusiast to learn and understand how things works. those things were driven me to learn coding.`}
                 </p>
             </div>
-            <div className="absolute opacity-1 top-4 flex gap-2 flex-col right-2 md:static md:flex-row md:mx-10 md:mt-10">
-                <Link href="https://www.linkedin.com/in/nadav-eliash/">
-                    <Image src="https://www.svgrepo.com/show/452051/linkedin.svg" alt="linkedin" width={60} height={60}></Image>
+            <div className="absolute top-16 flex gap-1 flex-col-reverse items-center justify-center right-2 md:static md:flex-row md:mt-10">
+                <Link href="https://www.linkedin.com/in/nadav-eliash/" className="w-12 md:w-20 md:h-20 rounded-full">
+                    <Image src="https://www.svgrepo.com/show/452051/linkedin.svg" alt="linkedin" width={60} height={60} className="rounded-full w-full h-full"></Image>
                 </Link>
-                <Link href="https://github.com/NadavEliash" className="bg-gray-900 rounded-full">
-                    <Image src="https://www.svgrepo.com/show/452211/github.svg" alt="github" width={60} height={60}></Image>
+                <Link href="https://github.com/NadavEliash" className="w-12 md:w-20 md:h-20 rounded-full p-1">
+                    <Image src="https://www.svgrepo.com/show/450156/github.svg" alt="github" width={60} height={60} className="rounded-full w-full h-full"></Image>
                 </Link>
-                <Link href="https://drive.google.com/file/d/1ZaJTI-GByj5o4FIRtB2yXsgm92WZ_dIa/view?usp=sharing" className="flex flex-col items-center w-14 h-14 px-3 py-1 bg-white/20 rounded-full">
-                    <Image src="https://www.svgrepo.com/show/384666/career-detail-document-file-info-job.svg" alt="CV" width={60} height={60} className="invert">
+                <Link href="https://drive.google.com/file/d/1ZaJTI-GByj5o4FIRtB2yXsgm92WZ_dIa/view?usp=sharing" className="w-10 h-10 md:w-[72px] md:h-[72px] flex flex-col items-center p-1 md:px-3 md:py-1 m-1 bg-white/20 rounded-full">
+                    <Image src="https://www.svgrepo.com/show/384666/career-detail-document-file-info-job.svg" alt="CV" width={60} height={60} className="invert w-16 h-16">
                     </Image>
-                    <h1 className="text-sm text-white">cv</h1>
+                    <h1 className="hidden md:block text-sm text-white">cv</h1>
                 </Link>
             </div>
         </>

@@ -49,7 +49,7 @@ export default function Portfolio() {
             src: 'https://res.cloudinary.com/dnvbfkgsb/video/upload/v1714028561/final_03_hvpkng.mp4'
         },
         {
-            title: '2D animation combine with Motion graphic video I made for association which contribute the money received from Lulav sales',
+            title: '2D animation and Motion graphics I made for association which contribute the money received from Lulav sales',
             src: 'https://res.cloudinary.com/dnvbfkgsb/video/upload/v1714029250/lulav_pvnno5.mp4'
         },
         {
@@ -57,11 +57,11 @@ export default function Portfolio() {
             src: 'https://res.cloudinary.com/dnvbfkgsb/video/upload/v1714028123/patiesserie_s3tcjm.mp4'
         },
         {
-            title: '3D animation of Dolphins',
+            title: '3D modeling, shading, animation and render of Dolphins.',
             src: 'https://res.cloudinary.com/dnvbfkgsb/video/upload/v1714028401/dolphins_hjaeae.mp4'
         },
         {
-            title: 'Collection of my 3D animation, includes shots from series in which I took part',
+            title: 'Collection of my 3D animation, includes shots from international series in which I took part',
             src: 'https://res.cloudinary.com/dnvbfkgsb/video/upload/v1714038408/3Dcharacters_fjog4n.mp4'
         },
         {

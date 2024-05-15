@@ -328,7 +328,7 @@ export default function Animate() {
                 <img src="https://res.cloudinary.com/dnvbfkgsb/image/upload/v1715596174/WIP.png" alt="mobile version still not available" width={1080} height={1980}
                     className="opacity-100">
                 </img>
-                <h1 className="mx-6 mt-6 text-xl text-center"><span className="text-2xl">Sorry,</span><br />Still working on the mobile version.. <br />Try the Desktop version!</h1>
+                <h1 className="mx-6 mt-6 text-xl text-center"><span className="text-2xl">Sorry,</span><br />Still working on the mobile version.. <br />Meanwhile, try the Desktop version!</h1>
             </div>
         </>
     )

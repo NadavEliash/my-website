@@ -6,6 +6,7 @@ import { ChevronsDown, Smartphone, Tv2 } from "lucide-react"
 import { Fredoka } from "next/font/google"
 import Image from "next/image"
 import Link from "next/link"
+import { useRouter } from "next/navigation"
 import { TouchEventHandler, useEffect, useState } from "react"
 
 const fredoka = Fredoka({ weight: "400", subsets: ['hebrew'] })
@@ -15,28 +16,34 @@ interface project {
     subTitle?: string
     description: string[]
     src: string
+    video: string
 }
 
 const projects: project[] = [
     {
         title: 'בינה עברית',
         subTitle: '(AI hebrew app)',
-        description: ['AI platform for Hebrew speakers.', 'End to end application, responsive. Next.js, typescript, tailwind, PrismaDB.', 'Interact with (through API calls) Google api, Openai, Replicate, Clerk and uPay'],
-        src: 'https://ai-heb-app.vercel.app/dashboard'
+        description: ['AI platform for Hebrew speakers.', 'End to end application. Next, Typescript, Tailwind, PrismaDB.', 'API requests to Google cloud, Openai , Replicate , Clerk (auth) and uPay'],
+        src: 'https://ai-heb-app.vercel.app/dashboard',
+        video: 'https://res.cloudinary.com/dnvbfkgsb/video/upload/v1715799717/heb-ai_xsylql.mp4'
     },
     {
         title: 'Finerr',
-        description: ['A Fiverr-like marketplace, contains the full user experience of the original app.', 'I\'ve been a part of a small team which created it within three weeks, using React, Redux, SCSS, Node.js, MongoDB and Git'],
-        src: 'https://finerr.onrender.com/'
+        description: ['A Fiverr-like marketplace, contains the full user experience of the original app.', 'I take part of a small team which created it within three weeks, using React, Redux, SCSS, Node.js, MongoDB and Git', 'I was responsible for Homepage, search and filter components, as well as to create and connect the Server and Database'],
+        src: 'https://finerr.onrender.com/',
+        video: 'https://res.cloudinary.com/dnvbfkgsb/video/upload/v1715799738/finerr_xk2fx8.mp4'
     },
     {
-        title: 'Vitcoin',
-        description: ['Bitcoin app, based on Vue.js.', 'The app allows user to check current value and statistics of Bitcoin. also, gives the user demo wallet to share coins with contacts (contacts list contains full CRUD actions)'],
-        src: 'https://nadaveliash.github.io/vitcoin-vue/#/'
+        title: 'Vit-coin',
+        description: ['Bitcoin trade app, based on Vue.js.', 'The app allows user to check current value and statistics of Bitcoin. also, gives the users demo wallet to transfer bitcoins to their contacts', 'contact list (demo data) allows full CRUD actions'],
+        src: 'https://nadaveliash.github.io/vitcoin-vue/#/',
+        video: 'https://res.cloudinary.com/dnvbfkgsb/video/upload/v1715799737/vitcoin_hj9lxk.mp4'
     },
 ]
 
 export default function Projects() {
+
+    const router = useRouter()
 
     const [currentView, setCurrentView] = useState(0)
     const [wideScreen, setWideScreen] = useState(true)
@@ -51,7 +58,7 @@ export default function Projects() {
         setTimeout(() => {
             setGuidDisplay(false)
         }, 1000)
-        
+
         setTimeout(() => {
             setFadeOut(true)
         }, 4000)
@@ -111,11 +118,21 @@ export default function Projects() {
             onTouchStart={handleTouchStart}
             onTouchMove={handleTouch}
         >
+            <div className="absolute md:hidden w-[40px] h-[40px] bg-black/80 top-1 left-1 rounded-xl z-40"></div>
+
             {projects && projects.map((project, idx) =>
-                <div className={`${idx === currentView ? 'grid' : 'hidden'} ${isReplacing ? 'scale-0' : 'scale-100'} grid-cols-8 items-center transition-all duration-1000`} key={project.title}>
-                    <div className="col-span-8 md:col-span-2 px-8 2xl:pl-32 flex flex-col gap-2 mt-10">
-                        <h1 className={`text-5xl mx-auto my-6 ${fredoka.className}`}>{project.title}</h1>
-                        {project.description.map((line, idx) => <h2 key={idx} className="text-xl">{line}</h2>)}
+                <div className={`${idx === currentView ? 'grid' : 'hidden'} ${isReplacing ? 'scale-0' : 'scale-100'} grid-cols-8 items-center transition-all duration-1000 md:pt-20`} key={project.title}>
+                    <div className="col-span-8 md:col-span-2 2xl:pl-32 flex flex-col gap-2">
+                        {idx === currentView && <video src={project.video} className="md:hidden w-full" autoPlay loop onClick={() => router.push(project.src)}>
+                        </video>}
+                        <h1 className={`text-5xl ${idx===0? 'text-end mr-4' :'ml-4'} my-6 px-8 ${fredoka.className}`}>{project.title}</h1>
+                        {project.description.map((line, idx) => <h2 key={idx} className="lg:text-xl px-8">{line}</h2>)}
+
+                        <div id="toggle-display" className="hidden md:flex relative mt-10 ml-[30%] w-32 h-12 bg-white/20 rounded-full items-center justify-between p-3 cursor-pointer" onClick={() => setWideScreen(!wideScreen)}>
+                            <Smartphone className="w-6 h-6" />
+                            <Tv2 className="w-6 h-6" />
+                            <div className={`absolute ${wideScreen ? 'left-[84px]' : 'left-[4px]'} transition-all duration-200 w-10 h-10 rounded-full bg-white/20`}></div>
+                        </div>
                     </div>
                     <div className={`hidden md:block col-span-6 justify-self-center relative opacity-90 shadow-xl shadow-white/30 scale-y-[0.7] scale-x-[0.8]
                                     ${wideScreen ? 'w-full max-w-5xl rounded-2xl rotate-3 -skew-x-3' : 'w-[380px] rounded-[3rem] -rotate-12 -ml-40 skew-y-1'} 
@@ -129,11 +146,6 @@ export default function Projects() {
                     <Link href={project.src} target="_blank"
                         className="md:hidden col-span-4 col-start-3 bg-white/10 text-center rounded-full p-3 mt-10">Open in a new tab</Link>
                 </div>)}
-            <div className="hidden md:flex absolute left-[55vw] bottom-20 w-32 h-12 bg-white/20 rounded-full items-center justify-between p-3 cursor-pointer" onClick={() => setWideScreen(!wideScreen)}>
-                <Smartphone className="w-6 h-6" />
-                <Tv2 className="w-6 h-6" />
-                <div className={`absolute ${wideScreen ? 'left-[84px]' : 'left-[4px]'} transition-all duration-200 w-10 h-10 rounded-full bg-white/20`}></div>
-            </div>
             <div id="desktop-guid" className="hidden md:block">
                 <WheelGuid guidDisplay={guidDisplay} />
             </div>
