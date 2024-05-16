@@ -23,7 +23,9 @@ const projects: project[] = [
     {
         title: 'בינה עברית',
         subTitle: '(AI hebrew app)',
-        description: ['AI platform for Hebrew speakers.', 'End to end application. Next, Typescript, Tailwind, PrismaDB.', 'API requests to Google cloud, Openai , Replicate , Clerk (auth) and uPay'],
+        description: ['AI platform for Hebrew speakers.', 'End to end application. Next, Typescript, Tailwind, PrismaDB.',
+            'Auth with Clerk (currently suspend to allow guest to enter). The AI generation start with sending an API requests to Google cloud for translate, then send request to Openai / Replicate for generation.',
+            'Each logged-in user get 5 generation for free and then have to subscribe. The users can pay through Upay and then get back to the site with a new link, which sign them with their plan.'],
         src: 'https://ai-heb-app.vercel.app/dashboard',
         video: 'https://res.cloudinary.com/dnvbfkgsb/video/upload/v1715799717/heb-ai_xsylql.mp4'
     },
@@ -118,15 +120,15 @@ export default function Projects() {
             onTouchStart={handleTouchStart}
             onTouchMove={handleTouch}
         >
-            <div className="absolute md:hidden w-[40px] h-[40px] bg-black/80 top-1 left-1 rounded-xl z-40"></div>
+            <div className="absolute md:hidden w-[38px] h-[38px] bg-black/80 top-[5px] left-[5px] rounded-xl z-40"></div>
 
             {projects && projects.map((project, idx) =>
-                <div className={`${idx === currentView ? 'grid' : 'hidden'} ${isReplacing ? 'scale-0' : 'scale-100'} grid-cols-8 items-center transition-all duration-1000 md:pt-20`} key={project.title}>
+                <div className={`${idx === currentView ? 'grid' : 'hidden'} ${isReplacing ? 'scale-0' : 'scale-100'} grid-cols-8 transition-all duration-1000 md:pt-32 h-full`} key={project.title}>
                     <div className="col-span-8 md:col-span-2 2xl:pl-32 flex flex-col gap-2">
-                        {idx === currentView && <video src={project.video} className="md:hidden w-full" autoPlay loop onClick={() => router.push(project.src)}>
+                        {idx === currentView && <video src={project.video} className="md:hidden " autoPlay loop onClick={() => router.push(project.src)}>
                         </video>}
-                        <h1 className={`text-5xl ${idx===0? 'text-end mr-4' :'ml-4'} my-6 px-8 ${fredoka.className}`}>{project.title}</h1>
-                        {project.description.map((line, idx) => <h2 key={idx} className="lg:text-xl px-8">{line}</h2>)}
+                        <h1 className={`text-3xl md:text-5xl ${idx === 0 ? 'text-end mr-2' : 'ml-2'} my-4 px-8 ${fredoka.className}`}>{project.title}</h1>
+                        {project.description.map((line, idx) => <h2 key={idx} className="lg:text-xl lg:px-8 px-4">{line}</h2>)}
 
                         <div id="toggle-display" className="hidden md:flex relative mt-10 ml-[30%] w-32 h-12 bg-white/20 rounded-full items-center justify-between p-3 cursor-pointer" onClick={() => setWideScreen(!wideScreen)}>
                             <Smartphone className="w-6 h-6" />
@@ -144,14 +146,14 @@ export default function Projects() {
                         <iframe src={project.src} onLoad={onLoad} className={`w-full h-full border-[20px] border-black bg-white ${wideScreen ? 'rounded-2xl' : 'rounded-[3rem]'}`}></iframe>
                     </div>
                     <Link href={project.src} target="_blank"
-                        className="md:hidden col-span-4 col-start-3 bg-white/10 text-center rounded-full p-3 mt-10">Open in a new tab</Link>
+                        className="md:hidden absolute bottom-10 left-1/2 -translate-x-1/2 bg-white/10 text-center rounded-full p-3 w-60">Open in a new tab</Link>
                 </div>)}
             <div id="desktop-guid" className="hidden md:block">
                 <WheelGuid guidDisplay={guidDisplay} />
             </div>
-            <div id="swipe-guid" className={`md:hidden absolute left-1/2 bottom-10 -translate-x-1/2 flex flex-col items-center gap-3 text-white ${fadeOut && 'animate-[opacity_.3s_linear] opacity-0'}`}>
+            <div id="swipe-guid" className={`md:hidden absolute left-1/2 bottom-2 -translate-x-1/2 flex flex-col items-center gap-3 text-white ${fadeOut && 'animate-[opacity_.3s_linear] opacity-0'}`}>
                 <h1>Swipe to see more</h1>
-                <Image src={'https://www.svgrepo.com/show/409931/swipe-right.svg'} alt="swipe" width={40} height={40} className="absolute -top-20 opacity-100 animate-swipeDown invert" />
+                <Image src={'https://www.svgrepo.com/show/409931/swipe-right.svg'} alt="swipe" width={40} height={40} className="absolute -top-10 opacity-100 animate-swipeDown invert" />
             </div>
         </div>
     )

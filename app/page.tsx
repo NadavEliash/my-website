@@ -36,8 +36,7 @@ const pages: page[] = [
     headline: 'About me',
     description: [
       'My name is Nadav Eliash.',
-      'I\'m a Frontend / Fullstack Web Developer, with experience in writing a single page applications.',
-      'more...'
+      'I\'m a Frontend / Fullstack Web Developer...',
     ],
     img: about,
   },
@@ -45,22 +44,20 @@ const pages: page[] = [
     href: 'animate',
     headline: 'Animate Online',
     description: [
-      'Animation app I built, based on HTML Canvas and React.',
-      'The app allows users to draw along frames and create animation clips.',
-      '** Mobile version still in progress.'
+      'Animation app I built, based on HTML Canvas and React. (Mobile version still in progress)'
     ],
     img: animate,
   },
   {
     href: 'projects',
     headline: 'My Portfolio',
-    description: ['An interactiv list That shows selection of apps I\'ve created.'],
+    description: ['An interactiv list shows selection of apps I\'ve created.'],
     img: projects,
   },
   {
     href: 'portfolio',
     headline: 'Animation Portfolio',
-    description: ['Before I learn code, I used to be an Animator. Here\'s a selection of my animation works.'],
+    description: ['I used to be an Animator. Here\'s a selection of my animation works.'],
     img: animationPortfolio
   },
 ]
@@ -203,13 +200,13 @@ export default function Home() {
       onTouchStart={handleTouchStart}
       onTouchMove={handleTouchMove}
       onTouchEnd={handleTouchEnd}>
-      <div className="mt-[25%] md:mt-20 md:m-10 md:w-fit h-[180px] md:h-[210px] bg-black/40 rounded-lg border-2 border-white text-lg flex flex-col" >
+      <div className="mt-[25%] md:mt-20 md:m-10 md:w-fit h-[140px] md:h-[180px] bg-black/40 rounded-lg border-2 border-white text-lg flex flex-col" >
         <div className="w-full py-2 bg-white/10 flex items-center gap-2">
           <div className="w-3 h-3 ml-3 bg-red-500 rounded-full"></div>
           <div className="w-3 h-3 bg-yellow-500 rounded-full"></div>
           <div className="w-3 h-3 bg-green-500 rounded-full"></div>
         </div>
-        <div className="mt-10 mx-5 md:text-xl md:w-[600px]">
+        <div className="mt-6 mx-5 md:text-xl md:w-[500px]">
           {string.length && string.map((letter, idx) =>
             <p key={idx} className={`${letter.color} inline transition-all leading-8`}>
               {letter.str === '+' ? <br /> : letter.str}
@@ -229,18 +226,18 @@ export default function Home() {
           <ChevronLeft className="mt-2 w-10 h-10 cursor-pointer" />
         </div>
         {pages.map((page, idx) =>
-          <Link href={page.href} key={idx} className={`absolute bg-white/10 w-[100%] max-w-[360px] md:w-[360px] h-[400px] max-h-[100%] rounded-2xl p-3 transition-all duration-500 grid grid-rows-12
-          ${currentPage === idx ? 'left-1/2 -translate-x-1/2 md:left-[80px] md:translate-x-0 opacity-100'
+          <Link href={page.href} key={idx} className={`absolute bg-white/10 w-[100%] max-w-[340px] md:w-[360px] h-[400px] max-h-[100%] rounded-[40px] p-5 transition-all duration-500 grid grid-rows-12
+          ${currentPage === idx ? 'left-1/2 -translate-x-1/2 md:left-[90px] md:translate-x-0 opacity-100'
               : nextPage === idx ? 'left-[400px] md:left-[520px] opacity-0'
                 : prevPage === idx ? '-left-[400px] opacity-0' : 'left-[100%] opacity-0'}
             `}>
-            <div className={`rounded-2xl row-span-6 border-[1px] border-white/50 overflow-hidden`}>
-              <Image key={idx} src={page.img!} alt="img" loading="eager" width={960} height={540} className={`${page.imgStyle} rounded-2xl`} />
+            <div className={`rounded-3xl row-span-7 h-fit border-[1px] border-white/50 overflow-hidden`}>
+              <Image key={idx} src={page.img!} alt="img" loading="eager" width={960} height={540} className={`${page.imgStyle} rounded-3xl w-full`} />
             </div>
-            <h1 className="text-lg font-bold mx-3 row-start-8">
+            <h1 className="text-lg font-bold mx-3 row-start-9">
               {page.headline}
             </h1>
-            <div className="row-span-5 mt-2">
+            <div className="row-span-2 mt-2">
               {page.description.map((line, idx) =>
                 <p key={idx} className="text-sm text-justify mx-3">
                   {line}

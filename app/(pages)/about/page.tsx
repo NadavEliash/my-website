@@ -13,8 +13,9 @@ export default function About() {
                 <p className="text-justify text-lg md:text-xl mt-4">
                     {`My name is Nadav Eliash.`}
                     <br />
-                    {`I'm a Frontend / Fullstack Web Developer with experience in writing single-page-applications using the latest technologies.
-                    I've Graduate the "Coding Academy" - an intensive coding bootcamp (640 h) for Fullstack developers.`}
+                    {`I'm a Frontend / Fullstack Web Developer with experience in writing single-page applications using the latest technologies.`}
+                    <br />
+                    {`I've Graduate the "Coding Academy" - an intensive coding bootcamp (640 h) for Fullstack developers.`}
                     <br />
                     {`I'm a talented Designer and Animator, who have a full capacity of compositoning things in space and moving them around to create satisfying and fully experience for users.`}
                     <br />
