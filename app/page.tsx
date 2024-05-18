@@ -35,8 +35,8 @@ const pages: page[] = [
     href: 'about',
     headline: 'About me',
     description: [
-      'My name is Nadav Eliash.',
-      'I\'m a Frontend / Fullstack Web Developer...',
+      'My name is Nadav Eliash. I\'m a Frontend, Fullstack Web Developer.',
+      'more..'
     ],
     img: about,
   },
@@ -44,7 +44,7 @@ const pages: page[] = [
     href: 'animate',
     headline: 'Animate Online',
     description: [
-      'Animation app I built, based on HTML Canvas and React. (Mobile version still in progress)'
+      'Animation app I built, based on HTML Canvas and React (Mobile version still in progress).'
     ],
     img: animate,
   },
@@ -195,7 +195,7 @@ export default function Home() {
   }
 
   return (
-    <main className={`${menlo.className} absolute left-0 top-0 h-svh w-full px-2 -z-10`}
+    <main className={`absolute left-0 top-0 h-svh w-full px-2 -z-10`}
       onWheel={handleWheel}
       onTouchStart={handleTouchStart}
       onTouchMove={handleTouchMove}
@@ -208,7 +208,7 @@ export default function Home() {
         </div>
         <div className="mt-6 mx-5 md:text-xl md:w-[500px]">
           {string.length && string.map((letter, idx) =>
-            <p key={idx} className={`${letter.color} inline transition-all leading-8`}>
+            <p key={idx} className={`${letter.color} ${menlo.className} inline transition-all leading-8`}>
               {letter.str === '+' ? <br /> : letter.str}
             </p>
           )}
@@ -234,12 +234,12 @@ export default function Home() {
             <div className={`rounded-3xl row-span-7 h-fit border-[1px] border-white/50 overflow-hidden`}>
               <Image key={idx} src={page.img!} alt="img" loading="eager" width={960} height={540} className={`${page.imgStyle} rounded-3xl w-full`} />
             </div>
-            <h1 className="text-lg font-bold mx-3 row-start-9">
+            <h1 className="text-xl font-bold mx-3 row-start-9 ">
               {page.headline}
             </h1>
             <div className="row-span-2 mt-2">
               {page.description.map((line, idx) =>
-                <p key={idx} className="text-sm text-justify mx-3">
+                <p key={idx} className="text-justify mx-3">
                   {line}
                 </p>
               )}</div>

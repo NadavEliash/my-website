@@ -124,26 +124,28 @@ export default function Projects() {
 
             {projects && projects.map((project, idx) =>
                 <div className={`${idx === currentView ? 'grid' : 'hidden'} ${isReplacing ? 'scale-0' : 'scale-100'} grid-cols-8 transition-all duration-1000 md:pt-32 h-full`} key={project.title}>
-                    <div className="col-span-8 md:col-span-2 2xl:pl-32 flex flex-col gap-2">
+                    <div className="col-span-8 md:col-span-3 lg:col-span-2 flex flex-col gap-2">
                         {idx === currentView && <video src={project.video} className="md:hidden " autoPlay loop onClick={() => router.push(project.src)}>
                         </video>}
-                        <h1 className={`text-3xl md:text-5xl ${idx === 0 ? 'text-end mr-2' : 'ml-2'} my-4 px-8 ${fredoka.className}`}>{project.title}</h1>
-                        {project.description.map((line, idx) => <h2 key={idx} className="lg:text-xl lg:px-8 px-4">{line}</h2>)}
+                        <div className="pl-6 md:pt-20">
+                            <h1 className={`text-[2.5rem] ${idx === 0 ? 'text-end mr-2' : 'ml-2'} my-4 ${fredoka.className}`}>{project.title}</h1>
+                            {project.description.map((line, idx) => <h2 key={idx} className="lg:text-lg">{line}</h2>)}
+                        </div>
 
-                        <div id="toggle-display" className="hidden md:flex relative mt-10 ml-[30%] w-32 h-12 bg-white/20 rounded-full items-center justify-between p-3 cursor-pointer" onClick={() => setWideScreen(!wideScreen)}>
+                        <div id="toggle-display" className="hidden lg:flex relative mt-10 ml-[30%] w-32 h-12 bg-white/20 rounded-full items-center justify-between p-3 cursor-pointer" onClick={() => setWideScreen(!wideScreen)}>
                             <Smartphone className="w-6 h-6" />
                             <Tv2 className="w-6 h-6" />
                             <div className={`absolute ${wideScreen ? 'left-[84px]' : 'left-[4px]'} transition-all duration-200 w-10 h-10 rounded-full bg-white/20`}></div>
                         </div>
                     </div>
-                    <div className={`hidden md:block col-span-6 justify-self-center relative opacity-90 shadow-xl shadow-white/30 scale-y-[0.7] scale-x-[0.8]
-                                    ${wideScreen ? 'w-full max-w-5xl rounded-2xl rotate-3 -skew-x-3' : 'w-[380px] rounded-[3rem] -rotate-12 -ml-40 skew-y-1'} 
+                    <div className={`hidden md:block md:col-span-5 lg:col-span-6 justify-self-center relative opacity-90 shadow-xl shadow-white/30 scale-y-[0.7] scale-x-[0.8]
+                                    ${wideScreen ? 'w-[380px] rounded-[3rem] lg:w-full lg:max-w-5xl lg:rounded-2xl rotate-3 -skew-x-3' : 'w-[380px] rounded-[3rem] -rotate-12 -ml-40 skew-y-1'} 
                                     ${project.title === 'Finerr' ? 'h-[700px]' : 'h-[780px]'}`}>
-                        <div className={`absolute top-3 left-3 bg-black/70 w-full h-full -z-10 ${wideScreen ? 'rounded-2xl' : 'rounded-[3rem]'}`}></div>
-                        {isLoading && <div className={`absolute w-full h-full bg-black border-[20px] border-black ${wideScreen ? 'rounded-2xl' : 'rounded-[3rem]'} flex items-center justify-center overflow-hidden`}>
+                        <div className={`absolute top-3 left-3 bg-black/70 w-full h-full -z-10 ${wideScreen ? 'rounded-[3rem] lg:rounded-2xl' : 'rounded-[3rem]'}`}></div>
+                        {isLoading && <div className={`absolute w-full h-full bg-black border-[20px] border-black ${wideScreen ? 'rounded-[3rem] lg:rounded-2xl' : 'rounded-[3rem]'} flex items-center justify-center overflow-hidden`}>
                             <Loader />
                         </div>}
-                        <iframe src={project.src} onLoad={onLoad} className={`w-full h-full border-[20px] border-black bg-white ${wideScreen ? 'rounded-2xl' : 'rounded-[3rem]'}`}></iframe>
+                        <iframe src={project.src} onLoad={onLoad} className={`w-full h-full border-[20px] border-black bg-white ${wideScreen ? 'rounded-[3rem] lg:rounded-2xl' : 'rounded-[3rem]'}`}></iframe>
                     </div>
                     <Link href={project.src} target="_blank"
                         className="md:hidden absolute bottom-10 left-1/2 -translate-x-1/2 bg-white/10 text-center rounded-full p-3 w-60">Open in a new tab</Link>
