@@ -10,9 +10,6 @@ export async function GET(req: Request) {
     try {
 
         const menlo = await fetch(new URL('../../../Menlo-Regular.ttf', import.meta.url)).then((res) => res.arrayBuffer())
-        const pc = await fetch(new URL('../../assets/pc.svg', import.meta.url)).then((res) => res.arrayBuffer())
-        const layout = await fetch(new URL('../../assets/layout.svg', import.meta.url)).then((res) => res.arrayBuffer())
-        const animation = await fetch(new URL('../../assets/animation.svg', import.meta.url)).then((res) => res.arrayBuffer())
 
         return new ImageResponse(
             (
