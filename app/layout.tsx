@@ -47,6 +47,9 @@ export default function RootLayout({
     <html lang="en">
       <head>
         <link rel="icon" href="./assets/icon.svg" sizes="any" />
+        <meta property="og:image" content="https://res.cloudinary.com/dnvbfkgsb/image/upload/v1716116697/og_dqrtcu.png" />
+        <meta property="og:image:width" content="600" />
+        <meta property="og:image:height" content="315" />
       </head>
       <body className={`${roboto.className} text-white/80`}>
         <Navbar />
