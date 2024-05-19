@@ -63,7 +63,7 @@ export default function Projects() {
 
         setTimeout(() => {
             setFadeOut(true)
-        }, 4000)
+        }, 2000)
     }, [])
 
     const handleWheel = (ev: any) => {
@@ -153,7 +153,7 @@ export default function Projects() {
             <div id="desktop-guid" className="hidden md:block">
                 <WheelGuid guidDisplay={guidDisplay} />
             </div>
-            <div id="swipe-guid" className={`md:hidden absolute bottom-0 w-full h-1/2 flex flex-col items-center justify-center gap-3 text-white ${fadeOut && 'animate-[opacity_1s_linear] opacity-0'} overflow-hidden`}>
+            <div id="swipe-guid" className={`md:hidden absolute bottom-0 w-full h-1/2 flex flex-col items-center justify-center gap-3 text-white ${fadeOut && 'animate-[opacity_1s_linear] opacity-0 pointer-events-none'} overflow-hidden`}>
                 <div className="absolute w-[600px] h-[600px] rounded-full bg-black/50 -bottom-1/2"></div>
                 <Image src={'https://www.svgrepo.com/show/409931/swipe-right.svg'} alt="swipe" width={40} height={40} className="opacity-100 animate-swipeDown invert z-50" />
                 <h1 className="z-50 text-2xl">Swipe to see more..</h1>
