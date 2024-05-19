@@ -35,8 +35,6 @@ export default function RootLayout({
     <html lang="en">
       <head>
         <link rel="icon" href="./assets/icon.svg" sizes="any" />
-        <meta property="og:title" content="Nadav Eliash" />
-        <meta property="og:description" content="Frontend / Fullstack programmer, Designer and Animator" />
       </head>
       <body className={`${roboto.className} text-white/80`}>
         <Navbar />
