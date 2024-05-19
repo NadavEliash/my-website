@@ -9,6 +9,13 @@ const roboto = Roboto_Condensed({ subsets: ["latin"] })
 
 export const metadata: Metadata = {
   openGraph: {
+    url: 'https://nadaveliash.com',
+    title: {
+      absolute: '',
+      default: "Nadav Eliash"
+    },
+    siteName: 'Nadav Eliash',
+    description: "Frontend / Fullstack developer | Designer | Animator",
     images: [
       {
         url: "/api/og",
@@ -16,14 +23,8 @@ export const metadata: Metadata = {
         height: 630,
         alt: "Nadav Eliash"
       }
-    ]
+    ],
   },
-  title: {
-    absolute: '',
-    default: "Nadav Eliash"
-  },
-  description: "Frontend / Fullstack developer | Designer | Animator",
-
 }
 
 export default function RootLayout({
