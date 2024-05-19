@@ -22,7 +22,7 @@ export const metadata: Metadata = {
     absolute: '',
     default: "Nadav Eliash"
   },
-  description: "Frontend / Fullstack programmer, Designer and Animator",
+  description: "Frontend / Fullstack developer | Designer | Animator",
 
 }
 
