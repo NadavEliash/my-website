@@ -12,6 +12,8 @@ export default function DrawingCanvas({
     background,
     loadImage,
     clear,
+    isPlay,
+    isDownload
 }) {
 
     const canvasRef = useRef()
@@ -105,6 +107,7 @@ export default function DrawingCanvas({
     // ACTIONS
 
     const startDrawing = (e, mobile = false) => {
+        if (isPlay || isDownload) return
         if (canvasRef.current && action.isDraw) {
             const ctx = canvasRef.current.getContext('2d')            
             ctx.beginPath()
@@ -151,8 +154,7 @@ export default function DrawingCanvas({
     }
 
     const startErasing = (e, mobile) => {
-        console.log('erase')
-
+        if (isPlay || isDownload) return
         if (context && action.isErase) {
             setIsDrawing(true)
         }
@@ -179,6 +181,8 @@ export default function DrawingCanvas({
     }
 
     const startTransform = async (e, mobile = false) => {
+        if (isPlay || isDownload) return
+
         setIsTransform(true)
         setTransformGap({ x: e.nativeEvent.offsetX, y: e.nativeEvent.offsetY })
         const newURL = await redrawImage()

@@ -24,7 +24,6 @@ html {
 body {
   max-height: 100%;
   color: rgb(var(--foreground-rgb));
-  background-image: url('assets/stars.jpg');
   background: radial-gradient(circle at center,
       rgb(var(--background-end-rgb)) 10%,
       rgb(var(--background-start-rgb))

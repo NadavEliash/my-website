@@ -10,8 +10,10 @@ import { ChevronLeft, ChevronRight, ChevronsLeft } from "lucide-react"
 import { StaticImageData } from "next/image";
 import about from "./assets/about.png"
 import animate from "./assets/animate.png"
-import projects from "./assets/projects.png"
-import animationPortfolio from "./assets/animationPortfolio.png"
+import finerr from "./assets/finerr.gif"
+import hebai from "./assets/hebai.gif"
+import vitcoin from "./assets/vitcoin.gif"
+// import animationPortfolio from "./assets/animationPortfolio.png"
 // import SceneCanvas from "./components/home-scene/scene-canvas";
 
 const menlo = localFont({ src: '../Menlo-Regular.ttf' })
@@ -27,7 +29,6 @@ interface page {
   headline: string
   description: string[]
   img?: StaticImageData | string
-  imgStyle?: string
 }
 
 const pages: page[] = [
@@ -41,7 +42,7 @@ const pages: page[] = [
     img: about,
   },
   {
-    href: 'animate',
+    href: 'code_portfolio/animate',
     headline: 'Animate Online',
     description: [
       'Animation app I built, based on HTML Canvas and React (Mobile version still in progress).'
@@ -49,17 +50,29 @@ const pages: page[] = [
     img: animate,
   },
   {
-    href: 'projects',
-    headline: 'My Portfolio',
-    description: ['An interactiv list shows selection of apps I\'ve created.'],
-    img: projects,
+    href: 'code_portfolio/finerr',
+    headline: 'Finerr',
+    description: ['Fiverr like marketplace, I\'ve created as part of a small team'],
+    img: finerr,
   },
   {
-    href: 'portfolio',
-    headline: 'Animation Portfolio',
-    description: ['I used to be an Animator. Here\'s a selection of my animation works.'],
-    img: animationPortfolio
+    href: 'code_portfolio/heb_ai',
+    headline: 'AI hebrew app (בינה עברית)',
+    description: ['App which accessible AI platforms to Hebrew speakers'],
+    img: hebai,
   },
+  {
+    href: 'code_portfolio/vitcoin',
+    headline: 'Vit-coin',
+    description: ['Bitcoin demo app, shows live statistics and allows user to share his bitcoins with friends'],
+    img: vitcoin,
+  },
+  // {
+  //   href: 'portfolio',
+  //   headline: 'Animation Portfolio',
+  //   description: ['I used to be an Animator. Here\'s a selection of my animation works.'],
+  //   img: animationPortfolio
+  // },
 ]
 
 export default function Home() {
@@ -231,8 +244,8 @@ export default function Home() {
               : nextPage === idx ? 'left-[400px] md:left-[520px] opacity-0'
                 : prevPage === idx ? '-left-[400px] opacity-0' : 'left-[100%] opacity-0'}
             `}>
-            <div className={`rounded-3xl row-span-7 h-fit border-[1px] border-white/50 overflow-hidden`}>
-              <Image key={idx} src={page.img!} alt="img" loading="eager" width={960} height={540} className={`${page.imgStyle} rounded-3xl w-full`} />
+            <div className={`rounded-xl row-span-7 h-fit border-[1px] border-white/50 overflow-hidden`}>
+              <Image key={idx} src={page.img!} alt="img" loading="eager" width={960} height={540} priority unoptimized/>
             </div>
             <h1 className="text-xl font-bold mx-3 row-start-9 ">
               {page.headline}

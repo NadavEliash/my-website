@@ -15,7 +15,7 @@ export async function GET(req: Request) {
             (
                 <div tw="w-full h-full flex flex-col items-center justify-center p-10" style={{ backgroundImage: 'linear-gradient(to top right, #0b0f27, #03274a)' }}>
                     <h1 tw="text-7xl text-white" style={{ fontFamily: "menlo" }}>Nadav Eliash</h1>
-                    <h2 tw="text-3xl text-white" style={{ fontFamily: "menlo" }}>Frontend / Fullstack developer | Designer | Animator</h2>
+                    <h2 tw="text-3xl text-white" style={{ fontFamily: "menlo" }}>Frontend / Fullstack developer | Designer </h2>
                     <div tw="relative flex items-center mt-10">
                         <div tw="w-28 h-28 border-2 border-white rounded-full"></div>
                         <div tw="w-28 h-28 border-2 border-white rounded-full ml-20"></div>
@@ -31,10 +31,16 @@ export async function GET(req: Request) {
                         <div tw="absolute left-[250px] top-[50px] w-4 h-1 rounded-md bg-white"></div>
                         <div tw="absolute left-[232px] top-[64px] w-3 h-3 rounded-xl border-2 border-white"></div>
                         
-                        <div tw="absolute left-[410px] top-6 w-6 h-6 rounded-full bg-white/20"></div>
-                        <div tw="absolute left-[420px] top-[30px] w-6 h-6 rounded-full bg-white/40"></div>
-                        <div tw="absolute left-[430px] top-[40px] w-6 h-6 rounded-full bg-white/60"></div>
-                        <div tw="absolute left-[438px] top-[52px] w-6 h-6 rounded-full bg-white"></div>
+                        <div tw="absolute left-[408px] top-[40px] w-16 h-8 rounded-full bg-white/10"></div>
+                        <div tw="absolute left-[400px] top-[36px] w-20 h-10 rounded-full bg-white/5"></div>
+                        <div tw="absolute left-[416px] top-12 w-12 h-4 rounded-full bg-white/70 text-xs px-[5px]"> CLICK</div>
+                        <div tw="absolute left-[420px] top-[20px] text-white text-xs h-2 overflow-hidden">\</div>
+                        <div tw="absolute left-[440px] top-[20px] text-white text-xs h-2 overflow-hidden">|</div>
+                        <div tw="absolute left-[460px] top-[20px] text-white text-xs h-2 overflow-hidden">/</div>
+                        <div tw="absolute left-[460px] top-[84px] text-white text-xs h-2 overflow-hidden">\</div>
+                        <div tw="absolute left-[440px] top-[84px] text-white text-xs h-2 overflow-hidden">|</div>
+                        <div tw="absolute left-[420px] top-[84px] text-white text-xs h-2 overflow-hidden">/</div>
+                        
                     </div>
                 </div>
             ),
