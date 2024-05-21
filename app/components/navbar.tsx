@@ -15,17 +15,17 @@ const pages = [
         title: 'Home'
     },
     {
-        href: 'about',
+        href: '/about',
         icon: '',
         title: 'About'
     },
     {
-        href: 'code_portfolio',
+        href: '/code_portfolio',
         icon: '',
         title: 'Code Portfolio'
     },
     {
-        href: 'animation_portfolio',
+        href: '/animation_portfolio',
         icon: '',
         title: 'More..'
     },
@@ -43,7 +43,7 @@ export default function Navbar() {
 
     return (
         <>
-            <nav className={`${hide? 'opacity-0 pointer-events-none' : ''} z-50 ${display ? 'left-0' : '-left-[100%]'} transition-all duration-500 absolute top-0 w-full flex-col items-start text-2xl ${dongle.className} 
+            <nav className={`${hide? 'opacity-0 pointer-events-none' : ''} z-50 ${display ? 'left-0' : '-left-[110%]'} transition-all duration-500 absolute top-0 w-full flex-col items-start text-2xl ${dongle.className} 
             md:left-0 md:px-4 md:py-3 md:flex md:flex-row md:h-fit md:gap-4`}
                 onClick={() => setDisplay(!display)}>
                 {pages.map(page =>

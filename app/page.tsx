@@ -9,7 +9,7 @@ import { ChevronLeft, ChevronRight, ChevronsLeft } from "lucide-react"
 
 import { StaticImageData } from "next/image";
 import about from "./assets/about.png"
-import animate from "./assets/animate.png"
+import animate from "./assets/animate.gif"
 import finerr from "./assets/finerr.gif"
 import hebai from "./assets/hebai.gif"
 import vitcoin from "./assets/vitcoin.gif"
@@ -239,7 +239,7 @@ export default function Home() {
           <ChevronLeft className="mt-2 w-10 h-10 cursor-pointer" />
         </div>
         {pages.map((page, idx) =>
-          <Link href={page.href} key={idx} className={`absolute bg-white/10 w-[100%] max-w-[340px] md:w-[360px] h-[400px] max-h-[100%] rounded-[40px] p-5 transition-all duration-500 grid grid-rows-12
+          <Link href={page.href} key={idx} className={`absolute bg-white/10 w-[100%] max-w-[340px] md:w-[360px] h-[400px] max-h-[100%] rounded-[30px] p-5 transition-all duration-500 grid grid-rows-12
           ${currentPage === idx ? 'left-1/2 -translate-x-1/2 md:left-[90px] md:translate-x-0 opacity-100'
               : nextPage === idx ? 'left-[400px] md:left-[520px] opacity-0'
                 : prevPage === idx ? '-left-[400px] opacity-0' : 'left-[100%] opacity-0'}

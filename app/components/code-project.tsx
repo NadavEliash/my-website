@@ -34,22 +34,23 @@ export default function CodeProject({ project }: CodeProjectProps) {
                 <div className="ml-6">
                     <h1 className={`text-[2.5rem] 'ml-2 my-4 ${fredoka.className}`}>{project.title}</h1>
                     {project.subTitle && <h2>{project.subTitle}</h2>}
-                    {project.description.map((line: string, idx: number) => <h2 key={idx} className="lg:text-lg">{line}</h2>)}
-                    <div id="buttons" className=" flex flex-col gap-2">
-                        <div id="toggle-display" className="hidden lg:flex relative mt-10 w-32 h-12 bg-white/20 rounded-full items-center justify-between p-3 cursor-pointer" onClick={() => setWideScreen(!wideScreen)}>
-                            <Smartphone className="w-6 h-6" />
+                    {project.description.map((line: string, idx: number) => <h2 key={idx} className="text-sm sm:text-base xl:text-lg">{line}</h2>)}
+
+                    <div id="buttons" className=" flex flex-col gap-2 mt-6">
+                        <div id="toggle-display" className="hidden lg:flex relative mt-10 w-40 h-12 bg-white/20 rounded-full items-center justify-between p-3 cursor-pointer" onClick={() => setWideScreen(!wideScreen)}>
                             <Tv2 className="w-6 h-6" />
-                            <div className={`absolute ${wideScreen ? 'left-[84px]' : 'left-[4px]'} transition-all duration-200 w-10 h-10 rounded-full bg-white/20`}></div>
+                            <Smartphone className="w-6 h-6" />
+                            <div className={`absolute ${wideScreen ? 'left-[4px]' : 'left-[114px]'} transition-all duration-200 w-10 h-10 rounded-full bg-white/20`}></div>
                         </div>
 
-                        <Link href={project.repo} className="flex items-center justify-between gap-4 w-32 bg-white/20 hover:bg-white/30 p-1 rounded-full cursor-pointer">
-                            <h1 className="pl-2">Repo</h1>
+                        <Link href={project.repo} className="flex items-center justify-between gap-4 w-40 bg-white/20 hover:bg-white/30 p-1 rounded-full cursor-pointer">
+                            <h1 className="pl-2">Repository</h1>
                             <Image src={"https://www.svgrepo.com/show/450156/github.svg"} alt="github" width={40} height={40}></Image>
                         </Link>
 
                         <Link href={project.src} target="_blank"
-                            className="bg-white/10 text-center rounded-full p-3 w-fit">
-                            Open in a new tab
+                            className="bg-white/20 rounded-full p-3 w-40 relative hover:bg-white/30">
+                            <h1 className="">Go to the App <span className="absolute bottom-2 right-3 text-3xl">»</span></h1>
                         </Link>
                     </div>
                 </div>

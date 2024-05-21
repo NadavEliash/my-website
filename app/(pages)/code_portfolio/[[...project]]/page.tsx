@@ -23,7 +23,7 @@ const projects: project[] = [
         title: 'Animate online',
         description: ['Animation app, based on HTML Canvas and React.', 'The app allow users create an animation clips from scratch. User can draw, erase, then translate, rotate and scale his drawings. Drawing along multiple frames creates animation, which the user can play and download.'],
         src: '/animate',
-        video: '',
+        video: 'https://res.cloudinary.com/dnvbfkgsb/video/upload/v1716328797/animate_dy2dk9.mp4',
         repo: 'https://github.com/NadavEliash/personal-website-prod-'
     },
     {
@@ -79,7 +79,7 @@ export default function Projects() {
 
         setTimeout(() => {
             setFadeOut(true)
-        }, 2000)
+        }, 1000)
     }, [])
 
     const handleWheel = (ev: any) => {
@@ -138,10 +138,10 @@ export default function Projects() {
             <div id="desktop-guid" className="hidden md:block">
                 <WheelGuid guidDisplay={guidDisplay} />
             </div>
-            <div id="swipe-guid" className={`md:hidden absolute w-full h-svh top-0 left-0 flex flex-col items-center justify-center gap-3 text-white ${fadeOut  && 'animate-[opacity_1s_linear] opacity-0 pointer-events-none'}`}>
-                <div className="absolute w-full h-full bg-black/80 top-0 left-0"></div>
+            <div id="swipe-guid" className={`md:hidden absolute w-full h-svh top-0 left-0 flex flex-col items-center justify-end gap-3 text-white overflow-hidden ${fadeOut && 'animate-[opacity_1s_linear] opacity-0 pointer-events-none'}`}>
+                <div className="absolute w-[600px] h-[600px] bg-gradient-to-t from-black/70 from-70% to-transparent -bottom-[300px] rounded-full"></div>
                 <Image src={'https://www.svgrepo.com/show/409931/swipe-right.svg'} alt="swipe" width={40} height={40} className="opacity-100 animate-swipeDown invert z-50" />
-                <h1 className="z-50 text-2xl">Swipe to see more..</h1>
+                <h1 className="z-50 text-2xl mb-10">Swipe to see more..</h1>
             </div>
         </div>
     )
