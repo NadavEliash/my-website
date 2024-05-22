@@ -10,29 +10,29 @@ const roboto = Roboto_Condensed({ subsets: ["latin"] })
 export const metadata: Metadata = {
   metadataBase: new URL('https://nadaveliash.com'),
   title: "Nadav Eliash",
-  description: "Frontend/Fullstack Developer | Designer | Animator",
+  description: "Frontend/Fullstack Developer",
   
   openGraph: {
     title: "Nadav Eliash",
-    description: "Frontend/Fullstack Developer | Designer | Animator",
+    description: "Frontend/Fullstack Developer",
     siteName: 'Nadav Eliash',
     images: [
       {
         url: "/api/og",
-        width: 1200,
-        height: 630,
+        width: 600,
+        height: 315,
         alt: "Nadav Eliash"
       }
     ],
   },
   twitter: {
     title: "Nadav Eliash",
-    description: "Frontend/Fullstack Developer | Designer | Animator",
+    description: "Frontend/Fullstack Developer",
     images: [
       {
         url: "/api/og",
-        width: 1200,
-        height: 630,
+        width: 600,
+        height: 315,
         alt: "Nadav Eliash"
       }
     ],
