@@ -88,19 +88,19 @@ export default function Frames({
                 <div title="Remove frame" className={framesButtonClass} onClick={removeFrame}>
                     <SquareMinusIcon />
                 </div>
-                <div title="Clear scene" className={`${framesButtonClass} md:bg-red-500/70 rounded-full w-8 h-8 text-black/70 flex items-center justify-center`} onClick={clearAll}>
+                <div title="Clear scene" className={`${framesButtonClass} md:bg-black/70 rounded-full w-8 h-8 text-black/70 flex items-center justify-center`} onClick={clearAll}>
                     <Trash className='w-5 h-5' />
                 </div>
-                <div id='animation-options' className='flex gap-6 items-center justify-center'>
+                <div id='animation-options' className='ml-6 flex gap-6 items-center justify-center'>
                     <div title="Play / Pause" className={framesButtonClass} onClick={toggleAnimation}>
                         {isPlay ? <Pause /> : <Play />}
                     </div>
                     <div title="Download" className={framesButtonClass} onClick={download}>
                         <Download />
                     </div>
-                    <div title="Save" className={framesButtonClass}>
+                    {/* <div title="Save" className={framesButtonClass}>
                         <Save />
-                    </div>
+                    </div> */}
                 </div>
             </div>
             <div id="frames-container" className="w-full h-36 md:bg-white/10 p-4 flex gap-2 items-center justify-center rounded-b-2xl">
