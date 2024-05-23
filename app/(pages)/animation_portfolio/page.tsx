@@ -116,7 +116,7 @@ export default function Portfolio() {
     return (
         <div className="flex flex-col 2xl:flex-row items-center lg:justify-center w-full h-svh md:gap-10 2xl:gap-40">
             <div id="tv" className="border-gray-700 relative w-full bg-white/60
-            md:mt-16 lg:bg-gray-700 lg:mt-0 lg:rounded-3xl lg:w-[900px] sm:h-[470px] lg:max-w-[90%] lg:border-[10px] lg:border-r-[100px]">
+            md:mt-16 lg:bg-gray-700 lg:mt-0 lg:rounded-3xl lg:w-[900px] lg:max-w-[90%] lg:border-[10px] lg:border-r-[100px]">
                 <div className="hidden lg:block">
                     <div className="absolute bg-gray-400 w-20 h-20 -top-12 left-1/2 -translate-x-1/2 rounded-full -z-10"></div>
                     <div className="absolute bg-gray-500 w-2 h-80 rotate-[60deg] -top-[200px] left-1/2 translate-x-[50px] -z-20"></div>
@@ -130,9 +130,9 @@ export default function Portfolio() {
                         <div className="w-8 h-5 bg-purple-400 border-2 rounded-xl"></div>
                     </div>
                 </div>
-                {!isLoad && <Image src={no_signal} alt="no-signal" className="absolute w-full border-black lg:border-4 lg:rounded-2xl z-10" />}
+                {!isLoad && <Image src={no_signal} alt="no-signal" className="w-full border-black lg:border-4 lg:rounded-2xl z-10" />}
                 <video loop ref={videoRef} src={works[current].src}
-                    className="border-black w-full sm:h-[470px] lg:border-4 lg:rounded-2xl lg:h-auto"
+                    className={`${isLoad ? 'block' : 'hidden'} border-black w-full lg:border-4 lg:rounded-2xl lg:h-auto`}
                     onCanPlayThrough={playVideo}
                     onPointerDown={togglePlay} />
                 <div className="absolute right-6 top-6 z-10">
@@ -161,7 +161,7 @@ export default function Portfolio() {
                     <h1 className="my-2 mx-2 text-lg text-center">{works[current].title}</h1>
                 </div>}
             </div>
-            
+
             <div id="remote" className="relative flex flex-col items-center p-6 w-full bg-black/50
             md:rounded-full md:shadow-inner md:shadow-white/60 md:max-w-[500px] overflow-hidden
             2xl:rounded-[70px] 2xl:gap-4 2xl:-rotate-[9deg] 2xl:flex-col 2xl:py-8 2xl:w-[240px]">
