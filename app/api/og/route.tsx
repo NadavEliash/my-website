@@ -14,31 +14,35 @@ export async function GET(req: Request) {
         return new ImageResponse(
             (
                 <div tw="w-full h-full flex flex-col items-center justify-center p-10" style={{ backgroundImage: 'linear-gradient(to top right, #0b0f27, #03274a)' }}>
-                    <h1 tw="text-7xl text-white" style={{ fontFamily: "menlo" }}>Nadav Eliash</h1>
-                    <h2 tw="text-4xl text-white" style={{ fontFamily: "menlo" }}>Frontend / Fullstack Developer </h2>
+                    <h1 tw="text-[7rem] text-white" style={{ fontFamily: "menlo" }}>Nadav Eliash</h1>
+                    <h2 tw="text-5xl text-white" style={{ fontFamily: "menlo" }}>Frontend / Fullstack Developer </h2>
                     <div tw="relative flex items-center mt-10">
-                        <div tw="w-28 h-28 border-2 border-white rounded-full"></div>
-                        <div tw="w-28 h-28 border-2 border-white rounded-full ml-20"></div>
-                        <div tw="w-28 h-28 border-2 border-white rounded-full ml-20"></div>
+                        <div tw="w-40 h-40 border-2 border-white rounded-full"></div>
+                        <div tw="w-40 h-40 border-2 border-white rounded-full ml-24"></div>
+                        <div tw="w-40 h-40 border-2 border-white rounded-full ml-24"></div>
 
-                        <div tw="absolute left-6 top-5 w-16 h-12 rounded-lg border-2 border-white text-white text-lg px-[12px] py-2">{'</>'}</div>
-                        <div tw="absolute left-8 top-[70px] w-12 h-4 rounded-xl border-2 border-white"></div>
+                        <div tw="absolute left-10 top-8 w-20 h-16 rounded-lg border-2 border-white text-white text-3xl px-[10px] py-3">{'</>'}</div>
+                        <div tw="absolute left-10 top-[100px] w-20 h-5 rounded-xl border-2 border-white"></div>
                         
-                        <div tw="absolute left-[218px] top-[30px] w-16 h-12 rounded-md border-2 border-white"></div>
-                        <div tw="absolute left-[230px] top-9 w-4 h-4 rounded-full border-2 border-white"></div>
-                        <div tw="absolute left-[250px] top-[38px] w-4 h-1 rounded-md bg-white"></div>
-                        <div tw="absolute left-[250px] top-[46px] w-4 h-1 rounded-md bg-white"></div>
-                        <div tw="absolute left-[232px] top-[58px] w-9 h-3 border-2 border-white"></div>
+                        <div tw="absolute left-[298px] top-[40px] w-20 h-20 rounded-md border-2 border-white"></div>
+                        <div tw="absolute left-[306px] top-12 w-6 h-6 rounded-full border-2 border-white"></div>
+                        <div tw="absolute left-[338px] top-[50px] w-8 h-1 rounded-md bg-white"></div>
+                        <div tw="absolute left-[338px] top-[58px] w-8 h-1 rounded-md bg-white"></div>
+                        <div tw="absolute left-[338px] top-[66px] w-8 h-1 rounded-md bg-white"></div>
+                        <div tw="absolute left-[310px] top-[82px] w-4 h-1 rounded-md bg-white/30"></div>
+                        <div tw="absolute left-[310px] top-[100px] w-4 h-1 rounded-md bg-white/30"></div>
+                        <div tw="absolute left-[338px] top-[78px] w-8 h-3 border-2 border-white rounded-full"></div>
+                        <div tw="absolute left-[338px] top-[96px] w-8 h-3 border-2 border-white rounded-full"></div>
                         
-                        <div tw="absolute left-[408px] top-[40px] w-16 h-8 rounded-full bg-white/10"></div>
-                        <div tw="absolute left-[400px] top-[36px] w-20 h-10 rounded-full bg-white/5"></div>
-                        <div tw="absolute left-[416px] top-12 w-12 h-4 rounded-full bg-white/70 text-xs px-[5px]"> CLICK</div>
-                        <div tw="absolute left-[420px] top-[20px] text-white text-sm h-[10px] overflow-hidden">\</div>
-                        <div tw="absolute left-[440px] top-[20px] text-white text-sm h-[10px] overflow-hidden">|</div>
-                        <div tw="absolute left-[460px] top-[20px] text-white text-sm h-[10px] overflow-hidden">/</div>
-                        <div tw="absolute left-[460px] top-[84px] text-white text-sm h-[10px] overflow-hidden">\</div>
-                        <div tw="absolute left-[440px] top-[84px] text-white text-sm h-[10px] overflow-hidden">|</div>
-                        <div tw="absolute left-[420px] top-[84px] text-white text-sm h-[10px] overflow-hidden">/</div>
+                        <div tw="absolute left-[536px] top-[50px] w-28 h-[60px] rounded-full bg-white/10"></div>
+                        <div tw="absolute left-[544px] top-[56px] w-24 h-12 rounded-full bg-white/20"></div>
+                        <div tw="absolute left-[552px] top-[64px] w-20 h-8 rounded-full bg-white/70 text-lg font-bold px-[12px] py-1"> CLICK</div>
+                        <div tw="absolute left-[560px] top-[30px] text-white text-lg h-[16px] overflow-hidden">\</div>
+                        <div tw="absolute left-[585px] top-[30px] text-white text-lg h-[16px] overflow-hidden">|</div>
+                        <div tw="absolute left-[612px] top-[30px] text-white text-lg h-[16px] overflow-hidden">/</div>
+                        <div tw="absolute left-[612px] top-[110px] text-white text-lg h-[16px] overflow-hidden">\</div>
+                        <div tw="absolute left-[585px] top-[110px] text-white text-lg h-[16px] overflow-hidden">|</div>
+                        <div tw="absolute left-[560px] top-[110px] text-white text-lg h-[16px] overflow-hidden">/</div>
                         
                     </div>
                 </div>

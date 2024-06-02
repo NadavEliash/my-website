@@ -135,9 +135,9 @@ export default function Portfolio() {
                     className={`${isLoad ? 'block' : 'hidden'} border-black w-full lg:border-4 lg:rounded-2xl lg:h-auto`}
                     onCanPlayThrough={playVideo}
                     onPointerDown={togglePlay} />
-                <div className="absolute right-6 top-6 z-10">
+                <div className="absolute right-6 top-4 z-10">
                     {volume === 0
-                        ? <Volume2 className={`cursor-pointer md:mt-16 lg:mt-0 w-8 h-8 text-black`} onClick={() => { ToggleVolume(+5) }} />
+                        ? <Volume2 className={`cursor-pointer w-8 h-8 text-black`} onClick={() => { ToggleVolume(+5) }} />
                         : <VolumeX className={`cursor-pointer w-8 h-8 text-black`} onClick={() => { ToggleVolume(0) }} />}
                 </div>
                 <div className="hidden md:block absolute bottom-40 w-full h-[70%] pointer-events-none">
@@ -149,7 +149,7 @@ export default function Portfolio() {
                             <h1 className="text-blue-900/90 font-bold text-center text-xl">VOL</h1>
                         </div>}
                 </div>
-                <div id="info" className="hidden md:block absolute md:-bottom-1 lg:bottom-1 lg:rounded-b-[1.3rem] h-32 w-full overflow-hidden">
+                <div id="info" className="hidden md:block absolute md:-bottom-1 lg:bottom-1 lg:rounded-b-xl h-32 w-full overflow-hidden">
                     {isInfo && <div className="absolute bottom-0 h-24 w-full bg-black/80 py-3 animate-slideUp">
                         <h1 className="my-2 mx-6 text-xl">{works[current].title}</h1>
                     </div>}
