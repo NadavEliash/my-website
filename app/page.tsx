@@ -213,7 +213,7 @@ export default function Home() {
       onTouchStart={handleTouchStart}
       onTouchMove={handleTouchMove}
       onTouchEnd={handleTouchEnd}>
-      <div className="mt-[25%] md:mt-20 md:m-10 md:w-fit h-[140px] md:h-[180px] bg-black/40 rounded-lg border-2 border-white text-lg flex flex-col" >
+      <div className="mt-[25%] md:mt-32 md:m-20 md:w-fit h-[140px] md:h-[180px] bg-black/40 rounded-lg border-2 border-white text-lg flex flex-col" >
         <div className="w-full py-2 bg-white/10 flex items-center gap-2">
           <div className="w-3 h-3 ml-3 bg-red-500 rounded-full"></div>
           <div className="w-3 h-3 bg-yellow-500 rounded-full"></div>
@@ -234,7 +234,7 @@ export default function Home() {
         <h1 className="absolute left-1/2 -translate-x-1/2 whitespace-nowrap -top-10 text-sm">swipe to navigate, click to jump in</h1>
       </div>
 
-      <div className="absolute bottom-4 md:top-1/3 left-1/2 -translate-x-1/2 w-[95vw] md:w-[520px] h-[400px] max-h-[50%] flex items-center justify-center gap-[460px] overflow-hidden">
+      <div className="absolute bottom-4 md:top-[40%] left-1/2 -translate-x-1/2 w-[95vw] md:w-[520px] h-[400px] max-h-[50%] flex items-center justify-center gap-[460px] overflow-hidden">
         <div className="hidden md:block" onClick={() => setPages(-1)}>
           <ChevronLeft className="mt-2 w-10 h-10 cursor-pointer" />
         </div>

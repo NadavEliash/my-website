@@ -150,7 +150,7 @@ export default function Portfolio() {
                         </div>}
                 </div>
                 <div id="info" className="hidden md:block absolute md:-bottom-1 lg:bottom-1 lg:rounded-b-xl h-32 w-full overflow-hidden">
-                    {isInfo && <div className="absolute bottom-0 h-24 w-full bg-black/80 py-3 animate-slideUp">
+                    {isInfo && isLoad && <div className="absolute bottom-0 h-24 w-full bg-black/80 py-3 animate-slideUp">
                         <h1 className="my-2 mx-6 text-xl">{works[current].title}</h1>
                     </div>}
                     {!isInfo && <div className="absolute -bottom-24 h-24 w-full bg-black/80 py-3 animate-slideDown">
