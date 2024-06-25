@@ -212,7 +212,7 @@ export default function Home() {
       onTouchStart={handleTouchStart}
       onTouchMove={handleTouchMove}
       onTouchEnd={handleTouchEnd}>
-      <div className="mt-[25%] md:mt-32 md:m-20 md:w-fit h-[140px] md:h-[180px] bg-black/40 rounded-lg border-2 border-white text-lg flex flex-col" >
+      <div className="mt-[25%] md:mt-32 md:m-20 md:w-fit h-[150px] md:h-[180px] bg-black/40 rounded-lg border-2 border-white flex flex-col" >
         <div className="w-full py-2 bg-white/10 flex items-center gap-2">
           <div className="w-3 h-3 ml-3 bg-red-500 rounded-full"></div>
           <div className="w-3 h-3 bg-yellow-500 rounded-full"></div>
@@ -220,11 +220,11 @@ export default function Home() {
         </div>
         <div className="mt-6 mx-5 md:text-xl md:w-[500px]">
           {string.length && string.map((letter, idx) =>
-            <p key={idx} className={`${letter.color} ${menlo.className} inline transition-all leading-8`}>
+            <p key={idx} className={`${letter.color} ${menlo.className} inline transition-all leading-8 md:text-3xl`}>
               {letter.str === '+' ? <br /> : letter.str}
             </p>
           )}
-          <p className="inline animate-pulse">|</p>
+          <p className="inline animate-pulse text-2xl md:text-4xl">|</p>
         </div>
       </div>
 
