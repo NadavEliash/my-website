@@ -126,7 +126,7 @@ export default function Home() {
       color: "text-pink-300"
     },
     {
-      str: "+my_website ",
+      str: "+-my_website ",
       color: "text-sky-300"
     },
     {
@@ -213,7 +213,7 @@ export default function Home() {
       onTouchStart={handleTouchStart}
       onTouchMove={handleTouchMove}
       onTouchEnd={handleTouchEnd}>
-      <div className="mt-[25%] h-40 bg-black/40 rounded-lg border-2 border-white flex flex-col mx-2
+      <div className="mt-[25%] h-44 bg-black/40 rounded-lg border-2 border-white flex flex-col mx-2
       md:border-0 md:bg-transparent md:mt-32 md:m-20 md:w-fit md:h-[180px]" >
         <div className="md:hidden w-full py-2 bg-slate-700 flex items-center gap-3 rounded-t-lg">
           <div className="w-3 h-3 ml-3 bg-red-500 rounded-full"></div>
@@ -222,8 +222,8 @@ export default function Home() {
         </div>
         <div className="mt-4 mx-5 md:text-xl md:w-[500px]">
           {string.length && string.map((letter, idx) =>
-            <p key={idx} className={`${letter.color} font-mono md:${font.className} inline transition-all duration-300 text-[6vw] md:font-bold`}>
-              {letter.str === '+' ? <br /> : letter.str}
+            <p key={idx} className={`${letter.color} font-mono md:${font.className} inline transition-all duration-300 text-xl md:text-[6vw] md:font-bold ${letter.str === '-' ? 'ml-6' : ''}`}>
+              {letter.str === '+' ? <br /> : letter.str === '-'? '' : letter.str}
             </p>
           )}
           <p className="inline animate-pulse text-[8vw]">|</p>
