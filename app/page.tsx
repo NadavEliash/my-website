@@ -126,11 +126,11 @@ export default function Home() {
       color: "text-pink-300"
     },
     {
-      str: "+-my_website ",
+      str: "++-my_website ",
       color: "text-sky-300"
     },
     {
-      str: "+}",
+      str: "++}",
       color: "text-pink-300"
     },
     {
@@ -226,7 +226,7 @@ export default function Home() {
               {letter.str === '+' ? <br /> : letter.str === '-'? '' : letter.str}
             </p>
           )}
-          <p className="inline animate-pulse text-[8vw]">|</p>
+          <p className="relative inline animate-pulse text-xl md:text-[8vw]"><span className="absolute -top-[6px] text-3xl md:hidden">|</span></p>
         </div>
       </div>
       <div className={`absolute top-[calc(25%+150px)] w-full left-0 md:hidden ${swipe && !swipeFade ? 'opacity-100' : 'opacity-0'} transition-opacity duration-200 ${swipeFade ? 'animate-[opacity_.5s_linear]' : ''}`}>
