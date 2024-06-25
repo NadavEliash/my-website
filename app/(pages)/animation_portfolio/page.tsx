@@ -9,7 +9,7 @@ import no_signal from "../../assets/no-signal.gif"
 const works = [
     {
         title: '',
-        src: 'https://res.cloudinary.com/dnvbfkgsb/video/upload/v1716295589/animation_Intro_ot7yvs.mp4'
+        src: '\animation-preview.mp4'
     },
     {
         title: 'Cut-Out animation I made for NGO, which struggling BDS campaign',
@@ -119,8 +119,8 @@ export default function Portfolio() {
             md:mt-16 lg:bg-gray-700 lg:mt-0 lg:rounded-3xl lg:w-[900px] lg:max-w-[90%] lg:border-[10px] lg:border-r-[100px]">
                 <div className="hidden lg:block">
                     <div className="absolute bg-gray-400 w-20 h-20 -top-12 left-1/2 -translate-x-1/2 rounded-full -z-10"></div>
-                    <div className="absolute bg-gray-500 w-2 h-80 rotate-[60deg] -top-[200px] left-1/2 translate-x-[50px] -z-20"></div>
-                    <div className="absolute bg-gray-500 w-2 h-80 -rotate-[60deg] -top-[200px] left-1/2 -translate-x-[50px] -z-20"></div>
+                    <div className="absolute bg-gray-500 w-2 h-32 rotate-[60deg] -top-[120px] left-1/2 translate-x-[50px] -z-20"></div>
+                    <div className="absolute bg-gray-500 w-2 h-32 -rotate-[60deg] -top-[120px] left-1/2 -translate-x-[60px] -z-20"></div>
                     <div className="absolute w-8 h-8 bg-pink-800 border-black border-2 rounded-2xl -right-[65px] bottom-2"></div>
                     <div className="absolute  -right-[65px] top-20 flex flex-col gap-4">
                         <div className="w-8 h-5 bg-blue-200 border-2 rounded-xl"></div>
@@ -130,7 +130,7 @@ export default function Portfolio() {
                         <div className="w-8 h-5 bg-purple-400 border-2 rounded-xl"></div>
                     </div>
                 </div>
-                {!isLoad && <Image src={no_signal} alt="no-signal" className="w-full border-black lg:border-4 lg:rounded-2xl z-10" />}
+                {!isLoad && <Image src={no_signal} alt="no-signal" className="w-full border-black lg:border-4 lg:rounded-2xl z-10" priority />}
                 <video loop ref={videoRef} src={works[current].src}
                     className={`${isLoad ? 'block' : 'hidden'} border-black w-full lg:border-4 lg:rounded-2xl lg:h-auto`}
                     onCanPlayThrough={playVideo}

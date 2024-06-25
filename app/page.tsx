@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import Image from "next/image"
 import localFont from "next/font/local"
-import { Sue_Ellen_Francisco } from 'next/font/google'
+import { Sue_Ellen_Francisco, Lexend_Deca } from 'next/font/google'
 import { ChevronLeft, ChevronRight, ChevronsLeft } from "lucide-react"
 
 import { StaticImageData } from "next/image";
@@ -13,11 +13,11 @@ import animate from "./assets/animate.gif"
 import finerr from "./assets/finerr.gif"
 import hebai from "./assets/hebai.gif"
 import vitcoin from "./assets/vitcoin.gif"
-// import animationPortfolio from "./assets/animationPortfolio.png"
 // import SceneCanvas from "./components/home-scene/scene-canvas";
 
 const menlo = localFont({ src: '../Menlo-Regular.ttf' })
 const sue_ellen = Sue_Ellen_Francisco({ subsets: ['latin'], weight: '400' })
+const font = Lexend_Deca({ subsets: ['latin'], weight: '700' })
 
 interface line {
   str: string
@@ -105,12 +105,12 @@ export default function Home() {
   }, [])
 
   const text: line[] = [
+    // {
+    //   str: "Hi there!",
+    //   color: "text-pink-300"
+    // },
     {
-      str: "Hi there!",
-      color: "text-pink-300"
-    },
-    {
-      str: "+Welcome",
+      str: "Welcome",
       color: "text-blue-400"
     },
     {
@@ -126,11 +126,11 @@ export default function Home() {
       color: "text-pink-300"
     },
     {
-      str: " my_website ",
+      str: "+my_website ",
       color: "text-sky-300"
     },
     {
-      str: "}",
+      str: "+}",
       color: "text-pink-300"
     },
     {
@@ -208,27 +208,27 @@ export default function Home() {
   }
 
   return (
-    <main className={`absolute left-0 top-0 h-svh w-full px-2 -z-10`}
+    <main className={`absolute left-0 top-0 h-svh w-full -z-10`}
       onWheel={handleWheel}
       onTouchStart={handleTouchStart}
       onTouchMove={handleTouchMove}
       onTouchEnd={handleTouchEnd}>
-      <div className="mt-[25%] md:mt-32 md:m-20 md:w-fit h-[140px] md:h-[180px] bg-black/40 rounded-lg border-2 border-white text-lg flex flex-col" >
-        <div className="w-full py-2 bg-white/10 flex items-center gap-2">
+      <div className="mt-[25%] h-40 bg-black/40 rounded-lg border-2 border-white flex flex-col mx-2
+      md:border-0 md:bg-transparent md:mt-32 md:m-20 md:w-fit md:h-[180px]" >
+        <div className="md:hidden w-full py-2 bg-slate-700 flex items-center gap-3 rounded-t-lg">
           <div className="w-3 h-3 ml-3 bg-red-500 rounded-full"></div>
           <div className="w-3 h-3 bg-yellow-500 rounded-full"></div>
           <div className="w-3 h-3 bg-green-500 rounded-full"></div>
         </div>
-        <div className="mt-6 mx-5 md:text-xl md:w-[500px]">
+        <div className="mt-4 mx-5 md:text-xl md:w-[500px]">
           {string.length && string.map((letter, idx) =>
-            <p key={idx} className={`${letter.color} ${menlo.className} inline transition-all leading-8`}>
+            <p key={idx} className={`${letter.color} font-mono md:${font.className} inline transition-all duration-300 text-[6vw] md:font-bold`}>
               {letter.str === '+' ? <br /> : letter.str}
             </p>
           )}
-          <p className="inline animate-pulse">|</p>
+          <p className="inline animate-pulse text-[8vw]">|</p>
         </div>
       </div>
-
       <div className={`absolute top-[calc(25%+150px)] w-full left-0 md:hidden ${swipe && !swipeFade ? 'opacity-100' : 'opacity-0'} transition-opacity duration-200 ${swipeFade ? 'animate-[opacity_.5s_linear]' : ''}`}>
         <Image src={'https://www.svgrepo.com/show/409928/swipe-left.svg'} alt='swipe' width={50} height={50} className="absolute -top-4 w-10 h-10 invert animate-swipe" />
         <h1 className="absolute left-1/2 -translate-x-1/2 whitespace-nowrap -top-10 text-sm">swipe to navigate, click to jump in</h1>
@@ -245,7 +245,7 @@ export default function Home() {
                 : prevPage === idx ? '-left-[400px] opacity-0' : 'left-[100%] opacity-0'}
             `}>
             <div className={`rounded-xl row-span-7 h-fit border-[1px] border-white/50 overflow-hidden`}>
-              <Image key={idx} src={page.img!} alt="img" loading="eager" width={960} height={540} priority unoptimized/>
+              <Image key={idx} src={page.img!} alt="img" loading="eager" width={960} height={540} priority unoptimized />
             </div>
             <h1 className="text-xl font-bold mx-3 row-start-9 ">
               {page.headline}

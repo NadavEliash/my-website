@@ -27,10 +27,10 @@ export default function WheelGuid({
                 <div className='flex px-16 py-6'>
                     <h1 className={`${sue_ellen.className} text-[2rem] tracking-wider`}>Use the wheel to navigate</h1>
                     <div className='animate-bounce'>
-                        <img src="https://res.cloudinary.com/dnvbfkgsb/image/upload/v1714318125/arrow_bzvt0v.png" alt="arrow" className="invert w-40 mt-8 -rotate-[190deg] scale-x-75" />
+                        <img src="/arrow.png" alt="arrow" className="w-32 ml-6 mt-4" />
                     </div>
                 </div>
-                <div className="w-[180px] h-[300px] rotate-[-25deg] ml-[50%] mt-4">
+                <div className="w-[180px] h-[300px] rotate-[-25deg] ml-[50%] mt-2">
                     <div className="bg-white/90 w-full h-full rounded-t-[100px] rounded-b-[90px] p-2 shadow-2xl shadow-black">
                         <div className="bg-black/20 mx-auto w-8 h-20 rounded-3xl overflow-hidden">
                             <div className='w-8 h-28 flex flex-col items-center justify-between p-2 animate-bounce'>

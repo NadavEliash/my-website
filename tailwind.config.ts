@@ -16,6 +16,7 @@ const config: Config = {
       animation: {
         pulse: 'pulse 1.3s linear infinite',
         slideRight: 'slideRight 3s ease-in-out infinite',
+        slideLeft: 'slideLeft 1s ease-in infinite',
         slideUp: 'slideUp 1s ease-in-out',
         slideDown: 'slideDown 1s ease-in-out',
         opacity: 'opacity 2s ease-in-out',
@@ -31,6 +32,10 @@ const config: Config = {
         slideRight: {
           '10%': { left: '-200px' },
           '100%': { left: '110%' },
+        },
+        slideLeft: {
+          '10%': { left: '100px', opacity: '1' },
+          '100%': { left: '4px', opacity: '0.2' },
         },
         slideUp: {
           '0%': { bottom: '-96px' },

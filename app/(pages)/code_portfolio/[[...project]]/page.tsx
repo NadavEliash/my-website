@@ -24,7 +24,7 @@ const projects: project[] = [
         description: ['Animation app, based on HTML Canvas and React.', 'The app allow users create an animation clips from scratch. User can draw, erase, then translate, rotate and scale his drawings. Drawing along multiple frames creates animation, which the user can play and download.'],
         src: '/animate',
         video: 'https://res.cloudinary.com/dnvbfkgsb/video/upload/v1716328797/animate_dy2dk9.mp4',
-        repo: 'https://github.com/NadavEliash/personal-website-prod-'
+        repo: 'https://github.com/NadavEliash/animate-online'
     },
     {
         params: 'finerr',
@@ -75,7 +75,7 @@ export default function Projects() {
 
         setTimeout(() => {
             setGuidDisplay(false)
-        }, 1000)
+        }, 2000)
 
         setTimeout(() => {
             setFadeOut(true)
