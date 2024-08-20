@@ -35,7 +35,7 @@ const pages: page[] = [
     href: 'about',
     headline: 'About me',
     description: [
-      'My name is Nadav Eliash. I\'m a Frontend, Fullstack Web Developer.',
+      'My name is Nadav Eliash. I\'m a Frontend, Backend Web Developer.',
       'more..'
     ],
     img: about,
@@ -61,8 +61,8 @@ const pages: page[] = [
     img: hebai,
   },
   {
-    href: 'code_portfolio/vitcoin',
-    headline: 'Vit-coin',
+    href: 'code_portfolio/crypto-share',
+    headline: 'Crypto share',
     description: ['Bitcoin demo app, shows live statistics and allows user to share his bitcoins with friends'],
     img: vitcoin,
   },
