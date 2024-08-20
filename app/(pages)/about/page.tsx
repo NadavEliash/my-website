@@ -13,7 +13,7 @@ export default function About() {
                 <p className="text-justify text-lg md:text-xl mt-4">
                     {`My name is Nadav Eliash.`}
                     <br />
-                    {`I'm a Frontend / Fullstack Web Developer with experience in writing single-page applications using the latest technologies.`}
+                    {`I'm a Frontend, Backend Web Developer with experience in writing single-page applications using the latest technologies.`}
                     <br />
                     {`I've Graduate the "Coding Academy" - an intensive coding bootcamp (640 h) for Fullstack developers.`}
                     <br />

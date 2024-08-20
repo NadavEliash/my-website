@@ -8,10 +8,6 @@ import no_signal from "../../assets/no-signal.gif"
 
 const works = [
     {
-        title: '',
-        src: '\animation-preview.mp4'
-    },
-    {
         title: 'Cut-Out animation I made for NGO, which struggling BDS campaign',
         src: 'https://res.cloudinary.com/dnvbfkgsb/video/upload/v1714028561/final_03_hvpkng.mp4'
     },
@@ -53,11 +49,6 @@ export default function Portfolio() {
             setIsLoad(true)
             if (videoRef.current) videoRef.current.play()
         }, 500);
-
-        setTimeout(() => {
-            setIsLoad(false)
-            setCurrent(1)
-        }, 5000);
     }, [])
 
     useEffect(() => {

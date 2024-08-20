@@ -22,7 +22,7 @@ const projects: project[] = [
         params: 'animate',
         title: 'Animate online',
         description: ['Animation app, based on HTML Canvas and React.', 'The app allow users create an animation clips from scratch. User can draw, erase, then translate, rotate and scale his drawings. Drawing along multiple frames creates animation, which the user can play and download.'],
-        src: '/animate',
+        src: 'https://animate.nadaveliash.com/',
         video: 'https://res.cloudinary.com/dnvbfkgsb/video/upload/v1716328797/animate_dy2dk9.mp4',
         repo: 'https://github.com/NadavEliash/animate-online'
     },
@@ -37,18 +37,17 @@ const projects: project[] = [
     {
         params: 'heb_ai',
         title: 'AI hebrew app',
-        subTitle: '(בינה עברית)',
-        description: ['AI platform for Hebrew speakers.', 'End to end application. Next, Typescript, Tailwind, PrismaDB.',
-            'Auth by Clerk. The AI generation start with sending an API requests to Google cloud for translation to English, then send request to Openai / Replicate for generation.',
-            'Each logged-in user get 5 sessions for free and then have to subscribe. The payment is made via Upay and then get back with a new link, which sign the users in the database according their plan.'],
+        description: ['AI platform for Hebrew speakers.', 'End to end application. Next, TS, Tailwind, PrismaDB.',
+            'The user\'s hebrew text sent to Google translate, then the translation sent to Openai or Replicate for generation.',
+            'Each user get 5 sessions for free and then have to subscribe. The payment is made via Upay which give the user new link according their plan, which sign them in the database.'],
         src: 'https://ai-heb-app.vercel.app/dashboard',
         video: 'https://res.cloudinary.com/dnvbfkgsb/video/upload/v1715799717/heb-ai_xsylql.mp4',
         repo: 'https://github.com/NadavEliash/AI-heb-app'
     },
     {
-        params: 'vitcoin',
-        title: 'Vit-coin',
-        description: ['Bitcoin trade app, based on Vue.js.', 'The app allows user to check current value and statistics of Bitcoin. also, gives the users demo wallet to transfer bitcoins to their contacts', 'contact list (demo data) allows full CRUD actions'],
+        params: 'crypto-share',
+        title: 'Crypto share',
+        description: ['Share with friends demo app, based on Vue.js.', 'The app allows user to check current value and statistics of Bitcoin. also, gives the users demo wallet to share with their contacts.', 'The contact list (demo data) allows full CRUD actions.'],
         src: 'https://nadaveliash.github.io/vitcoin-vue/#/',
         video: 'https://res.cloudinary.com/dnvbfkgsb/video/upload/v1715799737/vitcoin_hj9lxk.mp4',
         repo: 'https://github.com/NadavEliash/vitcoin-vue'

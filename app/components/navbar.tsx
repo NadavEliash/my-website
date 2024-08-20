@@ -24,11 +24,11 @@ const pages = [
         icon: '',
         title: 'Code Portfolio'
     },
-    {
-        href: '/animation_portfolio',
-        icon: '',
-        title: 'More..'
-    },
+    // {
+    //     href: '/animation_portfolio',
+    //     icon: '',
+    //     title: 'More..'
+    // },
 ]
 
 export default function Navbar() {
@@ -38,7 +38,7 @@ export default function Navbar() {
     const [hide, setHide] = useState(false)
 
     useEffect(()=>{
-        pathname === "/animate" ? setHide(true) : setHide(false)
+        pathname === "/animation_portfolio" ? setHide(true) : setHide(false)
     },[pathname])
 
     return (

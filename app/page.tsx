@@ -212,7 +212,7 @@ export default function Home() {
       onTouchStart={handleTouchStart}
       onTouchMove={handleTouchMove}
       onTouchEnd={handleTouchEnd}>
-      <div className="mt-[25%] md:mt-32 md:m-20 md:w-fit h-[150px] md:h-[180px] bg-black/40 rounded-lg border-2 border-white flex flex-col" >
+      {/* <div className="mt-[25%] md:mt-32 md:m-20 md:w-fit h-[150px] md:h-[180px] bg-black/40 rounded-lg border-2 border-white flex flex-col" >
         <div className="w-full py-2 bg-white/10 flex items-center gap-2">
           <div className="w-3 h-3 ml-3 bg-red-500 rounded-full"></div>
           <div className="w-3 h-3 bg-yellow-500 rounded-full"></div>
@@ -226,9 +226,9 @@ export default function Home() {
           )}
           <p className="inline animate-pulse text-2xl md:text-4xl">|</p>
         </div>
-      </div>
+      </div> */}
 
-      <div className={`absolute top-[calc(25%+150px)] w-full left-0 md:hidden ${swipe && !swipeFade ? 'opacity-100' : 'opacity-0'} transition-opacity duration-200 ${swipeFade ? 'animate-[opacity_.5s_linear]' : ''}`}>
+      <div className={`absolute w-full left-0 top-[25%] md:hidden transition-opacity duration-200 ${swipeFade ? 'animate-[opacity_.5s_linear]' : ''}`}>
         <Image src={'https://www.svgrepo.com/show/409928/swipe-left.svg'} alt='swipe' width={50} height={50} className="absolute -top-4 w-10 h-10 invert animate-swipe" />
         <h1 className="absolute left-1/2 -translate-x-1/2 whitespace-nowrap -top-10 text-sm">swipe to navigate, click to jump in</h1>
       </div>
