@@ -14,6 +14,7 @@ export interface project {
     description: string[]
     src: string
     video: string
+    mobileVideo?: string 
     repo: string
 }
 
@@ -23,7 +24,7 @@ const projects: project[] = [
         title: 'Animate online',
         description: ['Animation app, based on HTML Canvas and React.', 'The app allow users create an animation clips from scratch. User can draw, erase, then translate, rotate and scale his drawings. Drawing along multiple frames creates animation, which the user can play and download.'],
         src: 'https://animate.nadaveliash.com/',
-        video: 'https://res.cloudinary.com/dnvbfkgsb/video/upload/v1716328797/animate_dy2dk9.mp4',
+        video: 'https://res.cloudinary.com/dnvbfkgsb/video/upload/v1725219524/pc-animate_mccrt2.mp4',
         repo: 'https://github.com/NadavEliash/animate-online'
     },
     {
@@ -31,7 +32,8 @@ const projects: project[] = [
         title: 'Finerr',
         description: ['A Fiverr-like marketplace, contains the full user experience of the original app.', 'I take part of a small team which created it within three weeks, using React, Redux, SCSS, Node.js, MongoDB and Git', 'I was responsible for Homepage, search and filter components, as well as to create and connect the Server and Database'],
         src: 'https://finerr.onrender.com/',
-        video: 'https://res.cloudinary.com/dnvbfkgsb/video/upload/v1715799738/finerr_xk2fx8.mp4',
+        video: 'https://res.cloudinary.com/dnvbfkgsb/video/upload/v1725219758/pc-finerr_m6ht9x.mp4',
+        mobileVideo: 'https://res.cloudinary.com/dnvbfkgsb/video/upload/v1725258027/mobile-finerr_rt00ku.mp4',
         repo: 'https://github.com/TodikPanshin/Sprint4-finerr'
     },
     {
@@ -41,15 +43,26 @@ const projects: project[] = [
             'The user\'s hebrew text sent to Google translate, then the translation sent to Openai or Replicate for generation.',
             'Each user get 5 sessions for free and then have to subscribe. The payment is made via Upay which give the user new link according their plan, which sign them in the database.'],
         src: 'https://ai-heb-app.vercel.app/dashboard',
-        video: 'https://res.cloudinary.com/dnvbfkgsb/video/upload/v1715799717/heb-ai_xsylql.mp4',
+        video: 'https://res.cloudinary.com/dnvbfkgsb/video/upload/v1725219787/pc-bina_dgfimy.mp4',
+        mobileVideo: 'https://res.cloudinary.com/dnvbfkgsb/video/upload/v1725258045/mobile-bina_lxqciq.mp4',
         repo: 'https://github.com/NadavEliash/AI-heb-app'
+    },
+    {
+        params: 'trip-planner',
+        title: 'Trip planner',
+        description: ['Web app for planning trips.','The app connects with ChatGPT and Google Cloud via REST API to provide users with a complete trip plan, delivering a neat and clean user experience.','Springboot, JWT, Rest API (Chat GPT, Google Maps, Google Places), Mongodb, Docker, AWS, React.js'],
+        src: 'http://triplanner.nadaveliash.com/',
+        video: 'https://res.cloudinary.com/dnvbfkgsb/video/upload/v1725219515/pc-trip_lhsdqc.mp4',
+        mobileVideo: 'https://res.cloudinary.com/dnvbfkgsb/video/upload/v1725257991/mobile-trip_zkx45p.mp4',
+        repo: 'https://github.com/NadavEliash/trip-planner'
     },
     {
         params: 'crypto-share',
         title: 'Crypto share',
         description: ['Share with friends demo app, based on Vue.js.', 'The app allows user to check current value and statistics of Bitcoin. also, gives the users demo wallet to share with their contacts.', 'The contact list (demo data) allows full CRUD actions.'],
         src: 'https://nadaveliash.github.io/vitcoin-vue/#/',
-        video: 'https://res.cloudinary.com/dnvbfkgsb/video/upload/v1715799737/vitcoin_hj9lxk.mp4',
+        video: 'https://res.cloudinary.com/dnvbfkgsb/video/upload/v1725219518/pc-crypto_fjqxz9.mp4',
+        mobileVideo: 'https://res.cloudinary.com/dnvbfkgsb/video/upload/v1725257970/mobile-crypto_js8dty.mp4',
         repo: 'https://github.com/NadavEliash/vitcoin-vue'
     },
 ]
@@ -86,7 +99,7 @@ export default function Projects() {
             setIsScroll(true)
             setIsReplacing(true)
 
-            ev.deltaY < 0
+            ev.deltaY > 0
                 ? setCurrentView(currentView + 1 >= projects.length ? 0 : currentView + 1)
                 : setCurrentView(currentView - 1 < 0 ? projects.length - 1 : currentView - 1)
 
