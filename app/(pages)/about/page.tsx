@@ -8,23 +8,25 @@ export default function About() {
 
     return (
         <>
-            <div className="relative mt-20 w-[92vw] mx-auto bg-white/10 p-3 rounded-lg md:mt-32 md:w-[600px] md:p-6 md:rounded-3xl">
+            <div className="relative mt-20 w-[92vw] mx-auto bg-white/10 p-3 rounded-lg md:mt-24 md:w-[660px] md:p-6 md:rounded-3xl">
                 <Image src={profile} alt="profile" width={100} height={100} className="rounded-full"></Image>
-                <p className="text-justify text-lg md:text-xl mt-4">
+                <p className="text-justify text-lg md:text-2xl mt-2 font-light">
                     {`My name is Nadav Eliash.`}
                     <br />
-                    {`I'm a Frontend, Backend Web Developer with experience in writing single-page applications using the latest technologies.`}
                     <br />
-                    {`I've Graduate the "Coding Academy" - an intensive coding bootcamp (640 h) for Fullstack developers.`}
+                    {`I'm a Backend and Frontend Web Developer with a passion for crafting engaging digital experiences.`}
                     <br />
-                    {`I'm a talented Designer and Animator, who have a full capacity of compositoning things in space and moving them around to create satisfying and fully experience for users.`}
                     <br />
-                    {`I used to work for an international companies like Matell and Disney, as well as locals, such as Israel Hayom and TLV Municipality.`}
+                    {`I've honed my skills at Coding Academy, a rigorous bootcamp that equipped me with the latest technologies and best practices. My strong background in design and animation ensures that every project I work on is visually stunning and user-friendly.`}
                     <br />
-                    {`I love to solve problems, and enthusiast to learn and understand how things works. those things were driven me to learn coding.`}
+                    <br />
+                    {`With experience of working with international companies like Mattel and Disney, as well as local organizations like Israel Hayom and TLV Municipality, I've had the opportunity to collaborate on a variety of projects and solve complex challenges.`}
+                    <br />
+                    <br />
+                    {`I'm driven by a love of problem-solving and a constant desire to learn. Let's create something amazing together.`}
                 </p>
             </div>
-            <div className="absolute top-16 flex gap-1 flex-col-reverse items-center justify-center right-2 md:static md:flex-row md:mt-10">
+            <div className="absolute top-16 flex md:gap-8 flex-col-reverse items-center justify-center right-2 md:static md:flex-row md:mt-10">
                 <Link href="https://www.linkedin.com/in/nadav-eliash/" className="w-12 md:w-20 md:h-20 rounded-full">
                     <Image src="https://www.svgrepo.com/show/452051/linkedin.svg" alt="linkedin" width={60} height={60} className="rounded-full w-full h-full"></Image>
                 </Link>

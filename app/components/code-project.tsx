@@ -25,13 +25,17 @@ export default function CodeProject({ project }: CodeProjectProps) {
         }, 600);
     }
 
+    const togglePlay = ()=>{
+        
+    }
+
 
     return (
         <div className={`grid grid-cols-10 transition-all duration-1000 md:pt-28 h-full max-h-[100svh] overflow-hidden ${fredoka.className}`}>
             <div className="col-span-10 md:col-start-2 md:col-end-5 flex flex-col gap-2 md:justify-start">
                 <video src={project.video} className="md:hidden" autoPlay loop onClick={() => router.push(project.src)}>
                 </video>
-                <div className="absolute top-[38svh] md:h-[560px] sm:top-[45svh] md:static md:mt-28 flex flex-col justify-between">
+                <div className="md:h-[560px] sm:mt-10 md:mt-28 flex flex-col justify-between">
                     <h1 className={`text-[2.5rem] text-center  ${fredoka.className}`}>{project.title}</h1>
                     {project.subTitle && <h2 className="mb-1 text-center">{project.subTitle}</h2>}
                     <div className="">
@@ -57,16 +61,19 @@ export default function CodeProject({ project }: CodeProjectProps) {
                     </div>
                 </div>
             </div>
-            <div className={`hidden md:block md:col-span-5 lg:col-span-6 justify-self-center relative opacity-90  scale-y-[0.7] scale-x-[0.8] transition-all duration-500
+            <div className={`hidden md:block md:col-span-6 lg:col-span-6 justify-self-center relative opacity-90 scale-y-[0.6] scale-x-[0.8]  duration-700 bg-black
                                     ${wideScreen
-                    ? 'w-[380px] rounded-[3rem] lg:w-full lg:max-w-5xl lg:rounded-2xl rotate-3 -skew-x-3'
-                    : 'w-[380px] rounded-[3rem] -rotate-12 -ml-40 skew-y-1'}`}>
-                {/* <div className={`absolute top-3 left-3 bg-black/70 w-full h-full -z-10 ${wideScreen ? 'rounded-[3rem] lg:rounded-2xl' : 'rounded-[3rem]'}`}></div> */}
-                {isLoading && <div className={`absolute w-full h-full bg-black border-[20px] border-black ${wideScreen ? 'rounded-[3rem] lg:rounded-2xl' : 'rounded-[3rem]'} flex items-center justify-center overflow-hidden`}>
+                    ? 'w-[380px] rounded-[3rem] lg:w-full lg:max-w-5xl lg:rounded-2xl rotate-3 -skew-x-3 transition-portfolio'
+                    : 'w-[380px] rounded-[3rem] md:-rotate-12 skew-y-1 transition-transform'}
+                    shadow-[5px_5px_rgba(0,0,0,0.4),_10px_10px_rgba(0,0,0,0.3),_15px_15px_rgba(0,0,0,0.2),_20px_20px_rgba(0,0,0,0.1),_25px_25px_rgba(0,0,0,0.1)]
+                    border-[20px] border-slate-800`}>
+
+                {isLoading && <div className={`absolute w-full h-full bg-black border-[20px] border-black 
+                    ${wideScreen ? 'rounded-[3rem] lg:rounded-2xl' : 'rounded-[3rem]'} flex items-center justify-center overflow-hidden`}>
                     <Loader />
                 </div>}
-                <video src={wideScreen ? project.video : project.mobileVideo} onCanPlay={onLoad} autoPlay loop className={`hidden lg:block border-[20px] border-slate-800  ${wideScreen ? 'rounded-[3rem] lg:rounded-2xl' : 'rounded-[3rem]'} shadow-[5px_5px_rgba(0,0,0,0.4),_10px_10px_rgba(0,0,0,0.3),_15px_15px_rgba(0,0,0,0.2),_20px_20px_rgba(0,0,0,0.1),_25px_25px_rgba(0,0,0,0.1)]`}></video>
-                <video src={project.mobileVideo} onCanPlay={onLoad} autoPlay loop className={`lg:hidden border-[20px] border-slate-800 h-full rounded-[3rem]`}></video>
+                <video src={wideScreen ? project.video : project.mobileVideo} onCanPlay={onLoad} autoPlay loop className={`hidden lg:block object-fill w-full h-full ${wideScreen ? 'rounded-[3rem] lg:rounded-2xl' : 'rounded-[2rem]'}`}></video>
+                <video src={project.mobileVideo} onLoadedData={onLoad} autoPlay loop onClick={togglePlay} className={`lg:hidden object-fill h-full rounded-[2rem]`}></video>
                 {/* <iframe src={project.src} onLoad={onLoad} className={`w-full h-full border-[20px] border-black bg-white ${wideScreen ? 'rounded-[3rem] lg:rounded-2xl' : 'rounded-[3rem]'}`}></iframe> */}
             </div>
 

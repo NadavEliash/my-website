@@ -60,6 +60,9 @@ const config: Config = {
           '50%': { opacity: '1' },
           '100%': { rotate: '-50deg', transform: 'translateX(40px) translateY(-30px)', opacity: '0' },
         }
+      },
+      transitionProperty: {
+        'portfolio': 'transform, width',
       }
     },
   },

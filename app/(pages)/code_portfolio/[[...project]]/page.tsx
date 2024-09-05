@@ -14,7 +14,7 @@ export interface project {
     description: string[]
     src: string
     video: string
-    mobileVideo?: string 
+    mobileVideo?: string
     repo: string
 }
 
@@ -50,7 +50,7 @@ const projects: project[] = [
     {
         params: 'trip-planner',
         title: 'Trip planner',
-        description: ['Web app for planning trips.','The app connects with ChatGPT and Google Cloud via REST API to provide users with a complete trip plan, delivering a neat and clean user experience.','Springboot, JWT, Rest API (Chat GPT, Google Maps, Google Places), Mongodb, Docker, AWS, React.js'],
+        description: ['Web app for planning trips.', 'The app connects with ChatGPT and Google Cloud via REST API to provide users with a complete trip plan, delivering a neat and clean user experience.', 'Springboot, JWT, Rest API (Chat GPT, Google Maps, Google Places), Mongodb, Docker, AWS, React.js'],
         src: 'http://triplanner.nadaveliash.com/',
         video: 'https://res.cloudinary.com/dnvbfkgsb/video/upload/v1725219515/pc-trip_lhsdqc.mp4',
         mobileVideo: 'https://res.cloudinary.com/dnvbfkgsb/video/upload/v1725257991/mobile-trip_zkx45p.mp4',
@@ -81,18 +81,22 @@ export default function Projects() {
 
     useEffect(() => {
         if (params.project) {
-            const idx = projects.findIndex((project, idx)=> project.params === params.project[0])
+            const idx = projects.findIndex((project, idx) => project.params === params.project[0])
             setCurrentView(idx)
         }
 
         setTimeout(() => {
             setGuidDisplay(false)
-        }, 2000)
+        }, 1500)
 
         setTimeout(() => {
             setFadeOut(true)
         }, 1000)
     }, [])
+
+    const handleDown = () => {
+        setCurrentView(currentView + 1 < projects.length ? currentView + 1 : 0)
+    }
 
     const handleWheel = (ev: any) => {
         if (!isScroll) {
@@ -147,6 +151,8 @@ export default function Projects() {
             {projects && projects.map((project, idx) =>
                 idx === currentView ? <CodeProject key={idx} project={project} /> : <div key={idx}></div>
             )}
+            <div className="absolute bottom-4 right-1/2 text-5xl cursor-pointer animate-bounce" onClick={handleDown}>
+            <div className="-rotate-90">‹‹</div></div>
             <div id="desktop-guid" className="hidden md:block">
                 <WheelGuid guidDisplay={guidDisplay} />
             </div>
