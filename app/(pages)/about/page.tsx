@@ -14,10 +14,10 @@ export default function About() {
                     {`My name is Nadav Eliash.`}
                     <br />
                     <br />
-                    {`I'm a Backend and Frontend Web Developer with a passion for crafting engaging digital experiences.`}
+                    {`I'm a Frontend Web Developer with deep knowledge in Backend. I have two years experience of building and creating end-to-end applications.`}
                     <br />
                     <br />
-                    {`I've honed my skills at Coding Academy, a rigorous bootcamp that equipped me with the latest technologies and best practices. My strong background in design and animation ensures that every project I work on is visually stunning and user-friendly.`}
+                    {`I Have passion for crafting engaging digital experiences. My strong background in design (Adobe, Figma) and animation ensures that every project I work on is visually stunning and user-friendly.`}
                     <br />
                     <br />
                     {`With experience of working with international companies like Mattel and Disney, as well as local organizations like Israel Hayom and TLV Municipality, I've had the opportunity to collaborate on a variety of projects and solve complex challenges.`}

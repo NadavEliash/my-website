@@ -25,7 +25,7 @@ export default function WheelGuid({
         <div className={`absolute w-[100vw] h-[100svh] top-0 left-0 bg-black/20 ${hidden ? 'pointer-events-none animate-opacity opacity-0 overflow-hidden' : ''}`}>
             <div className='absolute right-0 top-0 rounded-es-full bg-white/30 w-[600px] h-1/2 flex flex-col overflow-hidden'>
                 <div className='flex px-16 py-6'>
-                    <h1 className={`${sue_ellen.className} text-[2rem] tracking-wider`}>Use the wheel to navigate</h1>
+                    <h1 className={`${sue_ellen.className} text-[2rem] tracking-wider text-center`}>You can use the wheel to navigate through</h1>
                     <div className='animate-bounce'>
                         <img src="/arrow.png" alt="arrow" className="w-32 ml-6 mt-4" />
                     </div>

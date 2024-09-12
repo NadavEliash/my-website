@@ -228,12 +228,14 @@ export default function Home() {
         </div>
       </div> */}
 
-      <div className={`absolute w-full left-0 top-[25%] md:hidden transition-opacity duration-200 ${swipeFade ? 'animate-[opacity_.5s_linear]' : ''}`}>
+      <h1 className="sm:mt-32 text-center text-[4rem] md:text-[6rem] text-yellow-100 font-extrabold">{('Welcome aboard!').toUpperCase()}</h1>
+
+      <div className={`absolute w-full left-0 top-[40svh] md:hidden transition-opacity duration-200 ${swipeFade ? 'animate-[opacity_.5s_linear]' : ''}`}>
         <Image src={'https://www.svgrepo.com/show/409928/swipe-left.svg'} alt='swipe' width={50} height={50} className="absolute -top-4 w-10 h-10 invert animate-swipe" />
         <h1 className="absolute left-1/2 -translate-x-1/2 whitespace-nowrap -top-10 text-sm">swipe to navigate, click to jump in</h1>
       </div>
 
-      <div className="absolute bottom-4 md:top-[40%] left-1/2 -translate-x-1/2 w-[95vw] md:w-[520px] h-[400px] max-h-[50%] flex items-center justify-center gap-[460px] overflow-hidden">
+      <div className="absolute bottom-12 md:top-[40%] left-1/2 -translate-x-1/2 w-[95vw] md:w-[520px] h-[400px] max-h-[50%] flex items-center justify-center gap-[460px] overflow-hidden">
         <div className="hidden md:block" onClick={() => setPages(-1)}>
           <ChevronLeft className="mt-2 w-10 h-10 cursor-pointer" />
         </div>
@@ -244,7 +246,7 @@ export default function Home() {
                 : prevPage === idx ? '-left-[400px] opacity-0' : 'left-[100%] opacity-0'}
             `}>
             <div className={`rounded-xl row-span-7 h-fit border-[1px] border-white/50 overflow-hidden`}>
-              <Image key={idx} src={page.img!} alt="img" loading="eager" width={960} height={540} priority unoptimized/>
+              <Image key={idx} src={page.img!} alt="img" loading="eager" width={960} height={540} priority unoptimized />
             </div>
             <h1 className="text-xl font-bold mx-3 row-start-9 ">
               {page.headline}

@@ -24,7 +24,7 @@ const projects: project[] = [
         title: 'Animate online',
         description: ['Animation app, based on HTML Canvas and React.', 'The app allow users create an animation clips from scratch. User can draw, erase, then translate, rotate and scale his drawings. Drawing along multiple frames creates animation, which the user can play and download.'],
         src: 'https://animate.nadaveliash.com/',
-        video: 'https://res.cloudinary.com/dnvbfkgsb/video/upload/v1725219524/pc-animate_mccrt2.mp4',
+        video: 'https://res.cloudinary.com/dnvbfkgsb/video/upload/v1726143176/aniamte.mp4',
         repo: 'https://github.com/NadavEliash/animate-online'
     },
     {
