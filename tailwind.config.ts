@@ -19,8 +19,8 @@ const config: Config = {
         slideLeft: 'slideLeft 1s ease-in infinite',
         slideUp: 'slideUp 1s ease-in-out',
         slideDown: 'slideDown 1s ease-in-out',
-        opacity: 'opacity 2s ease-in-out',
-        swipe: 'swipe 1s ease-in-out infinite',
+        opacity: 'opacity 3s ease-in-out',
+        swipe: 'swipe 1.4s ease-in-out infinite',
         swipeDown: 'swipeDown 1s ease-in-out infinite'
       },
       keyframes: {
@@ -50,7 +50,7 @@ const config: Config = {
           '100%': { opacity: '0' },
         },
         swipe: {
-          '0%': { marginLeft: '70vw', opacity: '0' },
+          '0%': { marginLeft: '70vw', opacity: '0', rotate:'30deg' },
           '50%': { opacity: '1' },
           '100%': { marginLeft: '30vw', opacity: '0' },
         },

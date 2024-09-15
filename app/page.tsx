@@ -82,7 +82,6 @@ export default function Home() {
   const [isWheel, setIsWheel] = useState(false)
   const [touchStart, setTouchStart] = useState(null)
   const [touchEnd, setTouchEnd] = useState(null)
-  const [swipe, setSwipe] = useState(false)
   const [swipeFade, setSwipeFade] = useState(false)
   const [string, setString] = useState<line[]>([{
     str: '',
@@ -95,12 +94,8 @@ export default function Home() {
     }, 1000);
 
     setTimeout(() => {
-      setSwipe(true)
-    }, 4000)
-
-    setTimeout(() => {
       setSwipeFade(true)
-    }, 8000)
+    }, 5600)
   }, [])
 
   const text: line[] = [
@@ -228,9 +223,9 @@ export default function Home() {
         </div>
       </div> */}
 
-      <h1 className="sm:mt-32 text-center text-[4rem] md:text-[6rem] text-yellow-100 font-extrabold">{('Welcome aboard!').toUpperCase()}</h1>
+      <h1 className="mt-10 sm:mt-32 text-center text-[4rem] md:text-[6rem] text-yellow-100 font-extrabold leading-[4.5rem]">{('Welcome aboard!').toUpperCase()}</h1>
 
-      <div className={`absolute w-full left-0 top-[40svh] md:hidden transition-opacity duration-200 ${swipeFade ? 'animate-[opacity_.5s_linear]' : ''}`}>
+      <div className={`absolute w-full left-0 top-[36svh] md:hidden transition-opacity duration-200 opacity-1 ${swipeFade ? 'animate-[opacity_.5s_linear] opacity-0' : ''}`}>
         <Image src={'https://www.svgrepo.com/show/409928/swipe-left.svg'} alt='swipe' width={50} height={50} className="absolute -top-4 w-10 h-10 invert animate-swipe" />
         <h1 className="absolute left-1/2 -translate-x-1/2 whitespace-nowrap -top-10 text-sm">swipe to navigate, click to jump in</h1>
       </div>
