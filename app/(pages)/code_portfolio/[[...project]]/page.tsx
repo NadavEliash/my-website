@@ -152,7 +152,7 @@ export default function Projects() {
                 idx === currentView ? <CodeProject key={idx} project={project} /> : <div key={idx}></div>
             )}
             <div className="absolute bottom-4 right-1/2 text-5xl cursor-pointer animate-bounce" onClick={handleDown}>
-            <div className="-rotate-90">‹‹</div></div>
+            <div className="hidden sm:block -rotate-90">‹‹</div></div>
             <div id="desktop-guid" className="hidden md:block">
                 <WheelGuid guidDisplay={guidDisplay} />
             </div>

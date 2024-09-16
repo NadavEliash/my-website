@@ -33,7 +33,7 @@ export default function CodeProject({ project }: CodeProjectProps) {
     return (
         <div className={`grid grid-cols-10 transition-all duration-1000 md:pt-28 h-full max-h-[100svh] overflow-hidden ${fredoka.className}`}>
             <div className="col-span-10 md:col-start-2 md:col-end-5 flex flex-col gap-2 md:justify-start">
-                <video src={project.video} className="md:hidden" autoPlay loop onClick={() => router.push(project.src)}>
+                <video src={project.video} className="md:hidden h-[35svh] object-fill" autoPlay loop onClick={() => router.push(project.src)}>
                 </video>
                 <div className="md:h-[560px] sm:mt-10 md:mt-28 flex flex-col justify-between">
                     <h1 className={`text-[2.5rem] text-center  ${fredoka.className}`}>{project.title}</h1>
