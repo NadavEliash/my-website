@@ -60,12 +60,12 @@ const pages: page[] = [
     description: ['App which accessible AI platforms to Hebrew speakers'],
     img: hebai,
   },
-  {
-    href: 'code_portfolio/crypto-share',
-    headline: 'Crypto share',
-    description: ['Bitcoin demo app, shows live statistics and allows user to share his bitcoins with friends'],
-    img: vitcoin,
-  },
+  // {
+  //   href: 'code_portfolio/crypto-share',
+  //   headline: 'Crypto share',
+  //   description: ['Bitcoin demo app, shows live statistics and allows user to share his bitcoins with friends'],
+  //   img: vitcoin,
+  // },
   // {
   //   href: 'portfolio',
   //   headline: 'Animation Portfolio',

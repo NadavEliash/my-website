@@ -56,15 +56,15 @@ const projects: project[] = [
         mobileVideo: 'https://res.cloudinary.com/dnvbfkgsb/video/upload/v1725257991/mobile-trip_zkx45p.mp4',
         repo: 'https://github.com/NadavEliash/trip-planner'
     },
-    {
-        params: 'crypto-share',
-        title: 'Crypto share',
-        description: ['Share with friends demo app, based on Vue.js.', 'The app allows user to check current value and statistics of Bitcoin. also, gives the users demo wallet to share with their contacts.', 'The contact list (demo data) allows full CRUD actions.'],
-        src: 'https://nadaveliash.github.io/vitcoin-vue/#/',
-        video: 'https://res.cloudinary.com/dnvbfkgsb/video/upload/v1725219518/pc-crypto_fjqxz9.mp4',
-        mobileVideo: 'https://res.cloudinary.com/dnvbfkgsb/video/upload/v1725257970/mobile-crypto_js8dty.mp4',
-        repo: 'https://github.com/NadavEliash/vitcoin-vue'
-    },
+    // {
+    //     params: 'crypto-share',
+    //     title: 'Crypto share',
+    //     description: ['Share with friends demo app, based on Vue.js.', 'The app allows user to check current value and statistics of Bitcoin. also, gives the users demo wallet to share with their contacts.', 'The contact list (demo data) allows full CRUD actions.'],
+    //     src: 'https://nadaveliash.github.io/vitcoin-vue/#/',
+    //     video: 'https://res.cloudinary.com/dnvbfkgsb/video/upload/v1725219518/pc-crypto_fjqxz9.mp4',
+    //     mobileVideo: 'https://res.cloudinary.com/dnvbfkgsb/video/upload/v1725257970/mobile-crypto_js8dty.mp4',
+    //     repo: 'https://github.com/NadavEliash/vitcoin-vue'
+    // },
 ]
 
 export default function Projects() {
@@ -153,9 +153,9 @@ export default function Projects() {
             )}
             <div className="absolute bottom-4 right-1/2 text-5xl cursor-pointer animate-bounce" onClick={handleDown}>
             <div className="hidden sm:block -rotate-90">‹‹</div></div>
-            <div id="desktop-guid" className="hidden md:block">
+            {/* <div id="desktop-guid" className="hidden md:block">
                 <WheelGuid guidDisplay={guidDisplay} />
-            </div>
+            </div> */}
             <div id="swipe-guid" className={`md:hidden absolute w-full h-svh top-0 left-0 flex flex-col items-center justify-end gap-3 text-white overflow-hidden ${fadeOut && 'animate-[opacity_1s_linear] opacity-0 pointer-events-none'}`}>
                 <div className="absolute w-[600px] h-[600px] bg-gradient-to-t from-black/70 from-70% to-transparent -bottom-[300px] rounded-full"></div>
                 <Image src={'https://www.svgrepo.com/show/409931/swipe-right.svg'} alt="swipe" width={40} height={40} className="opacity-100 animate-swipeDown invert z-50" />
