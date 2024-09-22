@@ -54,6 +54,7 @@ export default function Navbar() {
                             : <h1 className="mt-[3px] text-white">{page.title}</h1>}
                     </Link>
                 )}
+                <h1 className="absolute right-4 top-3 text-3xl text-white">nadaveliash.com</h1>
             </nav>
             <Menu className={`${hide? 'hidden' : ''} md:hidden ${display ? 'opacity-0' : 'opacity-100'} transition-opacity absolute flex left-2 top-2 w-8 h-8 text-black z-50 bg-gray-100/80 rounded-lg p-1`} onClick={() => setDisplay(!display)} />
             <div className={`${display ? 'opacity-1' : 'opacity-0 pointer-events-none'} transition-all duration-500 absolute top-0 w-full h-full bg-[rgba(16,16,37,.6)] z-40 md:hidden`}

@@ -39,7 +39,7 @@ export default function CodeProject({ project }: CodeProjectProps) {
                     <h1 className={`text-[2.5rem] text-center  ${fredoka.className}`}>{project.title}</h1>
                     {project.subTitle && <h2 className="mb-1 text-center">{project.subTitle}</h2>}
                     <div className="">
-                        {project.description.map((line: string, idx: number) => <h2 key={idx} className="text-sm sm:text-base xl:text-lg mx-2 text-justify">{line}</h2>)}
+                        {project.description.map((line: string, idx: number) => <h2 key={idx} className="text-sm sm:text-base xl:text-lg mx-2 w-10/12">{line}</h2>)}
                     </div>
 
                     <div id="buttons" className="flex md:flex-col gap-4 mt-6 mx-6 md:mx-10">
@@ -69,10 +69,10 @@ export default function CodeProject({ project }: CodeProjectProps) {
                     border-[20px] border-slate-800`}>
 
                 {isLoading && <div className={`absolute w-full h-full bg-black border-[20px] border-black 
-                    ${wideScreen ? 'rounded-[3rem] lg:rounded-2xl' : 'rounded-[3rem]'} flex items-center justify-center overflow-hidden`}>
+                    ${wideScreen ? '' : 'rounded-[3rem]'} flex items-center justify-center overflow-hidden`}>
                     <Loader />
                 </div>}
-                <video src={wideScreen ? project.video : project.mobileVideo} onCanPlay={onLoad} autoPlay loop className={`hidden lg:block object-fill w-full h-full ${wideScreen ? 'rounded-[3rem] lg:rounded-2xl' : 'rounded-[2rem]'}`}></video>
+                <video src={wideScreen ? project.video : project.mobileVideo} onCanPlay={onLoad} autoPlay loop className={`hidden lg:block object-fill w-full h-full ${wideScreen ? '' : 'rounded-[2rem]'}`}></video>
                 <video src={project.mobileVideo} onLoadedData={onLoad} autoPlay loop onClick={togglePlay} className={`lg:hidden object-fill h-full rounded-[2rem]`}></video>
                 {/* <iframe src={project.src} onLoad={onLoad} className={`w-full h-full border-[20px] border-black bg-white ${wideScreen ? 'rounded-[3rem] lg:rounded-2xl' : 'rounded-[3rem]'}`}></iframe> */}
             </div>
