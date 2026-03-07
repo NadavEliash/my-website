@@ -1057,9 +1057,9 @@ function confirmTakeExchangeBank(giveType, takeType) {
 function showSurpriseModal(card, handIdx) {
   showModal(`
     <div style="text-align:center;margin-bottom:16px">
-      <div style="font-size:4rem">${card.icon}</div>
-      <div class="modal-title">${card.name}</div>
-      <div class="modal-sub">${card.desc}</div>
+    <img src="assets/gift-removebg-preview.png" style="width: 120px;" alt="הפתעה">
+    <div class="modal-title">${card.name}</div>
+    <div class="modal-sub">${card.desc}</div>
     </div>
     <button class="start-btn" style="width:100%;padding:13px;font-size:1rem" onclick="applySurprise('${card.id}', ${handIdx})">
       השתמש כעת!
