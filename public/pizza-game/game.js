@@ -66,7 +66,9 @@ let bankTradeSelection = {}; // { type: count }
 let socket = null;
 let roomId = null;
 let myPlayerId = null; // The index in G.players
+let myPlayerName = null;
 let isMultiplayer = false;
+let roomPlayers = [];
 
 function initSocket() {
   // Replace with your server URL if different
@@ -84,11 +86,22 @@ function initSocket() {
 
   socket.on('player-joined', ({ players, gameState }) => {
     console.log('Player joined', players);
-    if (gameState && !G.phase) {
+    roomPlayers = players;
+    if (gameState && (!G.phase || G.phase === 'waiting')) {
        G = gameState;
+       findMyPlayerId();
+       render(false);
+    } else if (G.phase === 'waiting') {
        render(false);
     }
   });
+
+  function findMyPlayerId() {
+    if (G.players && myPlayerName) {
+      const idx = G.players.findIndex(p => p.name === myPlayerName);
+      if (idx !== -1) myPlayerId = idx;
+    }
+  }
   
   socket.on('receive-chat', ({ playerName, message }) => {
     console.log(`${playerName}: ${message}`);
@@ -491,36 +504,10 @@ function startFromSetup() {
       return;
     }
     roomId = rid;
+    myPlayerName = myName;
+    G.phase = 'waiting';
     socket.emit('join-room', { roomId, playerName: myName });
-    
-    // Check if game already exists in room, otherwise start new
-    // For simplicity, let's assume if it's the first player, they start it.
-    // We'll wait a bit to see if we get a state.
-    setTimeout(() => {
-      if (!G.players) {
-        // If no game yet, start it. We need names.
-        // In multiplayer, we might need a better lobby, but let's just 
-        // use the local names for now or just the joining player.
-        newGame([myName], selectedWinMode);
-        myPlayerId = 0;
-      } else {
-        // Game exists. Find my ID or add myself?
-        // Let's just find by name for now or pick first empty slot.
-        let idx = G.players.findIndex(p => p.name === myName);
-        if (idx === -1) {
-             // Add player to game? 
-             // For now, let's just use the first available player index
-             // This is a bit naive but works for a prototype.
-             myPlayerId = G.players.length;
-             G.players.push(mkPlayer(myName, myPlayerId));
-             G.players[myPlayerId].customer = { ...BASIC_CUSTOMER };
-             syncG();
-        } else {
-             myPlayerId = idx;
-        }
-        render();
-      }
-    }, 1000);
+    render();
   } else {
     const playersInfo = Array.from({ length: playerCount }, (_, i) => {
       const v = $(`pname${i}`).value.trim();
@@ -1456,26 +1443,56 @@ function renderWin(p, reason = '') {
   </div>`;
 }
 
-function confirmNewGame() {
-  showModal(`
-    <div style="text-align:center;">
-      <div class="modal-title">משחק חדש?</div>
-      <div class="modal-sub" style="margin-bottom:24px;">כל ההתקדמות הנוכחית תימחק ללא שחזור.</div>
-      <div style="display:flex; gap:12px;">
-        <button class="start-btn" style="flex:1; background:#c0392b; border-color:#922b21;" onclick="doConfirmNewGame()">
-        התחל מחדש
-        </button>
-        <button class="modal-close" style="flex:1;" onclick="closeModal()">
-          ביטול
-        </button>
-      </div>
-    </div>`);
-}
-
 function doConfirmNewGame() {
   closeModal();
   clearGameStorage();
+  isMultiplayer = false;
+  roomId = null;
+  myPlayerId = null;
+  roomPlayers = [];
   renderSetup();
+}
+
+function renderWaitingRoom() {
+  const isHost = roomPlayers[0] && roomPlayers[0].socketId === socket.id;
+  
+  app().innerHTML = `
+    <div id="setup-screen">
+      <div class="setup-title">⏳ חדר המתנה</div>
+      <div class="setup-card">
+        <div class="modal-sub" style="text-align:center; font-size:1.2rem; margin-bottom:24px;">
+          חדר: <strong style="color:var(--gold)">${roomId}</strong>
+        </div>
+        
+        <div class="waiting-list">
+          ${roomPlayers.map(p => `
+            <div class="player-waiting-row">
+              <span class="status-dot online"></span>
+              <span>${p.name} ${p.socketId === socket.id ? '(את/ה)' : ''}</span>
+            </div>
+          `).join('')}
+        </div>
+
+        <div style="margin-top:24px">
+          ${roomPlayers.length < 2 
+            ? `<div class="setup-mode-desc">מחכים לשחקנים נוספים...</div>`
+            : isHost 
+              ? `<button class="start-btn" onclick="startOnlineGame()">התחל משחק!</button>`
+              : `<div class="setup-mode-desc">מחכים שהמארח יתחיל את המשחק...</div>`
+          }
+        </div>
+        
+        <button class="modal-close" style="margin-top:16px" onclick="location.reload()">ביטול וחזרה</button>
+      </div>
+    </div>
+  `;
+}
+
+function startOnlineGame() {
+  const names = roomPlayers.map(p => p.name);
+  newGame(names, selectedWinMode);
+  myPlayerId = 0; // Host is always first
+  syncG();
 }
 
 // ═══════════════════════════════════════════════════════════
@@ -1487,6 +1504,7 @@ function render(shouldSync = true) {
   switch (G.phase) {
     case undefined:
     case 'setup':    renderSetup(); break;
+    case 'waiting':  renderWaitingRoom(); break;
     case 'gameover': break;
     default:         renderGame();
   }

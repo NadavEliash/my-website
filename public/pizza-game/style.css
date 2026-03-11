@@ -47,6 +47,26 @@ button:active { transform: scale(0.96); }
   box-shadow: 0 4px 12px rgba(0,0,0,0.2);
 }
 
+.waiting-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  background: rgba(0,0,0,0.15);
+  padding: 16px;
+  border-radius: 12px;
+}
+.player-waiting-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: var(--text);
+  padding: 8px;
+  background: rgba(255,255,255,0.03);
+  border-radius: 8px;
+}
+
 #setup-screen {
   min-height: 100vh;
   display: flex; flex-direction: column; align-items: center; justify-content: center;
