@@ -511,7 +511,7 @@ function startFromSetup() {
   } else {
     const playersInfo = Array.from({ length: playerCount }, (_, i) => {
       const v = $(`pname${i}`).value.trim();
-      const isAuto = $(`pauto${i}`).checked;
+      const isAuto = $(`pauto${i}`)?.checked;
       return { name: v || `שחקן ${i + 1}`, isAuto };
     });
     newGame(playersInfo, selectedWinMode);
@@ -735,7 +735,7 @@ function renderGame() {
           ${bankHTML}
         </div>
         <div id="side-panel-footer">
-          <button class="action-btn" style="background:#442222; color:#ffaaaa; border-color:#663333; width:100% ; text-align:center" onclick="confirmNewGame()">
+          <button class="action-btn" style="background:#442222; color:#ffaaaa; border-color:#663333; width:100% ; text-align:center" onclick="doConfirmNewGame()">
             משחק חדש
           </button>
         </div>
@@ -1450,6 +1450,7 @@ function doConfirmNewGame() {
   roomId = null;
   myPlayerId = null;
   roomPlayers = [];
+  G.phase = 'setup';
   renderSetup();
 }
 
@@ -1482,7 +1483,7 @@ function renderWaitingRoom() {
           }
         </div>
         
-        <button class="modal-close" style="margin-top:16px" onclick="location.reload()">ביטול וחזרה</button>
+        <button class="modal-close" style="margin-top:16px" onclick="doConfirmNewGame()">ביטול וחזרה</button>
       </div>
     </div>
   `;
@@ -1500,6 +1501,10 @@ function startOnlineGame() {
 // ═══════════════════════════════════════════════════════════
 
 function render(shouldSync = true) {
+  if (G.phase === 'waiting' && !roomId) {
+    G.phase = 'setup';
+    isMultiplayer = false;
+  }
   saveGame();
   switch (G.phase) {
     case undefined:
