@@ -62,6 +62,46 @@ const STORAGE_KEY = 'pizza_game_state_v1';
 let currentTrade = null; // { otherId, give: {}, take: {} }
 let bankTradeSelection = {}; // { type: count }
 
+// --- SOCKET MULTIPLAYER ---
+let socket = null;
+let roomId = null;
+let myPlayerId = null; // The index in G.players
+let isMultiplayer = false;
+
+function initSocket() {
+  // Replace with your server URL if different
+  socket = io('http://localhost:3001');
+
+  socket.on('connect', () => {
+    console.log('Connected to socket server');
+  });
+
+  socket.on('game-updated', (newG) => {
+    console.log('Received game update');
+    G = newG;
+    render(false); // Render without emitting back
+  });
+
+  socket.on('player-joined', ({ players, gameState }) => {
+    console.log('Player joined', players);
+    if (gameState && !G.phase) {
+       G = gameState;
+       render(false);
+    }
+  });
+  
+  socket.on('receive-chat', ({ playerName, message }) => {
+    console.log(`${playerName}: ${message}`);
+    // Optional: show in UI
+  });
+}
+
+function syncG() {
+  if (isMultiplayer && socket && roomId) {
+    socket.emit('sync-game', { roomId, G });
+  }
+}
+
 function saveGame() {
   if (G && G.phase && G.phase !== 'setup') {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(G));
@@ -88,7 +128,7 @@ function clearGameStorage() {
   localStorage.removeItem(STORAGE_KEY);
 }
 
-function newGame(names, winMode = 'score') {
+function newGame(playersInput, winMode = 'score') {
   const bank = {};
   ALL_TYPES.forEach(t => bank[t] = INGREDIENTS[t].basic ? 40 : 25);
 
@@ -96,7 +136,10 @@ function newGame(names, winMode = 'score') {
   const surprises = shuffle([...SURPRISE_POOL, ...SURPRISE_POOL, ...SURPRISE_POOL]);
 
   G = {
-    players: names.map((name, i) => mkPlayer(name, i)),
+    players: playersInput.map((p, i) => {
+      if (typeof p === 'string') return mkPlayer(p, i);
+      return mkPlayer(p.name, i, p.isAuto);
+    }),
     cur: 0,
     bank,
     custDeck: customers,
@@ -111,10 +154,11 @@ function newGame(names, winMode = 'score') {
   };
   G.players.forEach(p => p.customer = { ...BASIC_CUSTOMER });
   render();
+  if (isMultiplayer) syncG();
   notifyTurn();
 }
 
-function mkPlayer(name, i) {
+function mkPlayer(name, i, isAuto = false) {
   const rand2_12 = () => { let n; do { n = rnd(2, 12); } while (n === 7); return n; };
   return {
     name, id: i, color: PLAYER_COLORS[i],
@@ -123,6 +167,7 @@ function mkPlayer(name, i) {
     hand: {},
     customer: null,
     surprises: [],
+    isAuto,
   };
 }
 
@@ -144,6 +189,10 @@ function removeHand(player, type, n = 1) {
   G.bank[type] = (G.bank[type] || 0) + n;
 }
 function drawCustomer(p) {
+  if (p.isAuto) {
+    p.customer = { ...BASIC_CUSTOMER };
+    return;
+  }
   if (!G.custDeck.length) G.custDeck = shuffle(CUSTOMERS.filter(c => c.req.length > 3));
   p.customer = { ...G.custDeck.shift() };
 }
@@ -199,7 +248,7 @@ function renderHandFanHTML(hand, selectedMap, onClickFnName) {
 
   if (allCards.length === 0) return '<div style="text-align:center;color:var(--muted);width:100%;margin-top:50px;">אין מצרכים!</div>';
 
-  const CARDS_PER_ROW = 7;
+  const CARDS_PER_ROW = window.innerWidth <= 768 ? 4 : 7;
   let html = '';
   
   for (let i = 0; i < allCards.length; i += CARDS_PER_ROW) {
@@ -324,13 +373,28 @@ function renderSetup() {
   <div id="setup-screen">
     <div class="setup-title">🍕 פיצה בעיר</div>
     <div class="setup-card">
-      <span class="setup-label">מספר שחקנים:</span>
-      <div class="player-count-buttons">
-        <button id="btn3" onclick="setCount(3)" class="active">3</button>
-        <button id="btn4" onclick="setCount(4)">4</button>
+      <div class="setup-mode-tabs">
+        <button id="tab-local" class="tab-btn active" onclick="setMultiplayer(false)">משחק מקומי</button>
+        <button id="tab-online" class="tab-btn" onclick="setMultiplayer(true)">משחק אונליין</button>
       </div>
-      <span class="setup-label">שמות השחקנים:</span>
-      <div class="name-inputs" id="name-inputs"></div>
+
+      <div id="local-setup">
+        <span class="setup-label">מספר שחקנים:</span>
+        <div class="player-count-buttons">
+          <button id="btn3" onclick="setCount(3)" class="active">3</button>
+          <button id="btn4" onclick="setCount(4)">4</button>
+        </div>
+        <span class="setup-label">שמות השחקנים:</span>
+        <div class="name-inputs" id="name-inputs"></div>
+      </div>
+
+      <div id="online-setup" style="display:none">
+        <span class="setup-label">מזהה חדר:</span>
+        <input type="text" id="room-input" class="name-input" placeholder="למשל: pizza-123">
+        <span class="setup-label">השם שלך:</span>
+        <input type="text" id="my-name-input" class="name-input" placeholder="השם שלך">
+        <div style="margin-top:10px; font-size:0.9rem; color:var(--muted)">במשחק אונליין, השחקן הראשון שמצטרף לחדר קובע את הגדרות המשחק.</div>
+      </div>
 
       <span class="setup-label" style="margin-top:18px">🎮 תנאי סיום משחק:</span>
       <div class="win-mode-buttons" id="win-mode-buttons">
@@ -349,6 +413,15 @@ function renderSetup() {
     </div>
   </div>`;
   setCount(3);
+}
+
+function setMultiplayer(multi) {
+  isMultiplayer = multi;
+  $('tab-local').classList.toggle('active', !multi);
+  $('tab-online').classList.toggle('active', multi);
+  $('local-setup').style.display = multi ? 'none' : 'block';
+  $('online-setup').style.display = multi ? 'block' : 'none';
+  if (multi && !socket) initSocket();
 }
 
 let playerCount = 3;
@@ -371,21 +444,108 @@ function setCount(n) {
   ['btn3', 'btn4'].forEach(id => $(id) && $(id).classList.remove('active'));
   $('btn' + n).classList.add('active');
   const defaults = ['שחקן א', 'שחקן ב', 'שחקן ג', 'שחקן ד'];
-  $('name-inputs').innerHTML = Array.from({ length: n }, (_, i) =>
-    `<input class="name-input" id="pname${i}" placeholder="${defaults[i]}" value="${defaults[i]}">`
-  ).join('');
+  $('name-inputs').innerHTML = Array.from({ length: n }, (_, i) => {
+    const canBeBot = i >= n - 2;
+    return `<div class="setup-player-row">
+      <input class="name-input" id="pname${i}" placeholder="${defaults[i]}" value="${defaults[i]}">
+      ${canBeBot ? `
+        <label class="auto-toggle" title="מחשב (AI)">
+          <input type="checkbox" id="pauto${i}" onchange="updatePlayerNames()"> 🤖
+        </label>` : ''}
+    </div>`;
+  }).join('');
+}
+
+function updatePlayerNames() {
+  let botCount = 0;
+  const humanDefaults = ['שחקן א', 'שחקן ב', 'שחקן ג', 'שחקן ד'];
+  
+  for (let i = 0; i < playerCount; i++) {
+    const input = $(`pname${i}`);
+    const autoCheck = $(`pauto${i}`);
+    const isAuto = autoCheck ? autoCheck.checked : false;
+    
+    if (isAuto) {
+      botCount++;
+      if (botCount === 1) input.value = 'בוט הבן';
+      else if (botCount === 2) input.value = 'בוט הבת';
+      else input.value = `בוט ${botCount}`;
+      input.disabled = true;
+    } else {
+      input.disabled = false;
+      // Revert if it was a bot name
+      const val = input.value.trim();
+      if (val === 'בוט הבן' || val === 'בוט הבת' || val.startsWith('בוט ')) {
+         input.value = humanDefaults[i];
+      }
+    }
+  }
 }
 
 function startFromSetup() {
-  const names = Array.from({ length: playerCount }, (_, i) => {
-    const v = $(`pname${i}`).value.trim();
-    return v || `שחקן ${i + 1}`;
-  });
-  newGame(names, selectedWinMode);
+  if (isMultiplayer) {
+    const rid = $('room-input').value.trim();
+    const myName = $('my-name-input').value.trim();
+    if (!rid || !myName) {
+      alert('נא להזין מזהה חדר ושם');
+      return;
+    }
+    roomId = rid;
+    socket.emit('join-room', { roomId, playerName: myName });
+    
+    // Check if game already exists in room, otherwise start new
+    // For simplicity, let's assume if it's the first player, they start it.
+    // We'll wait a bit to see if we get a state.
+    setTimeout(() => {
+      if (!G.players) {
+        // If no game yet, start it. We need names.
+        // In multiplayer, we might need a better lobby, but let's just 
+        // use the local names for now or just the joining player.
+        newGame([myName], selectedWinMode);
+        myPlayerId = 0;
+      } else {
+        // Game exists. Find my ID or add myself?
+        // Let's just find by name for now or pick first empty slot.
+        let idx = G.players.findIndex(p => p.name === myName);
+        if (idx === -1) {
+             // Add player to game? 
+             // For now, let's just use the first available player index
+             // This is a bit naive but works for a prototype.
+             myPlayerId = G.players.length;
+             G.players.push(mkPlayer(myName, myPlayerId));
+             G.players[myPlayerId].customer = { ...BASIC_CUSTOMER };
+             syncG();
+        } else {
+             myPlayerId = idx;
+        }
+        render();
+      }
+    }, 1000);
+  } else {
+    const playersInfo = Array.from({ length: playerCount }, (_, i) => {
+      const v = $(`pname${i}`).value.trim();
+      const isAuto = $(`pauto${i}`).checked;
+      return { name: v || `שחקן ${i + 1}`, isAuto };
+    });
+    newGame(playersInfo, selectedWinMode);
+  }
 }
 
 function notifyTurn() {
   const p = G.players[G.cur];
+
+  if (p.isAuto) {
+    showModal(`
+      <div style="text-align:center; padding: 20px;">
+        <div style="font-size: 5rem; margin-bottom: 15px;">🤖</div>
+        <div class="modal-title" style="color:${p.color}; font-size: 2.2rem;">תור ${p.name} (מחשב)</div>
+        <div class="modal-sub" style="font-size: 1.1rem; margin-top: 10px;">המחשב חושב...</div>
+      </div>
+    `, 1);
+    setTimeout(runAILogic, 1200);
+    return;
+  }
+
   const html = `
     <div style="text-align:center; padding: 20px;">
       <div style="font-size: 5rem; margin-bottom: 15px;">👨‍🍳</div>
@@ -395,6 +555,24 @@ function notifyTurn() {
     </div>
   `;
   showModal(html, 0);
+}
+
+function runAILogic() {
+  const p = G.players[G.cur];
+  if (!p || !p.isAuto || G.phase === 'gameover') return;
+
+  if (G.phase === 'roll') {
+    doRoll();
+  } else if (G.phase === 'action') {
+    if (canFulfill(p)) {
+      setTimeout(() => {
+        doBake();
+        setTimeout(doEndTurn, 1000);
+      }, 800);
+    } else {
+      setTimeout(doEndTurn, 1000);
+    }
+  }
 }
 
 
@@ -441,12 +619,15 @@ function renderGame() {
     </div>`;
   }
 
-  const diceHTML = `
+    const isMyTurn = !isMultiplayer || myPlayerId === G.cur;
+    const diceDisabled = G.rolled || !isMyTurn;
+
+    const diceHTML = `
     <div id="dice-area">
       <div class="dice-row" id="dice-row">${dieFace(G.dice[0])} ${dieFace(G.dice[1])}</div>
       ${rollResultsHTML}
       ${G.phase === 'roll'
-        ? `<button class="roll-btn" id="roll-btn" onclick="doRoll()">הטל קוביות</button>`
+        ? `<button class="roll-btn" id="roll-btn" onclick="doRoll()" ${diceDisabled ? 'disabled' : ''}>${isMyTurn ? 'הטל קוביות' : `מחכים ל-${p.name}...`}</button>`
         : G.phase === 'pick7'
           ? `<div class="dice-msg" style="color:#f5c518">יצא 7! בחר מצרך לקחת מהקופה</div>`
           : ''}
@@ -503,7 +684,10 @@ function renderGame() {
         <div class="header-title">פיצה בעיר</div>
       </div>
       <div class="header-round">סיבוב ${G.round}</div>
-      <div class="header-info">תור: <strong style="color:${p.color}">${p.name}</strong></div>
+      <div class="header-info">
+        ${isMultiplayer ? `<span id="socket-status" class="status-dot ${socket && socket.connected ? 'online' : 'offline'}"></span>` : ''}
+        תור: <strong style="color:${p.color}">${p.name}</strong>
+      </div>
     </header>
     <div id="players-strip">${strip}</div>
     <div id="play-area">
@@ -576,7 +760,7 @@ function renderGame() {
           <div id="actions-drawer-header" onclick="toggleActionsDrawer()">
               <div class="drawer-handle"></div>
               <span class="drawer-title"><span class="drawer-arrow">
-              </span> פעולות נוספות${G.actionsDrawerOpen 
+              </span> פעולות ${G.actionsDrawerOpen 
                 ? 
                 `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                 <polyline points="6 9 12 15 18 9"></polyline>
@@ -593,10 +777,10 @@ function renderGame() {
         ` : ''}
         <div id="fixed-bottom-bar">
             ${G.phase === 'action' 
-              ? `<button class="action-btn end-turn" onclick="doEndTurn()">סיים תור</button>` 
+              ? `<button class="action-btn end-turn" onclick="doEndTurn()" ${!isMyTurn ? 'disabled' : ''}>סיים תור</button>` 
               : G.phase === 'pick7'
                 ? `<button class="action-btn" disabled style="background:rgba(245,197,24,0.12); color:var(--gold); border-color:var(--gold)">בחר מצרך (יצא 7)</button>`
-                : `<button class="action-btn roll-btn" id="mobile-roll-btn" onclick="doRoll()" ${G.rolled ? 'disabled' : ''}>הטל קוביות</button>`
+                : `<button class="action-btn roll-btn" id="mobile-roll-btn" onclick="doRoll()" ${G.rolled || !isMyTurn ? 'disabled' : ''}>${isMyTurn ? 'הטל קוביות' : `מחכים ל-${p.name}...`}</button>`
             }
         </div>
       </div>
@@ -615,27 +799,28 @@ function toggleActionsDrawer() {
 }
 
 function buildActionBtns(p, mobileMode = false) {
+  const isMyTurn = !isMultiplayer || myPlayerId === G.cur;
   const canBake = canFulfill(p);
   const buttons = [
-    `<button class="action-btn ${canBake ? 'can-bake' : ''}" onclick="doBake()" ${canBake ? '' : 'disabled'}>
+    `<button class="action-btn ${canBake ? 'can-bake' : ''}" onclick="doBake()" ${canBake && isMyTurn ? '' : 'disabled'}>
       אפה פיצה ${canBake ? '' : '(חסרים מצרכים)'}
     </button>`,
-    `<button class="action-btn" onclick="doPickSurprise()" ${p.coins >= 3 ? '' : 'disabled'}>
+    `<button class="action-btn" onclick="doPickSurprise()" ${p.coins >= 3 && isMyTurn ? '' : 'disabled'}>
       קלף הפתעה (3 מטבעות)
     </button>`,
-    `<button class="action-btn" onclick="doBuySlot()" ${p.coins >= 6 ? '' : 'disabled'}>
+    `<button class="action-btn" onclick="doBuySlot()" ${p.coins >= 6 && isMyTurn ? '' : 'disabled'}>
       מצרך חדש ללוח (6 מטבעות)
     </button>`,
-    `<button class="action-btn" onclick="doBuyNumber()" ${p.coins >= 4 ? '' : 'disabled'}>
+    `<button class="action-btn" onclick="doBuyNumber()" ${p.coins >= 4 && isMyTurn ? '' : 'disabled'}>
       מספר נוסף (4 מטבעות)
     </button>`,
-    `<button class="action-btn" onclick="doExchange()">
+    `<button class="action-btn" onclick="doExchange()" ${isMyTurn ? '' : 'disabled'}>
       המרת מצרכים
     </button>`
   ];
 
   if (!mobileMode) {
-    buttons.push(`<button class="action-btn end-turn" onclick="doEndTurn()">
+    buttons.push(`<button class="action-btn end-turn" onclick="doEndTurn()" ${isMyTurn ? '' : 'disabled'}>
       סיים תור
     </button>`);
   }
@@ -681,8 +866,18 @@ function doRoll() {
 
 function handleRollResult(sum) {
   G.lastRoll = { sum, results: [] };
+  const p = G.players[G.cur];
 
   if (sum === 7) {
+    if (p.isAuto) {
+      // Auto player rolls again on 7
+      G.lastRoll = null;
+      G.rolled = false;
+      G.phase = 'roll';
+      render();
+      setTimeout(doRoll, 1000);
+      return;
+    }
     G.phase = 'pick7';
     renderGame();
     showPick7Modal();
@@ -700,8 +895,10 @@ function handleRollResult(sum) {
     } else {
       G.phase = 'action';
       renderGame();
+      if (p.isAuto) setTimeout(runAILogic, 1000);
     }
   }
+  window.scrollTo(0, 1000);  
 }
 
 function distributeIngredients(sum) {
@@ -755,7 +952,9 @@ function doBake() {
   if (!canFulfill(p)) return;
   p.customer.req.forEach(t => removeHand(p, t));
   const coins = p.customer.req.length;
-  p.coins += coins;
+  
+  if (!p.isAuto) p.coins += coins;
+  
   p.score++;
   // Win condition: score mode only
   if (G.winMode !== 'bank' && p.score >= WIN_SCORE) {
@@ -1264,7 +1463,7 @@ function confirmNewGame() {
       <div class="modal-sub" style="margin-bottom:24px;">כל ההתקדמות הנוכחית תימחק ללא שחזור.</div>
       <div style="display:flex; gap:12px;">
         <button class="start-btn" style="flex:1; background:#c0392b; border-color:#922b21;" onclick="doConfirmNewGame()">
-          כן, התחל מחדש
+        התחל מחדש
         </button>
         <button class="modal-close" style="flex:1;" onclick="closeModal()">
           ביטול
@@ -1283,7 +1482,7 @@ function doConfirmNewGame() {
 // MAIN RENDER
 // ═══════════════════════════════════════════════════════════
 
-function render() {
+function render(shouldSync = true) {
   saveGame();
   switch (G.phase) {
     case undefined:
@@ -1291,6 +1490,7 @@ function render() {
     case 'gameover': break;
     default:         renderGame();
   }
+  if (shouldSync && isMultiplayer) syncG();
 }
 
 // Boot
