@@ -6,8 +6,8 @@
 
 const INGREDIENTS = {
   DOUGH:      { id: 'DOUGH',      name: 'בצק',       img: 'assets/dough-removebg-preview.png', basic: true },
-  SAUCE:      { id: 'SAUCE',      name: 'רוטב',      img: 'assets/tomato-sauce-removebg-preview.png', basic: true },
-  CHEESE:     { id: 'CHEESE',     name: 'גבינה',     img: 'assets/mozzarella-removebg-preview.png', basic: true },
+  SAUCE:      { id: 'SAUCE',      name: 'רסק',      img: 'assets/tomato-sauce-removebg-preview.png', basic: true },
+  CHEESE:     { id: 'CHEESE',     name: 'גבנצ',     img: 'assets/mozzarella-removebg-preview.png', basic: true },
   ONION:      { id: 'ONION',      name: 'בצל',       img: 'assets/onion-removebg-preview.png', basic: false },
   MUSHROOMS:  { id: 'MUSHROOMS',  name: 'פטריות',    img: 'assets/mushrooms-removebg-preview.png', basic: false },
   OLIVES:     { id: 'OLIVES',     name: 'זיתים',     img: 'assets/olives-removebg-preview.png', basic: false },
@@ -26,10 +26,10 @@ const CUSTOMERS = [
   { id:'c07', name:'ספייסי ספנסר',    gender:'m', quote:'FIRE FIRE FIRE!!! 🔥',                       req:['DOUGH','SAUCE','CHEESE','HOT_PEPPER'] },
   { id:'c08', name:'בת-שבע בולגרינה', gender:'f', quote:'בולגרית מעל הכל!',                          req:['DOUGH','SAUCE','CHEESE','BULGARIAN'] },
   { id:'c09', name:'בצלאל סגל',        gender:'m', quote:'עם בצל זה הרבה יותר טוב.',                  req:['DOUGH','SAUCE','CHEESE','ONION'] },
-  { id:'c10', name:'פטריצ\'יה',        gender:'f', quote:'פשוט שמי פטריות ובצל, בבקשה.',              req:['DOUGH','SAUCE','CHEESE','MUSHROOMS','ONION'] },
+  { id:'c10', name:'פטריצ\'יה',        gender:'f', quote:'פשוט שימי פטריות ובצל, בבקשה.',              req:['DOUGH','SAUCE','CHEESE','MUSHROOMS','ONION'] },
   { id:'c11', name:'רוקי ירקוני',      gender:'m', quote:'ירוק זה הצבע שלי 🌿',                       req:['DOUGH','SAUCE','CHEESE','OLIVES','HOT_PEPPER'] },
   { id:'c12', name:'חיים בן בצל',      gender:'m', quote:'בצל ובולגרית? יאמי!',                       req:['DOUGH','SAUCE','CHEESE','ONION','BULGARIAN'] },
-  { id:'c13', name:'מאריו הרומנטי',   gender:'m', quote:'Mamma mia! Funghi e bulgara!',               req:['DOUGH','SAUCE','CHEESE','MUSHROOMS','BULGARIAN'] },
+  { id:'c13', name:'מאריו הרומנטי',   gender:'m', quote:'Mamma mia! Funghi e bulgara',               req:['DOUGH','SAUCE','CHEESE','MUSHROOMS','BULGARIAN'] },
   { id:'c14', name:'בטי הקלאסית',     gender:'f', quote:'זיתים ובצל? מושלם!',                        req:['DOUGH','SAUCE','CHEESE','OLIVES','ONION'] },
   { id:'c15', name:'ג\'ון הגרגרן',     gender:'m', quote:'כל התוספות! אני חוגג ביום הולדת!',          req:['DOUGH','SAUCE','CHEESE','MUSHROOMS','OLIVES','ONION'] },
   { id:'c16', name:'נינה מנהטן',       gender:'f', quote:'I want it ALL, honey! 💅',                  req:['DOUGH','SAUCE','CHEESE','MUSHROOMS','OLIVES','HOT_PEPPER'] },
@@ -40,18 +40,15 @@ const CUSTOMERS = [
 const BASIC_CUSTOMER = CUSTOMERS[0];
 
 const SURPRISE_POOL = [
-  { id:'s01', name:'גנב המצרכים',  effect:'STEAL_CHOOSE',   param:null,        desc:'בחר מצרך וקח הכל מהשחקנים האחרים' },
-  { id:'s02', name:'מתנה מהשמיים', effect:'FREE_ANY',        param:null,        desc:'קח קלף מצרך לבחירתך מהקופה' },
+  { id:'s01', name:'שוד המצרכים',  effect:'STEAL_CHOOSE',   param:null,        desc:'בחר מצרך וקח הכל מהשחקנים האחרים' },
+  { id:'s02', name:'לפנק לפנק', effect:'FREE_ANY',        param:null,        desc:'קח קלף מצרך לבחירתך מהקופה' },
   { id:'s03', name:'תור נוסף!',    effect:'EXTRA_TURN',      param:null,        desc:'קבל תור נוסף' },
-  { id:'s04', name:'דמי חנוכה',    effect:'GAIN_COINS',      param:3,           desc:'קבל 3 מטבעות!' },
-  { id:'s05', name:'צ\'יפס מזל',   effect:'GAIN_COINS',      param:2,           desc:'קבל 2 מטבעות!' },
-  { id:'s06', name:'בצק קסום',     effect:'FREE_SPECIFIC',   param:'DOUGH',     desc:'קבל 2 קלפי בצק מהקופה' },
-  { id:'s07', name:'גבינה שמנה',   effect:'FREE_SPECIFIC',   param:'CHEESE',    desc:'קבל 2 קלפי גבינה מהקופה' },
-  { id:'s08', name:'גשם פטריות',   effect:'FREE_SPECIFIC',   param:'MUSHROOMS', desc:'קבל 2 קלפי פטריות מהקופה' },
-  { id:'s09', name:'שוד פטריות',   effect:'STEAL_SPECIFIC',  param:'MUSHROOMS', desc:'קח את כל הפטריות מהשחקנים' },
-  { id:'s10', name:'שוד זיתים',    effect:'STEAL_SPECIFIC',  param:'OLIVES',    desc:'קח את כל הזיתים מהשחקנים' },
-  { id:'s11', name:'רוטב מתנה',    effect:'FREE_SPECIFIC',   param:'SAUCE',     desc:'קבל 2 קלפי רוטב מהקופה' },
-  { id:'s12', name:'גנב מהסרטים',  effect:'STEAL_ANY_ONE',   param:null,        desc:'קח קלף מצרך אחד מכל שחקן מתחרה' },
+  { id:'s04', name:'דמי אבטלה',    effect:'GAIN_COINS',      param:3,           desc:'קבל 3 מטבעות!' },
+  { id:'s05', name:'מענק עסק חדש',    effect:'GAIN_COINS',      param:6,           desc:'קבל 6 מטבעות!' },
+  { id:'s06', name:'קמח מים',     effect:'FREE_SPECIFIC',   param:'DOUGH',     desc:'קבל 2 קלפי בצק מהקופה' },
+  { id:'s07', name:'צהוב עולה',   effect:'FREE_SPECIFIC',   param:'CHEESE',    desc:'קבל 2 קלפי גבנצ מהקופה' },
+  { id:'s08', name:'טומייטו טומאטו',    effect:'FREE_SPECIFIC',   param:'SAUCE',     desc:'קבל 2 קלפי רסק מהקופה' },
+  { id:'s09', name:'גנוב על המשחק',  effect:'STEAL_ANY_ONE',   param:null,        desc:'קח קלף מצרך אחד מכל שחקן מתחרה' },
 ];
 
 const PLAYER_COLORS = ['#e74c3c','#3498db','#2ecc71','#f39c12'];
@@ -60,7 +57,7 @@ const WIN_SCORE = 10;
 // ═══════════════════════════════════════════════════════════
 // GAME STATE
 // ═══════════════════════════════════════════════════════════
-let G = {};
+let G = { sidePanelOpen: false, actionsDrawerOpen: false };
 const STORAGE_KEY = 'pizza_game_state_v1';
 let currentTrade = null; // { otherId, give: {}, take: {} }
 let bankTradeSelection = {}; // { type: count }
@@ -191,42 +188,51 @@ function ingIcon(type, sizeClass = '') {
 }
 
 function renderHandFanHTML(hand, selectedMap, onClickFnName) {
-  const totalCards = Object.values(hand).reduce((a, b) => a + b, 0);
-  if (totalCards === 0) return '<div style="text-align:center;color:var(--muted);width:100%;margin-top:50px;">אין מצרכים!</div>';
-  
-  let html = '';
-  let idx = 0;
-  
+  const allCards = [];
   ALL_TYPES.forEach(t => {
     const countInHand = hand[t] || 0;
-    const selectedCount = selectedMap[t] || 0;
-    
+    const selectedSet = selectedMap[t];  // a Set of selected indices, or undefined
     for (let i = 0; i < countInHand; i++) {
-      const isSelected = i < selectedCount;
-      
-      // Calculate realistic fan spread
-      const offset = idx - (totalCards - 1) / 2;
-      const angle = offset * (30 / Math.max(5, totalCards / 2)); // Dynamic spread
-      const x = offset * (120 / Math.max(3, totalCards / 4)); // Horizontal spacing
-      const y = Math.abs(offset) * 5; // Slight arc
-      
-      const style = `transform: translate(${x}px, ${y}px) rotate(${angle}deg); 
-                     z-index: ${idx}; 
-                     --fan-rotation: ${angle}deg;
-                     --fan-x: ${x}px;
-                     --fan-y: ${y}px;`;
-      
-      html += `
-        <div class="selectable-card ${isSelected ? 'selected' : ''}" 
-             style="${style}" 
-             onclick="${onClickFnName}('${t}', ${isSelected})">
-          <div class="card-indicator">🍕</div>
-          <img src="${INGREDIENTS[t].img}" alt="${INGREDIENTS[t].name}">
-          <div class="card-name">${INGREDIENTS[t].name}</div>
-        </div>`;
-      idx++;
+      allCards.push({ type: t, idx: i, isSelected: selectedSet ? selectedSet.has(i) : false });
     }
   });
+
+  if (allCards.length === 0) return '<div style="text-align:center;color:var(--muted);width:100%;margin-top:50px;">אין מצרכים!</div>';
+
+  const CARDS_PER_ROW = 7;
+  let html = '';
+  
+  for (let i = 0; i < allCards.length; i += CARDS_PER_ROW) {
+    const rowCards = allCards.slice(i, i + CARDS_PER_ROW);
+    const n = rowCards.length;
+    const mid = (n - 1) / 2;
+    
+    html += '<div class="fan-row">';
+    rowCards.forEach((card, posInRow) => {
+      const offset = posInRow - mid;
+      const angle = offset * 5;      // Subtle rotation for each card
+      const x = offset * 48;         // Horizontal spread (overlapping)
+      const y = Math.abs(offset) * 4; // Arc effect
+      
+      const style = `
+        --fan-angle: ${angle}deg;
+        --fan-x: ${x}px;
+        --fan-y: ${y}px;
+        z-index: ${posInRow};
+      `;
+      
+      html += `
+        <div class="selectable-card ${card.isSelected ? 'selected' : ''}"
+             style="${style}"
+             onclick="${onClickFnName}('${card.type}', ${card.idx})">
+          <div class="card-indicator">🍕</div>
+          <img src="${INGREDIENTS[card.type].img}" alt="${INGREDIENTS[card.type].name}">
+          <div class="card-name">${INGREDIENTS[card.type].name}</div>
+        </div>`;
+    });
+    html += '</div>';
+  }
+  
   return html;
 }
 
@@ -413,8 +419,7 @@ function renderGame() {
 
   const strip = G.players.map((pl, i) => `
     <div class="player-chip ${i === G.cur ? 'active' : ''}">
-      <div class="chip-name" style="color:${pl.color}">${pl.name}</div>
-      <div class="chip-stats">
+      <div class="chip-name" style="color:${pl.color}">${pl.name}
         <span class="chip-score">${pl.score}${G.winMode !== 'bank' ? `/${WIN_SCORE}` : ''}</span>
       </div>
       <div class="chip-coins">${coinsHTML(pl.coins)}</div>
@@ -438,7 +443,6 @@ function renderGame() {
 
   const diceHTML = `
     <div id="dice-area">
-      <div class="section-title"></div>
       <div class="dice-row" id="dice-row">${dieFace(G.dice[0])} ${dieFace(G.dice[1])}</div>
       ${rollResultsHTML}
       ${G.phase === 'roll'
@@ -476,38 +480,35 @@ function renderGame() {
     const hasBasic = basicIngs.every(b => p.customer.req.includes(b));
     const pHasBasic = basicIngs.every(b => (p.hand[b] || 0) >= 1);
     const extras = p.customer.req.filter(r => !basicIngs.includes(r));
+    
     if (hasBasic) {
-      needsHTML += `<div class="board-cust-need-pizza ${pHasBasic ? 'have' : ''}" title="בצק, רוטב וגבינה">
-        <img src="assets/pizza-removebg-preview.png" style="width: 100px; height: 100px; object-fit: contain;">
-      </div>`;
+      needsHTML += `
+        <div class="board-cust-need-pizza ${pHasBasic ? 'have' : ''}" title="בצק, רסק וגבנצ">
+          <img src="assets/pizza-removebg-preview.png">
+        </div>`;
     } else {
       needsHTML += p.customer.req.filter(r => basicIngs.includes(r)).map(t => `<span class="board-cust-need ${(p.hand[t]||0)>=1?'have':''}">${ingIcon(t, 'tiny')}</span>`).join('');
     }
-    if (extras.length > 0) {
-      needsHTML += `<div style="display:flex; flex-wrap:wrap; gap:4px; margin-top:8px; align-items:center; justify-content:center; width:100%">`;
-      extras.forEach(t => {
-        needsHTML += `
-          <span class="board-cust-need ${(p.hand[t]||0)>=1?'have':''}">${ingIcon(t, 'tiny')}</span>`;
-      });
-      needsHTML += `</div>`;
-    }
+    
+    extras.forEach(t => {
+      needsHTML += `<span class="board-cust-need ${(p.hand[t]||0)>=1?'have':''}">${ingIcon(t, 'tiny')}</span>`;
+    });
   }
 
   app().innerHTML = `
   <div id="game-screen">
     <header id="game-header">
-      <div class="header-title">פיצה בעיר</div>
+      <div class="header-left">
+        <button class="hamburger-btn" onclick="toggleSidePanel()">☰</button>
+        <div class="header-title">פיצה בעיר</div>
+      </div>
       <div class="header-round">סיבוב ${G.round}</div>
       <div class="header-info">תור: <strong style="color:${p.color}">${p.name}</strong></div>
     </header>
     <div id="players-strip">${strip}</div>
     <div id="play-area">
+    <div id="play-area">
       <div id="active-area">
-        <div id="controls-row" style="display:flex; gap:16px; align-items: flex-start; margin-bottom: 16px;">
-          ${diceHTML}
-          ${actionBtns ? `<div id="action-buttons">${actionBtns}</div>` : ''}
-          ${surpriseCardsHTML(p)}
-        </div>
         <div class="board-wrapper">
           <div class="board-top-bar">
             <span class="board-player-label" style="color:${p.color}">${p.name}</span>
@@ -517,11 +518,15 @@ function renderGame() {
             <div class="board-cust-col">
               <div class="board-cust-body">
                 ${p.customer ? `
-                <div class="board-cust-img">
-                  <img src="assets/${p.customer.gender === 'f' ? 'female' : 'male'}-customer-removebg-preview.png" alt="${p.customer.name}">
+                <div class="board-cust-header">
+                  <div class="board-cust-img">
+                    <img src="assets/${p.customer.gender === 'f' ? 'female' : 'male'}-customer-removebg-preview.png" alt="${p.customer.name}">
+                  </div>
+                  <div class="board-cust-info">
+                    <div class="board-cust-name">${p.customer.name}</div>
+                    <div class="board-cust-quote">"${p.customer.quote}"</div>
+                  </div>
                 </div>
-                <div class="board-cust-name">${p.customer.name}</div>
-                <div class="board-cust-quote">"${p.customer.quote}"</div>
                 <div class="board-cust-needs">
                   ${needsHTML}
                 </div>
@@ -540,41 +545,102 @@ function renderGame() {
             </div>
           </div>
         </div>
+        <div id="controls-row" style="display:flex; gap:16px; align-items: flex-start;">
+          ${diceHTML}
+          ${actionBtns ? `<div id="action-buttons">${actionBtns}</div>` : ''}
+          ${surpriseCardsHTML(p)}
+        </div>
       </div>
-      <div id="side-panel">
-        ${bankHTML}
-        <div style="margin-top:auto; padding-top:20px; border-top:1px solid var(--border)">
+
+      <div id="side-panel" class="${G.sidePanelOpen ? 'drawer-open' : ''}">
+        <div id="side-panel-header" onclick="toggleSidePanel()">
+          <div class="drawer-handle"></div>
+          <div class="drawer-title right">
+            <span>פיצה בעיר</span>
+            <span class="drawer-arrow">✕</span>
+          </div>
+        </div>
+        <div id="side-panel-content">
+          ${bankHTML}
+        </div>
+        <div id="side-panel-footer">
           <button class="action-btn" style="background:#442222; color:#ffaaaa; border-color:#663333; width:100% ; text-align:center" onclick="confirmNewGame()">
             משחק חדש
           </button>
         </div>
       </div>
+
+      <!-- Mobile: Actions Drawer & Fixed End Turn -->
+      <div id="mobile-actions-wrapper" class="${G.actionsDrawerOpen ? 'open' : ''} ${G.phase === 'action' ? 'has-drawer' : ''}">
+        ${G.phase === 'action' ? `
+          <div id="actions-drawer-header" onclick="toggleActionsDrawer()">
+              <div class="drawer-handle"></div>
+              <span class="drawer-title"><span class="drawer-arrow">
+              </span> פעולות נוספות${G.actionsDrawerOpen 
+                ? 
+                `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <polyline points="6 9 12 15 18 9"></polyline>
+                </svg>`
+                :
+              `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <polyline points="18 15 12 9 6 15"></polyline>
+              </svg>` 
+              }</span>
+          </div>
+          <div id="actions-drawer-content">
+              ${buildActionBtns(p, true)}
+          </div>
+        ` : ''}
+        <div id="fixed-bottom-bar">
+            ${G.phase === 'action' 
+              ? `<button class="action-btn end-turn" onclick="doEndTurn()">סיים תור</button>` 
+              : G.phase === 'pick7'
+                ? `<button class="action-btn" disabled style="background:rgba(245,197,24,0.12); color:var(--gold); border-color:var(--gold)">בחר מצרך (יצא 7)</button>`
+                : `<button class="action-btn roll-btn" id="mobile-roll-btn" onclick="doRoll()" ${G.rolled ? 'disabled' : ''}>הטל קוביות</button>`
+            }
+        </div>
+      </div>
     </div>
   </div>`;
-
 }
 
-function buildActionBtns(p) {
+function toggleSidePanel() {
+  G.sidePanelOpen = !G.sidePanelOpen;
+  renderGame();
+}
+
+function toggleActionsDrawer() {
+  G.actionsDrawerOpen = !G.actionsDrawerOpen;
+  renderGame();
+}
+
+function buildActionBtns(p, mobileMode = false) {
   const canBake = canFulfill(p);
-  return `
-    <button class="action-btn ${canBake ? 'can-bake' : ''}" onclick="doBake()" ${canBake ? '' : 'disabled'}>
+  const buttons = [
+    `<button class="action-btn ${canBake ? 'can-bake' : ''}" onclick="doBake()" ${canBake ? '' : 'disabled'}>
       אפה פיצה ${canBake ? '' : '(חסרים מצרכים)'}
-    </button>
-    <button class="action-btn" onclick="doPickSurprise()" ${p.coins >= 3 ? '' : 'disabled'}>
+    </button>`,
+    `<button class="action-btn" onclick="doPickSurprise()" ${p.coins >= 3 ? '' : 'disabled'}>
       קלף הפתעה (3 מטבעות)
-    </button>
-    <button class="action-btn" onclick="doBuySlot()" ${p.coins >= 6 ? '' : 'disabled'}>
+    </button>`,
+    `<button class="action-btn" onclick="doBuySlot()" ${p.coins >= 6 ? '' : 'disabled'}>
       מצרך חדש ללוח (6 מטבעות)
-    </button>
-    <button class="action-btn" onclick="doBuyNumber()" ${p.coins >= 4 ? '' : 'disabled'}>
+    </button>`,
+    `<button class="action-btn" onclick="doBuyNumber()" ${p.coins >= 4 ? '' : 'disabled'}>
       מספר נוסף (4 מטבעות)
-    </button>
-    <button class="action-btn" onclick="doExchange()">
+    </button>`,
+    `<button class="action-btn" onclick="doExchange()">
       המרת מצרכים
-    </button>
-    <button class="action-btn end-turn" onclick="doEndTurn()">
+    </button>`
+  ];
+
+  if (!mobileMode) {
+    buttons.push(`<button class="action-btn end-turn" onclick="doEndTurn()">
       סיים תור
-    </button>`;
+    </button>`);
+  }
+
+  return buttons.join('');
 }
 
 // ═══════════════════════════════════════════════════════════
@@ -702,6 +768,7 @@ function doBake() {
 }
 
 function doEndTurn() {
+  G.actionsDrawerOpen = false; 
   if (G.extraTurn) {
     G.extraTurn = false;
   } else {
@@ -794,7 +861,7 @@ function doPickSurprise() {
 function showSurpriseFromHand(idx) {
   const p = G.players[G.cur];
   const card = p.surprises[idx];
-  showSurpriseModal(card, idx);
+  applySurprise(card.id, idx);
 }
 
 function doExchange() {
@@ -848,9 +915,9 @@ function updateBankExchangeModal() {
   const selectedEntries = Object.entries(bankTradeSelection);
   
   if (selectedEntries.length === 1) {
-    const [t, count] = selectedEntries[0];
+    const [t, set] = selectedEntries[0];
     const isBasic = INGREDIENTS[t].basic;
-    if ((isBasic && count === 3) || (!isBasic && count === 2)) {
+    if ((isBasic && set.size === 3) || (!isBasic && set.size === 2)) {
       canProceed = true;
       selectedType = t;
     }
@@ -865,25 +932,24 @@ function updateBankExchangeModal() {
     
     <div style="display:flex; gap:10px; margin-top:20px;">
       <button class="start-btn" style="flex:2" onclick="confirmGiveExchangeBank('${selectedType}')" ${canProceed ? '' : 'disabled'}>
-        ${canProceed ? `קבל מוצר בתמורה ל-${INGREDIENTS[selectedType].name} ⮕` : 'בחר מצרכים להחלפה...'}
+        ${canProceed ? `קבל מוצר בתמורה ל${INGREDIENTS[selectedType].name}` : 'בחר מצרכים להחלפה...'}
       </button>
       <button class="modal-close" style="flex:1" onclick="doExchange()">חזור</button>
     </div>
   `, 0);
 }
 
-function toggleBankTradeItem(type, currentlySelected) {
-  if (currentlySelected) {
-    bankTradeSelection[type]--;
-    if (bankTradeSelection[type] <= 0) delete bankTradeSelection[type];
-  } else {
-    // Only allow one type at a time for bank exchange
-    const existingType = Object.keys(bankTradeSelection)[0];
-    if (existingType && existingType !== type) {
-       bankTradeSelection = {};
-    }
-    bankTradeSelection[type] = (bankTradeSelection[type] || 0) + 1;
-  }
+function toggleBankTradeItem(type, localIdx) {
+  // Only allow one type at a time for bank exchange
+  const existingType = Object.keys(bankTradeSelection)[0];
+  if (existingType && existingType !== type) bankTradeSelection = {};
+
+  if (!bankTradeSelection[type]) bankTradeSelection[type] = new Set();
+  const set = bankTradeSelection[type];
+  if (set.has(localIdx)) set.delete(localIdx);
+  else set.add(localIdx);
+  if (set.size === 0) delete bankTradeSelection[type];
+
   updateBankExchangeModal();
 }
 
@@ -898,7 +964,7 @@ function updateMultiTradeGiveModal() {
   const op = G.players[currentTrade.otherId];
   
   const cardsHTML = renderHandFanHTML(p.hand, currentTrade.give, 'toggleTradeItemGive');
-  const total = Object.values(currentTrade.give).reduce((a, b) => a + b, 0);
+  const total = Object.values(currentTrade.give).reduce((a, s) => a + s.size, 0);
 
   showModal(`
     <div class="modal-title">מה תרצה לתת?</div>
@@ -920,7 +986,7 @@ function updateMultiTradeTakeModal() {
   const op = G.players[currentTrade.otherId];
   
   const cardsHTML = renderHandFanHTML(op.hand, currentTrade.take, 'toggleTradeItemTake');
-  const totalTake = Object.values(currentTrade.take).reduce((a, b) => a + b, 0);
+  const totalTake = Object.values(currentTrade.take).reduce((a, s) => a + s.size, 0);
 
   showModal(`
     <div class="modal-title">מה תרצה לקבל?</div>
@@ -934,18 +1000,16 @@ function updateMultiTradeTakeModal() {
   `, 0);
 }
 
-function toggleTradeItemGive(type, currentlySelected) { toggleTradeItem('give', type, currentlySelected); }
-function toggleTradeItemTake(type, currentlySelected) { toggleTradeItem('take', type, currentlySelected); }
+function toggleTradeItemGive(type, localIdx) { toggleTradeItem('give', type, localIdx); }
+function toggleTradeItemTake(type, localIdx) { toggleTradeItem('take', type, localIdx); }
 
-function toggleTradeItem(dir, type, currentlySelected) {
+function toggleTradeItem(dir, type, localIdx) {
   const map = currentTrade[dir];
-  if (currentlySelected) {
-    map[type] = (map[type] || 0) - 1;
-    if (map[type] <= 0) delete map[type];
-  } else {
-    map[type] = (map[type] || 0) + 1;
-  }
-  
+  if (!map[type]) map[type] = new Set();
+  const set = map[type];
+  if (set.has(localIdx)) set.delete(localIdx);
+  else set.add(localIdx);
+  if (set.size === 0) delete map[type];
   if (dir === 'give') updateMultiTradeGiveModal();
   else updateMultiTradeTakeModal();
 }
@@ -954,12 +1018,12 @@ function showTradeApprovalModal() {
   const p = G.players[G.cur];
   const op = G.players[currentTrade.otherId];
 
-  const giveItems = Object.entries(currentTrade.give).map(([t, count]) => `
-    <div class="trade-summary-item">${ingIcon(t, 'small')} ${INGREDIENTS[t].name} x${count}</div>
+  const giveItems = Object.entries(currentTrade.give).map(([t, set]) => `
+    <div class="trade-summary-item">${ingIcon(t, 'small')} ${INGREDIENTS[t].name} x${set.size}</div>
   `).join('');
   
-  const takeItems = Object.entries(currentTrade.take).map(([t, count]) => `
-    <div class="trade-summary-item">${ingIcon(t, 'small')} ${INGREDIENTS[t].name} x${count}</div>
+  const takeItems = Object.entries(currentTrade.take).map(([t, set]) => `
+    <div class="trade-summary-item">${ingIcon(t, 'small')} ${INGREDIENTS[t].name} x${set.size}</div>
   `).join('');
 
   showModal(`
@@ -993,21 +1057,21 @@ function confirmPlayerExchange() {
   const op = G.players[currentTrade.otherId];
 
   // Validate one last time
-  for (const [t, n] of Object.entries(currentTrade.give)) {
-    if ((p.hand[t] || 0) < n) { closeModal(); return; }
+  for (const [t, set] of Object.entries(currentTrade.give)) {
+    if ((p.hand[t] || 0) < set.size) { closeModal(); return; }
   }
-  for (const [t, n] of Object.entries(currentTrade.take)) {
-    if ((op.hand[t] || 0) < n) { closeModal(); return; }
+  for (const [t, set] of Object.entries(currentTrade.take)) {
+    if ((op.hand[t] || 0) < set.size) { closeModal(); return; }
   }
 
   // Execute swap
-  for (const [t, n] of Object.entries(currentTrade.give)) {
-    removeHand(p, t, n);
-    addHand(op, t, n);
+  for (const [t, set] of Object.entries(currentTrade.give)) {
+    removeHand(p, t, set.size);
+    addHand(op, t, set.size);
   }
-  for (const [t, n] of Object.entries(currentTrade.take)) {
-    removeHand(op, t, n);
-    addHand(p, t, n);
+  for (const [t, set] of Object.entries(currentTrade.take)) {
+    removeHand(op, t, set.size);
+    addHand(p, t, set.size);
   }
 
   showModal(`
@@ -1054,18 +1118,6 @@ function confirmTakeExchangeBank(giveType, takeType) {
 // SURPRISE EFFECTS
 // ═══════════════════════════════════════════════════════════
 
-function showSurpriseModal(card, handIdx) {
-  showModal(`
-    <div style="text-align:center;margin-bottom:16px">
-    <img src="assets/gift-removebg-preview.png" style="width: 120px;" alt="הפתעה">
-    <div class="modal-title">${card.name}</div>
-    <div class="modal-sub">${card.desc}</div>
-    </div>
-    <button class="start-btn" style="width:100%;padding:13px;font-size:1rem" onclick="applySurprise('${card.id}', ${handIdx})">
-      השתמש כעת!
-    </button>
-    <button class="modal-close" style="margin-top:10px" onclick="closeModal()">שמור לאחר כך</button>`, 0);
-}
 
 function applySurprise(cardId, handIdx) {
   const p = G.players[G.cur];
