@@ -71,8 +71,11 @@ let isMultiplayer = false;
 let roomPlayers = [];
 
 function initSocket() {
-  // Replace with your server URL if different
-  socket = io('http://localhost:3001');
+  // Use current origin for production, or localhost:3001 for local development
+  const isLocal = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
+  const socketUrl = isLocal ? 'http://localhost:3001' : window.location.origin;
+  
+  socket = io(socketUrl);
 
   socket.on('connect', () => {
     console.log('Connected to socket server');
