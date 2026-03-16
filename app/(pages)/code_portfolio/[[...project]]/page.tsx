@@ -55,19 +55,10 @@ const projects: project[] = [
             'The user\'s hebrew text sent to Google translate, then the translation sent to Openai or Replicate for generation.',
             'Each user get 5 sessions for free and then have to subscribe. The payment is made via Upay which give the user new link according their plan, which sign them in the database.'],
         src: 'https://ai-heb-app.vercel.app/dashboard',
-        video: 'https://res.cloudinary.com/dnvbfkgsb/video/upload/v1725219787/pc-bina_dgfimy.mp4',
+        video: 'https://res.cloudinary.com/dnvbfkgsb/video/upload/v1725219787/pc-bina_dgfimy.mp4', // Placeholder video
         mobileVideo: 'https://res.cloudinary.com/dnvbfkgsb/video/upload/v1725258045/mobile-bina_lxqciq.mp4',
-        repo: 'https://github.com/NadavEliash/AI-heb-app'
+        repo: 'https://github.com/NadavEliash/my-website'
     },
-    // {
-    //     params: 'crypto-share',
-    //     title: 'Crypto share',
-    //     description: ['Share with friends demo app, based on Vue.js.', 'The app allows user to check current value and statistics of Bitcoin. also, gives the users demo wallet to share with their contacts.', 'The contact list (demo data) allows full CRUD actions.'],
-    //     src: 'https://nadaveliash.github.io/vitcoin-vue/#/',
-    //     video: 'https://res.cloudinary.com/dnvbfkgsb/video/upload/v1725219518/pc-crypto_fjqxz9.mp4',
-    //     mobileVideo: 'https://res.cloudinary.com/dnvbfkgsb/video/upload/v1725257970/mobile-crypto_js8dty.mp4',
-    //     repo: 'https://github.com/NadavEliash/vitcoin-vue'
-    // },
 ]
 
 export default function Projects() {
