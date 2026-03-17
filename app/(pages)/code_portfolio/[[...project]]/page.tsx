@@ -75,7 +75,7 @@ export default function Projects() {
 
     useEffect(() => {
         if (params.project) {
-            const idx = projects.findIndex((project, idx) => project.params === params.project[0])
+            const idx = projects.findIndex((project, idx) => project.params === params?.project[0])
             setCurrentView(idx)
         }
 
