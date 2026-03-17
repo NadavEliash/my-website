@@ -254,7 +254,7 @@ export default function PizzaGame() {
 
   const initSocket = useCallback(() => {
     const isLocal = typeof window !== 'undefined' && (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1');
-    const socketUrl = isLocal ? 'http://localhost:3001' : window.location.origin;
+    const socketUrl = isLocal ? 'http://localhost:3001' : 'https://pizza-game-server.onrender.com';
     const newSocket = io(socketUrl);
     
     newSocket.on('connect', () => {
@@ -982,13 +982,32 @@ export default function PizzaGame() {
   const handleStartFromSetup = () => {
     if (isMultiplayer) {
       if (!roomId || !playerName) {
-        alert('נא להזין מזהה חדר ושם');
+        showModal(
+          <div style={{ textAlign: 'center' }}>
+            <div className="modal-title">חסרים פרטים</div>
+            <div className="modal-sub">נא להזין מזהה חדר ואת השם שלך</div>
+            <button className="modal-close" onClick={closeModal} style={{ marginTop: '20px' }}>סגור</button>
+          </div>
+        );
         return;
       }
       setGameState(prev => ({ ...prev, phase: 'waiting' }));
       let currentSocket = socket;
       if (!currentSocket) currentSocket = initSocket();
-      currentSocket.emit('join-room', { roomId, playerName });
+      currentSocket.emit('join-room', { roomId, playerName }, (response: any) => {
+        if (response && response.error) {
+          showModal(
+            <div style={{ textAlign: 'center' }}>
+              <div className="modal-title">שגיאה בפתיחת החדר</div>
+              <div className="modal-sub">{response.error}</div>
+              <button className="modal-close" onClick={() => {
+                closeModal();
+                setGameState(prev => ({ ...prev, phase: 'setup' }));
+              }} style={{ marginTop: '20px' }}>חזור</button>
+            </div>
+          );
+        }
+      });
     } else {
       startNewGame(setupPlayerInfos, gameState.winMode);
     }
@@ -1239,7 +1258,7 @@ export default function PizzaGame() {
                           <img src={`/pizza-game/assets/${p.customer.gender === 'f' ? 'female' : 'male'}-customer-removebg-preview.png`} alt={p.customer.name} />
                         </div>
                         <div className="board-cust-name">{p.customer.name}</div>
-                        <div className="board-cust-quote">"{p.customer.quote}"</div>
+                        <div className="board-cust-quote">{`"${p.customer.quote}"`}</div>
                       </div>
                       <div className="board-cust-needs">
                         <div className={`board-cust-need-pizza ${pHasBasic ? 'have' : ''}`} title="פיצה בסיסית">

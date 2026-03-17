@@ -1,84 +1,102 @@
-const express = require('express');
 const http = require('http');
 const { Server } = require('socket.io');
-const path = require('path');
 
-const app = express();
-const server = http.createServer(app);
+const server = http.createServer();
+
 const io = new Server(server, {
   cors: {
-    origin: "*",
-    methods: ["GET", "POST"]
+    origin: '*',
+    methods: ['GET', 'POST']
   }
 });
 
-// Store room states
-const rooms = {};
+const rooms = new Map(); // roomId -> { players: [{socketId, name}], gameState: object | null }
 
 io.on('connection', (socket) => {
-  console.log('A user connected:', socket.id);
+  console.log('User connected:', socket.id);
 
-  socket.on('join-room', ({ roomId, playerName }) => {
+  socket.on('join-room', ({ roomId, playerName }, callback) => {
+    // If the room name or player name is entirely an integer/number, reject it
+    
+    if (!isNaN(playerName) && String(playerName).trim() !== '') {
+      if (callback) callback({ error: 'שם שחקן לא יכול להיות מספר בלבד' });
+      return;
+    }
+
+    if (rooms.has(roomId)) {
+       const roomData = rooms.get(roomId);
+       // Reject if game already started
+       if (roomData.gameState && roomData.gameState.phase !== 'setup' && roomData.gameState.phase !== 'waiting') {
+           if (callback) callback({ error: 'החדר כבר פעיל במשחק! לא ניתן להצטרף לחדר קיים שכבר התחיל' });
+           return;
+       }
+       
+       // Reject if name is already taken in the room
+       const isNameTaken = roomData.players.some(p => p.name === playerName && p.socketId !== socket.id);
+       if (isNameTaken) {
+           if (callback) callback({ error: 'השם הזה כבר תפוס בחדר' });
+           return;
+       }
+    }
+
     socket.join(roomId);
-    console.log(`User ${playerName} (${socket.id}) joined room: ${roomId}`);
-    
-    if (!rooms[roomId]) {
-      rooms[roomId] = {
-        players: [],
-        gameState: null
-      };
-    }
-    
-    // Add player to room list if not already there
-    const existingPlayer = rooms[roomId].players.find(p => p.socketId === socket.id);
-    if (!existingPlayer) {
-      rooms[roomId].players.push({
-        socketId: socket.id,
-        name: playerName
-      });
+
+    if (!rooms.has(roomId)) {
+      rooms.set(roomId, { players: [], gameState: null });
     }
 
-    // Notify others in the room
+    const roomData = rooms.get(roomId);
+    
+    // Check if player already in room
+    const existingPlayerIndex = roomData.players.findIndex(p => p.socketId === socket.id);
+    if (existingPlayerIndex === -1) {
+        roomData.players.push({ socketId: socket.id, name: playerName });
+    } else {
+        roomData.players[existingPlayerIndex].name = playerName;
+    }
+
     io.to(roomId).emit('player-joined', {
-      players: rooms[roomId].players,
-      gameState: rooms[roomId].gameState
+      players: roomData.players,
+      gameState: roomData.gameState
     });
+
+    if (callback) callback({ success: true });
   });
 
   socket.on('sync-game', ({ roomId, G }) => {
-    if (rooms[roomId]) {
-      rooms[roomId].gameState = G;
-      // Broadcast updated state to everyone in the room
+    const roomData = rooms.get(roomId);
+    if (roomData) {
+      roomData.gameState = G;
+      // Broadcast to everyone in the room except the sender
       socket.to(roomId).emit('game-updated', G);
     }
   });
 
-  socket.on('send-chat', ({ roomId, playerName, message }) => {
-    io.to(roomId).emit('receive-chat', { playerName, message });
+  socket.on('disconnecting', () => {
+    // remove player from any rooms they were in
+    for (const roomId of socket.rooms) {
+      if (roomId !== socket.id) {
+        const roomData = rooms.get(roomId);
+        if (roomData) {
+          roomData.players = roomData.players.filter(p => p.socketId !== socket.id);
+          io.to(roomId).emit('player-joined', {
+            players: roomData.players,
+            gameState: roomData.gameState
+          });
+          if (roomData.players.length === 0) {
+              rooms.delete(roomId);
+          }
+        }
+      }
+    }
   });
 
   socket.on('disconnect', () => {
     console.log('User disconnected:', socket.id);
-    // Cleanup room info if needed (optional)
-    for (const roomId in rooms) {
-      const index = rooms[roomId].players.findIndex(p => p.socketId === socket.id);
-      if (index !== -1) {
-        const playerName = rooms[roomId].players[index].name;
-        rooms[roomId].players.splice(index, 1);
-        io.to(roomId).emit('player-left', {
-          playerName,
-          players: rooms[roomId].players
-        });
-        if (rooms[roomId].players.length === 0) {
-          delete rooms[roomId];
-        }
-        break;
-      }
-    }
   });
 });
 
 const PORT = process.env.PORT || 3001;
 server.listen(PORT, () => {
-  console.log(`Socket server running on port ${PORT}`);
+  console.log(`Socket.IO server running on port ${PORT}`);
 });
