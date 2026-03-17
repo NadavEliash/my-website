@@ -74,8 +74,9 @@ export default function Projects() {
     const [fadeOut, setFadeOut] = useState<boolean>(false)
 
     useEffect(() => {
-        if (params.project && params.project !== undefined) {
-            const idx = projects.findIndex((project, idx) => project.params === params.project[0])
+        const projectParam = params.project;
+        if (projectParam) {
+            const idx = projects.findIndex((project) => project.params === projectParam[0])
             setCurrentView(idx)
         }
 
