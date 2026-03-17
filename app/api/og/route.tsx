@@ -8,14 +8,15 @@ export const runtime = "edge"
 
 export async function GET(req: Request) {
     try {
-
-        const menlo = await fetch(new URL('../../../Menlo-Regular.ttf', import.meta.url)).then((res) => res.arrayBuffer())
+        const fontData = await fetch(
+            'https://fonts.gstatic.com/s/roboto/v30/KFOmCnqEu92Fr1Mu4mxK.woff2'
+        ).then((res) => res.arrayBuffer())
 
         return new ImageResponse(
             (
                 <div tw="w-full h-full flex flex-col items-center justify-center p-10" style={{ backgroundImage: 'linear-gradient(to top right, #0b0f27, #03274a)' }}>
-                    <h1 tw="text-[7rem] text-white" style={{ fontFamily: "menlo" }}>Nadav Eliash</h1>
-                    <h2 tw="text-5xl text-white" style={{ fontFamily: "menlo" }}>Frontend / Fullstack Developer </h2>
+                    <h1 tw="text-[7rem] text-white" style={{ fontFamily: "Roboto" }}>Nadav Eliash</h1>
+                    <h2 tw="text-5xl text-white" style={{ fontFamily: "Roboto" }}>Frontend / Fullstack Developer </h2>
                     <div tw="relative flex items-center mt-10">
                         <div tw="w-40 h-40 border-2 border-white rounded-full"></div>
                         <div tw="w-40 h-40 border-2 border-white rounded-full ml-24"></div>
@@ -49,8 +50,8 @@ export async function GET(req: Request) {
             ),
             {
                 fonts: [{
-                    data: menlo,
-                    name: "menlo"
+                    data: fontData,
+                    name: "Roboto"
                 }]
             }
         )
