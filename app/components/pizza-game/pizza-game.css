@@ -322,9 +322,12 @@
 
 .roll-results { background: rgba(255,255,255,0.04); border: 1px solid var(--border); border-radius: 10px; padding: 10px 14px; width: 100%; }
 .roll-results-title { font-size: 1rem; font-weight: 800; color: var(--gold); margin-bottom: 6px; text-align: center; }
-.roll-result-item   { color: var(--text); padding: 2px 0; display: flex; align-items: center; justify-content: center; gap: 8px; font-size: 0.85rem; }
+.roll-result-item   { color: var(--text); padding: 2px 0; display: flex; align-items: center; justify-content: center; gap: 8px; font-size: 0.85rem;
+  .ing-icon {
+    width: 80px;
+    }
+}
 
-/* Buttons */
 #action-buttons { display: flex; flex-direction: column; gap: 8px; min-width: 180px; }
 .action-btn { width: 100%; padding: 8px 14px; font-size: 0.9rem; background: var(--bg3); color: var(--text); border: 1px solid var(--border); border-radius: 10px; text-align: center; }
 .action-btn:disabled { opacity: 0.5; cursor: default; }
@@ -482,7 +485,11 @@
 #side-panel-header { display: none; }
 .section-title { font-size: 0.8rem; color: var(--muted); font-weight: 600; margin-bottom: 8px; text-transform: uppercase; letter-spacing: .05em; }
 .bank-grid { display: flex; flex-direction: column; gap: 6px; }
-.bank-row  { display: flex; justify-content: space-between; align-items: center; background: var(--bg3); border-radius: 8px; padding: 7px 10px; }
+.bank-row  { display: flex; justify-content: space-between; align-items: center; background: var(--bg3); border-radius: 8px; padding: 7px 10px; 
+  .ing-icon {
+    width: 80px;
+    }
+}
 .bank-count { font-weight: 700; color: var(--gold); }
 .board-cust-need-pizza img { width: 80%; }
 #mobile-actions-wrapper { display: none; }
@@ -737,14 +744,42 @@
   .board-cust-need-pizza img { width: 100%; }
 }
 
-.coins-display { display: flex; flex-wrap: wrap; row-gap: 8px; }
-.coin-token { font-size: 1.5rem; line-height: 1; }
-.board-coins-row .coin-token { font-size: 2rem;}
 
-.ing-icon { width: 48px; height: 48px; object-fit: contain; }
+/* --- My Turn Modal --- */
+.my-turn-modal {
+  text-align: center;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+}
 
-.board-cust-needs { display: flex; gap: 24px; align-items: center; justify-content: center; }
-.board-cust-need { opacity: 0.6; }
-.board-cust-need.have { opacity: 1; }
-.board-cust-need-pizza { display: flex; align-items: center; justify-content: center; opacity: 0.6; }
-.board-cust-need-pizza.have { opacity: 1; }
+.my-turn-icon {
+  font-size: 5rem;
+  margin-bottom: 10px;
+  filter: drop-shadow(0 0 15px var(--gold));
+  animation: turnPulse 2s infinite ease-in-out;
+}
+
+@keyframes turnPulse {
+  0%, 100% { transform: scale(1); filter: drop-shadow(0 0 10px var(--gold)); }
+  50% { transform: scale(1.1); filter: drop-shadow(0 0 25px var(--orange)); }
+}
+
+.my-turn-title {
+  font-size: 2.8rem;
+  font-weight: 900;
+  background: linear-gradient(to bottom, #fff, var(--gold));
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  margin-bottom: 4px;
+}
+
+.my-turn-sub {
+  font-size: 1.2rem;
+  color: var(--muted);
+  margin-bottom: 20px;
+}
+

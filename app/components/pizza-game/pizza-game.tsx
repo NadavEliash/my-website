@@ -18,7 +18,6 @@ import { GameState, Player, RoomPlayer } from './types';
 
 const heebo = Heebo({ subsets: ['hebrew', 'latin'] });
 
-// Components
 const DieFace = ({ value, rolling }: { value: number; rolling: boolean }) => {
   const DOT_MAP: Record<number, number[][]> = {
     1: [[1, 1]],
@@ -138,12 +137,14 @@ export default function PizzaGame() {
   const [roomId, setRoomId] = useState('');
   const [playerName, setPlayerName] = useState('');
   const [roomPlayers, setRoomPlayers] = useState<RoomPlayer[]>([]);
+  const [pendingTradeOffer, setPendingTradeOffer] = useState<any>(null);
   const [playerCount, setPlayerCount] = useState(3);
   const [setupPlayerInfos, setSetupPlayerInfos] = useState<{name: string, isAuto: boolean}[]>(
     Array.from({ length: 4 }, (_, i) => ({ name: `שחקן ${String.fromCharCode(1488 + i)}`, isAuto: false }))
   );
   const [modal, setModal] = useState<{ html: React.ReactNode; autoClose?: number } | null>(null);
   const modalTimer = useRef<NodeJS.Timeout | null>(null);
+  const pendingOutgoingOffer = useRef<any>(null);
 
   const STORAGE_KEY = 'pizza_game_state_v1';
   const [hasSavedGame, setHasSavedGame] = useState(false);
@@ -153,6 +154,26 @@ export default function PizzaGame() {
       setHasSavedGame(!!localStorage.getItem(STORAGE_KEY));
     }
   }, [gameState.phase]);
+
+  const myPlayerIndex = isMultiplayer
+    ? gameState.players.findIndex(pl => pl.name === playerName)
+    : -1;
+  const isMyTurn = !isMultiplayer || (myPlayerIndex !== -1 && myPlayerIndex === gameState.cur);
+  const prevIsMyTurn = useRef(isMyTurn);
+
+  useEffect(() => {
+    if (!prevIsMyTurn.current && isMyTurn && gameState.phase !== 'setup' && gameState.phase !== 'waiting' && gameState.phase !== 'gameover') {
+      showModal(
+        <div className="my-turn-modal">
+          <div className="my-turn-icon">🍕</div>
+          <div className="my-turn-title">עכשיו התור שלך!</div>
+          <div className="my-turn-sub">כל העיר מחכה לפיצות המעלפות שלך...</div>
+          <button className="start-btn" style={{ fontSize: '1.2rem', padding: '12px 24px' }} onClick={closeModal}>קדימה, לחמם תנורים!</button>
+        </div>
+      );
+    }
+    prevIsMyTurn.current = isMyTurn;
+  }, [isMyTurn, gameState.phase]);
 
 
 
@@ -164,15 +185,14 @@ export default function PizzaGame() {
         const parsed = JSON.parse(saved);
         if (parsed && parsed.players) {
           setGameState(parsed);
-          setIsMultiplayer(false);
-          // Small delay before notifying turn to ensure state is set         
+          setIsMultiplayer(false);         
             const p = parsed.players[parsed.cur];
             if (p) {
                setModal({ html: (
                   <div style={{ textAlign: 'center', padding: '20px' }}>
                     <div style={{ fontSize: '3rem', marginBottom: '10px' }}>🍕</div>
                     <div className="modal-title" style={{ color: p.color }}>חזרנו למשחק של {p.name}</div>
-                    <div className="modal-sub">הכן את הפיצות הטובות ביותר בעיר!</div>
+                    <div className="modal-sub">התנור כבר חם</div>
                     <button className="start-btn" onClick={() => setModal(null)}>קדימה!</button>
                   </div>
                )});
@@ -184,7 +204,6 @@ export default function PizzaGame() {
     }
   };
 
-  // Helper for RNG
   const rnd = (a: number, b: number) => Math.floor(Math.random() * (b - a + 1)) + a;
   const shuffle = <T,>(a: T[]): T[] => [...a].sort(() => Math.random() - 0.5);
 
@@ -196,7 +215,6 @@ export default function PizzaGame() {
     }
   };
 
-  // AI Turn Handling
   useEffect(() => {
     if (gameState.phase === 'gameover' || isMultiplayer) return;
     const p = gameState.players[gameState.cur];
@@ -272,21 +290,57 @@ export default function PizzaGame() {
       }
     });
 
+    newSocket.on('trade-request', (offer: any) => {
+      setPendingTradeOffer(offer);
+    });
+
+    newSocket.on('trade-response', ({ accepted }: { accepted: boolean }) => {
+      const offer = pendingOutgoingOffer.current;
+      pendingOutgoingOffer.current = null;
+      if (accepted && offer) {
+        setGameState(prev => {
+          const next = JSON.parse(JSON.stringify(prev)) as GameState;
+          const p = next.players[next.cur];
+          const opIdx = next.players.findIndex((_p: any) => _p.name === offer.opName);
+          const op = next.players[opIdx];
+          if (!op) return prev;
+          Object.entries(offer.give || {}).forEach(([t, arr]: any) => {
+            p.hand[t as IngredientType] = (p.hand[t as IngredientType] || 0) - (arr?.length || 0);
+            op.hand[t as IngredientType] = (op.hand[t as IngredientType] || 0) + (arr?.length || 0);
+          });
+          Object.entries(offer.take || {}).forEach(([t, arr]: any) => {
+            op.hand[t as IngredientType] = (op.hand[t as IngredientType] || 0) - (arr?.length || 0);
+            p.hand[t as IngredientType] = (p.hand[t as IngredientType] || 0) + (arr?.length || 0);
+          });
+          return next;
+        });
+        closeModal();
+      } else {
+        showModal(
+          <div style={{ textAlign: 'center' }}>
+            <div style={{ fontSize: '3rem' }}>❌</div>
+            <div className="modal-title">חבל</div>
+            <div className="modal-sub">ההצעה שלך נדחתה</div>
+            <button className="start-btn" onClick={closeModal}>סגור</button>
+          </div>
+        );
+      }
+    });
+
     setSocket(newSocket);
     return newSocket;
   }, []);
 
-  // Actions
   const notifyTurn = (player: Player) => {
+    if (isMultiplayer) return;
     showModal(
       <div style={{ textAlign: 'center', padding: '20px' }}>
         <div style={{ fontSize: '3rem', marginBottom: '10px' }}>🍕</div>
-        <div className="modal-title" style={{ color: player.color, fontSize: '2.5rem' }}>התור של {player.name}</div>
+        <div className="modal-title" style={{ color: player.color, fontSize: '2.5rem' }}>התור של{player.name}</div>
         <div className="modal-sub">הכן את הפיצות הטובות ביותר בעיר!</div>
         <button className="start-btn" onClick={closeModal}>קדימה!</button>
       </div>
     );
-     // Auto-close after 1.5s if it's AI
     if (player.isAuto) {
       setTimeout(() => {
         closeModal();
@@ -299,7 +353,6 @@ export default function PizzaGame() {
     window.scrollTo(0, document.body.scrollHeight);
     updateGameState(prev => ({ ...prev, rolled: true, lastRoll: null }));
 
-    // Animation
     let cycles = 0;
     const TOTAL_CYCLES = 10;
     const anim = setInterval(() => {
@@ -362,7 +415,6 @@ export default function PizzaGame() {
       if (sum === 7) {
         const p = next.players[next.cur];
         if (p.isAuto) {
-          // AI ignores 7 and rerolls
           next.rolled = false; 
           next.lastRoll = null as any; 
           next.phase = 'roll';
@@ -377,7 +429,6 @@ export default function PizzaGame() {
       } else {
         const gotResult = distributeIngredients(next, sum);
         if (!gotResult) {
-          // Auto reroll immediately without showing "nobody got card" message
           next.rolled = false;
           next.lastRoll = null as any;
           next.phase = 'roll';
@@ -565,7 +616,6 @@ export default function PizzaGame() {
   const renderTradeModal = () => {
     if (!tradeState.modal) return null;
     
-    // Handlers
     const startExchangeBank = () => setTradeState(prev => ({ ...prev, modal: 'bankTrade', give: {} }));
     
     const selectIngredientToGivePlayer = (id: number) => {
@@ -625,12 +675,42 @@ export default function PizzaGame() {
         <div style={{ textAlign: 'center' }}>
           <div style={{ fontSize: '4rem' }}>🤝</div>
           <div className="modal-title">החלפה בוצעה!</div>
-          <div className="modal-sub">העסקה הושלמה בהצלחה.</div>
+          <div className="modal-sub">העסקה הושלמה בהצלחה</div>
           <br/><button className="start-btn" onClick={closeModal}>המשך</button>
         </div>
       );
       closeTradeModal();
     };
+
+    const sendTradeRequestOnline = () => {
+      const op = gameState.players[tradeState.otherId];
+      const opRoomPlayer = roomPlayers.find(rp => rp.name === op.name);
+      if (!opRoomPlayer || !socket) return;
+      const offer = {
+        fromName: gameState.players[gameState.cur].name,
+        opName: op.name,
+        give: tradeState.give,
+        take: tradeState.take,
+        fromSocketId: socket.id,
+        gameStateCur: gameState.cur,
+        otherId: tradeState.otherId,
+      };
+      pendingOutgoingOffer.current = offer;
+      socket.emit('trade-request', { toSocketId: opRoomPlayer.socketId, tradeOffer: offer });
+      closeTradeModal();
+      showModal(
+        <div style={{ textAlign: 'center' }}>
+          <div style={{ fontSize: '3rem' }}>⏳</div>
+          <div className="modal-title">ממתין לתגובה...</div>
+          <div className="modal-sub">הבקשה נשלחה ל{op.name}</div>
+          <button className="modal-close" onClick={() => {
+            pendingOutgoingOffer.current = null;
+            closeModal();
+          }}>ביטול</button>
+        </div>
+      );
+    };
+
 
     const toggleBankTradeItem = (type: IngredientType, idx: number) => {
       setTradeState(prev => {
@@ -802,6 +882,30 @@ export default function PizzaGame() {
           <div key={t} className="trade-summary-item"><img src={INGREDIENTS[t as IngredientType].img} className="ing-icon small" alt=""/> {INGREDIENTS[t as IngredientType].name} x{arr.length}</div>
         ) : null);
 
+      if (isMultiplayer) {
+        return (
+          <div id="modal-overlay" onClick={closeTradeModal}>
+            <div id="modal-box" onClick={e => e.stopPropagation()}>
+              <div style={{ textAlign: 'center', padding: '10px' }}>
+                <div style={{ fontSize: '4rem' }}>🤝</div>
+                <div className="modal-title">שליחת הצעת החלפה</div>
+                <div className="modal-sub">שלח את ההצעה הבאה ל<strong style={{ color: op.color }}>{op.name}</strong>:</div>
+                <div style={{ background: 'rgba(255,140,60,0.05)', borderRadius: '12px', padding: '15px', margin: '15px 0', textAlign: 'right' }}>
+                  <div style={{ fontWeight: 'bold', marginBottom: '10px', color: 'var(--gold)' }}>⬇️ אתה נותן:</div>
+                  <div style={{ display: 'flex', flexWrap: 'wrap', gap: '5px' }}>{renderSummary(tradeState.give)}</div>
+                  <div style={{ fontWeight: 'bold', margin: '20px 0 10px', color: 'var(--gold)' }}>⬆️ אתה מקבל:</div>
+                  <div style={{ display: 'flex', flexWrap: 'wrap', gap: '5px' }}>{renderSummary(tradeState.take)}</div>
+                </div>
+                <div style={{ display: 'flex', gap: '12px' }}>
+                  <button className="start-btn" style={{ flex: 2 }} onClick={sendTradeRequestOnline}>📨 שלח הצעה</button>
+                  <button className="modal-close" style={{ flex: 1 }} onClick={closeTradeModal}>ביטול</button>
+                </div>
+              </div>
+            </div>
+          </div>
+        );
+      }
+
       return (
         <div id="modal-overlay" onClick={closeTradeModal}>
           <div id="modal-box" onClick={e => e.stopPropagation()}>
@@ -811,15 +915,15 @@ export default function PizzaGame() {
               <div className="modal-sub"><strong style={{ color: p.color }}>{p.name}</strong> מציע לך עסקה:</div>
               
               <div style={{ background: 'rgba(255,140,60,0.05)', borderRadius: '12px', padding: '15px', margin: '15px 0', textAlign: 'right' }}>
-                <div style={{ fontWeight: 'bold', marginBottom: '10px', color: 'var(--green)' }}>⬇️ מה שתקבל/י:</div>
+                <div style={{ fontWeight: 'bold', marginBottom: '10px', color: 'var(--green)' }}>⬇️ מה שתקבל.י:</div>
                 <div style={{ display: 'flex', flexWrap: 'wrap', gap: '5px' }}>{renderSummary(tradeState.give)}</div>
-                <div style={{ fontWeight: 'bold', margin: '20px 0 10px', color: 'var(--red)' }}>⬆️ מה שתיתנ/י:</div>
+                <div style={{ fontWeight: 'bold', margin: '20px 0 10px', color: 'var(--red)' }}>⬆️ מה שתיתנ.י:</div>
                 <div style={{ display: 'flex', flexWrap: 'wrap', gap: '5px' }}>{renderSummary(tradeState.take)}</div>
               </div>
               <div style={{ fontSize: '1rem', color: 'var(--text)', margin: '25px 0 15px' }}>האם <span style={{ color: op.color, fontWeight: 900 }}>{op.name}</span> מאשר/ת?</div>
               <div style={{ display: 'flex', gap: '12px' }}>
-                <button className="start-btn" style={{ flex: 2 }} onClick={confirmPlayerExchange}>✅ מאשר/ת!</button>
-                <button className="modal-close" style={{ flex: 1 }} onClick={closeTradeModal}>❌ מסרב/ת</button>
+                <button className="start-btn" style={{ flex: 2 }} onClick={confirmPlayerExchange}>✅ מאשר.ת!</button>
+                <button className="modal-close" style={{ flex: 1 }} onClick={closeTradeModal}>❌ מסרב.ת</button>
               </div>
             </div>
           </div>
@@ -876,7 +980,6 @@ export default function PizzaGame() {
                    curP.hand[t as IngredientType] = (curP.hand[t as IngredientType] || 0) + arr.length;
                 }
              });
-             // Card is spent ONLY when successfully confirmed Steal Take:
              const cardIdx = curP.surprises.findIndex(s => s.effect === 'STEAL_ANY_ONE');
              if (cardIdx !== -1) curP.surprises.splice(cardIdx, 1);
              return next;
@@ -892,7 +995,7 @@ export default function PizzaGame() {
                setTradeState(prev => {
                   const arr = prev.take[type] || [];
                   if (arr.includes(idx)) return { ...prev, take: {} };
-                  const newTake: Partial<Record<IngredientType, number[]>> = {}; // Max 1 card total
+                  const newTake: Partial<Record<IngredientType, number[]>> = {};
                   newTake[type] = [idx];
                   return { ...prev, take: newTake };
                })
@@ -1307,7 +1410,6 @@ export default function PizzaGame() {
                     <div className="board-coins-row">
                       <CoinsHTML coins={p.coins} />
                     </div>
-                    {/* Extra Hand area for non-slot ingredients */}
                     <div className="extra-hand-area">
                       {ALL_TYPES.filter(t => (p.hand[t] || 0) > 0 && !p.slots.map(s => s.type).includes(t)).map(t => (
                         <div key={t} className="extra-hand-stack">
@@ -1358,10 +1460,10 @@ export default function PizzaGame() {
                    </div>
                  )}
                  {gameState.phase === 'roll' && (
-                   <button className="roll-btn" onClick={doRoll} disabled={gameState.rolled}>הטל קוביות</button>
+                   <button className="roll-btn" onClick={doRoll} disabled={gameState.rolled || !isMyTurn}>הטל קוביות</button>
                  )}
                  {gameState.phase === 'pick7' && (
-                   <button className="action-btn" style={{ background: 'var(--red)', color: 'white' }} onClick={() => showPick7Modal()}>
+                   <button className="action-btn" style={{ background: 'var(--red)', color: 'white' }} onClick={() => showPick7Modal()} disabled={!isMyTurn}>
                      בחר מצרך (יצא 7)
                    </button>
                  )}
@@ -1371,15 +1473,15 @@ export default function PizzaGame() {
                  <button 
                    className={`action-btn ${canBake ? 'can-bake' : ''}`} 
                    onClick={doBake}
-                   disabled={!canBake}
+                   disabled={!canBake || !isMyTurn}
                  >
                    אפה פיצה
                  </button>
-                 <button className="action-btn" onClick={doPickSurprise} disabled={!canPickSurprise}>קלף הפתעה (3 מטבעות)</button>
-                 <button className="action-btn" onClick={doBuySlot} disabled={!canBuySlot}>מצרך חדש ללוח (6 מטבעות)</button>
-                 <button className="action-btn" onClick={doBuyNumber} disabled={p.coins < 4}>מספר נוסף (4 מטבעות)</button>
-                 <button className="action-btn" onClick={doExchange} disabled={!canExchange}>המרת מצרכים</button>
-                 <button className="action-btn end-turn" onClick={doEndTurn}>סיים תור</button>
+                 <button className="action-btn" onClick={doPickSurprise} disabled={!canPickSurprise || !isMyTurn}>קלף הפתעה (3 מטבעות)</button>
+                 <button className="action-btn" onClick={doBuySlot} disabled={!canBuySlot || !isMyTurn}>מצרך חדש ללוח (6 מטבעות)</button>
+                 <button className="action-btn" onClick={doBuyNumber} disabled={p.coins < 4 || !isMyTurn}>מספר נוסף (4 מטבעות)</button>
+                 <button className="action-btn" onClick={doExchange} disabled={!canExchange || !isMyTurn}>המרת מצרכים</button>
+                 <button className="action-btn end-turn" onClick={doEndTurn} disabled={!isMyTurn}>סיים תור</button>
                </div>
 
                {p.surprises.length > 0 && (
@@ -1587,16 +1689,87 @@ export default function PizzaGame() {
           )}
           <div id="fixed-bottom-bar">
              {gameState.phase === 'action' ? (
-               <button className="action-btn end-turn" onClick={doEndTurn}>סיים תור</button>
+               <button className="action-btn end-turn" onClick={doEndTurn} disabled={!isMyTurn}>סיים תור</button>
              ) : gameState.phase === 'pick7' ? (
-               <button className="action-btn" style={{ background: 'var(--red)', color: 'white' }} onClick={() => showPick7Modal()}>בחר מצרך (יצא 7)</button>
+               <button className="action-btn" style={{ background: 'var(--red)', color: 'white' }} onClick={() => showPick7Modal()} disabled={!isMyTurn}>בחר מצרך (יצא 7)</button>
              ) : (
-               <button className="action-btn roll-btn" onClick={doRoll} disabled={gameState.rolled}>הטל קוביות</button>
+               <button className="action-btn roll-btn" onClick={doRoll} disabled={gameState.rolled || !isMyTurn}>הטל קוביות</button>
              )}
           </div>
         </div>
 
         {renderTradeModal()}
+
+        {pendingTradeOffer && (
+          <div id="modal-overlay">
+            <div id="modal-box" onClick={e => e.stopPropagation()}>
+              <div style={{ textAlign: 'center', padding: '10px' }}>
+                <div style={{ fontSize: '4rem' }}>🤝</div>
+                <div className="modal-title">בקשת החלפה!</div>
+                <div className="modal-sub"><strong>{pendingTradeOffer.fromName}</strong> מציע לך עסקה:</div>
+                <div style={{ background: 'rgba(255,140,60,0.05)', borderRadius: '12px', padding: '15px', margin: '15px 0', textAlign: 'right' }}>
+                  <div style={{ fontWeight: 'bold', marginBottom: '10px', color: 'var(--green)' }}>⬇️ מה שתקבל/י:</div>
+                  <div style={{ display: 'flex', flexWrap: 'wrap', gap: '5px' }}>
+                    {Object.entries(pendingTradeOffer.give || {}).map(([t, arr]: any) => arr?.length > 0 ? (
+                      <div key={t} className="trade-summary-item"><img src={INGREDIENTS[t as IngredientType].img} className="ing-icon small" alt=""/> {INGREDIENTS[t as IngredientType].name} x{arr.length}</div>
+                    ) : null)}
+                  </div>
+                  <div style={{ fontWeight: 'bold', margin: '20px 0 10px', color: 'var(--red)' }}>⬆️ מה שתיתנ/י:</div>
+                  <div style={{ display: 'flex', flexWrap: 'wrap', gap: '5px' }}>
+                    {Object.entries(pendingTradeOffer.take || {}).map(([t, arr]: any) => arr?.length > 0 ? (
+                      <div key={t} className="trade-summary-item"><img src={INGREDIENTS[t as IngredientType].img} className="ing-icon small" alt=""/> {INGREDIENTS[t as IngredientType].name} x{arr.length}</div>
+                    ) : null)}
+                  </div>
+                </div>
+                <div style={{ display: 'flex', gap: '12px' }}>
+                  <button className="start-btn" style={{ flex: 2 }} onClick={() => {
+                    if (socket) socket.emit('trade-response', { toSocketId: pendingTradeOffer.fromSocketId, accepted: true });
+                    updateGameState(prev => {
+                      const next = JSON.parse(JSON.stringify(prev)) as GameState;
+                      const initiator = next.players[pendingTradeOffer.gameStateCur];
+                      const me = next.players[myPlayerIndex];
+                      Object.entries(pendingTradeOffer.give || {}).forEach(([t, arr]: any) => {
+                        initiator.hand[t as IngredientType] = (initiator.hand[t as IngredientType] || 0) - (arr?.length || 0);
+                        me.hand[t as IngredientType] = (me.hand[t as IngredientType] || 0) + (arr?.length || 0);
+                      });
+                      Object.entries(pendingTradeOffer.take || {}).forEach(([t, arr]: any) => {
+                        me.hand[t as IngredientType] = (me.hand[t as IngredientType] || 0) - (arr?.length || 0);
+                        initiator.hand[t as IngredientType] = (initiator.hand[t as IngredientType] || 0) + (arr?.length || 0);
+                      });
+                      return next;
+                    });
+                    setPendingTradeOffer(null);
+                  }}>✅ מאשר/ת!</button>
+                  <button className="modal-close" style={{ flex: 1 }} onClick={() => {
+                    if (socket) socket.emit('trade-response', { toSocketId: pendingTradeOffer.fromSocketId, accepted: false });
+                    setPendingTradeOffer(null);
+                  }}>❌ מסרב/ת</button>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {isMultiplayer && !isMyTurn && (
+          <div style={{
+            position: 'fixed', inset: 0, zIndex: 50,
+            background: 'rgba(0,0,0,0.55)',
+            display: 'flex', flexDirection: 'column',
+            alignItems: 'center', justifyContent: 'center',
+            pointerEvents: 'none',
+          }}>
+            <div style={{
+              background: 'var(--bg2)', borderRadius: '18px', padding: '28px 36px',
+              textAlign: 'center', border: '2px solid var(--orange)',
+              pointerEvents: 'none',
+            }}>
+              <div style={{ fontSize: '2.5rem', marginBottom: '10px' }}>⏳</div>
+              <div style={{ fontSize: '1.4rem', fontWeight: 700, color: 'var(--orange)' }}>{p.name} משחק.ת</div>
+              <div style={{ color: 'var(--muted)', marginTop: '6px' }}>ממתין לתורך...</div>
+            </div>
+          </div>
+        )}
+
         {modal && (
           <div id="modal-overlay" onClick={closeModal}>
             <div id="modal-box" onClick={e => e.stopPropagation()}>
@@ -1608,7 +1781,6 @@ export default function PizzaGame() {
     );
   };
 
-  // Main Render
   switch (gameState.phase) {
     case 'setup':
       return <div className="pizza-game-root">{renderSetup()}</div>;
