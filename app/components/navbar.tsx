@@ -38,12 +38,12 @@ export default function Navbar() {
     const [hide, setHide] = useState(false)
 
     useEffect(()=>{
-        pathname === "/animation_portfolio" ? setHide(true) : setHide(false)
+        setHide(pathname === "/animation_portfolio" || pathname === "/pizza")
     },[pathname])
 
     return (
         <>
-            <nav className={`${hide? 'opacity-0 pointer-events-none' : ''} z-50 ${display ? 'left-0' : '-left-[110%]'} transition-all duration-500 absolute top-0 w-full flex-col items-start text-2xl ${dongle.className} 
+            {!hide && <nav className={`z-50 ${display ? 'left-0' : '-left-[110%]'} transition-all duration-500 absolute top-0 w-full flex-col items-start text-2xl ${dongle.className} 
             md:left-0 md:px-4 md:py-3 md:flex md:flex-row md:h-fit md:gap-4`}
                 onClick={() => setDisplay(!display)}>
                 {pages.map(page =>
@@ -55,10 +55,10 @@ export default function Navbar() {
                     </Link>
                 )}
                 <h1 className="absolute right-4 top-3 text-3xl text-white">nadaveliash.com</h1>
-            </nav>
-            <Menu className={`${hide? 'hidden' : ''} md:hidden ${display ? 'opacity-0' : 'opacity-100'} transition-opacity absolute flex left-2 top-2 w-8 h-8 text-black z-50 bg-gray-100/80 rounded-lg p-1`} onClick={() => setDisplay(!display)} />
-            <div className={`${display ? 'opacity-1' : 'opacity-0 pointer-events-none'} transition-all duration-500 absolute top-0 w-full h-full bg-[rgba(16,16,37,.6)] z-40 md:hidden`}
-                onClick={() => setDisplay(!display)}></div>
+            </nav>}
+            {!hide && <Menu className={`md:hidden ${display ? 'opacity-0' : 'opacity-100'} transition-opacity absolute flex left-2 top-2 w-8 h-8 text-black z-50 bg-gray-100/80 rounded-lg p-1`} onClick={() => setDisplay(!display)} />}
+            {!hide && <div className={`${display ? 'opacity-1' : 'opacity-0 pointer-events-none'} transition-all duration-500 absolute top-0 w-full h-full bg-[rgba(16,16,37,.6)] z-40 md:hidden`}
+                onClick={() => setDisplay(!display)}></div>}
         </>
     )
 }

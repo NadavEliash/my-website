@@ -166,7 +166,7 @@ export default function PizzaGame() {
       showModal(
         <div className="my-turn-modal">
           <div className="my-turn-icon">🍕</div>
-          <div className="my-turn-title">עכשיו התור שלך!</div>
+          <div className="my-turn-title">{gameState.players[gameState.cur].name} עכשיו התור שלך!</div>
           <div className="my-turn-sub">כל העיר מחכה לפיצות המעלפות שלך...</div>
           <button className="start-btn" style={{ fontSize: '1.2rem', padding: '12px 24px' }} onClick={closeModal}>קדימה, לחמם תנורים!</button>
         </div>

@@ -12,9 +12,6 @@ import about from "./assets/about.png"
 import animate from "./assets/animate.gif"
 import finerr from "./assets/finerr.gif"
 import hebai from "./assets/hebai.gif"
-import vitcoin from "./assets/vitcoin.gif"
-import pizzaGame from "./assets/pizza-game.png"
-// import SceneCanvas from "./components/home-scene/scene-canvas";
 
 const menlo = localFont({ src: '../Menlo-Regular.ttf' })
 const sue_ellen = Sue_Ellen_Francisco({ subsets: ['latin'], weight: '400' })
