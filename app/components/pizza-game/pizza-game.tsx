@@ -216,9 +216,16 @@ export default function PizzaGame() {
   };
 
   useEffect(() => {
+    // We only automate actions for local games (non-multiplayer) when it's an AI's turn.
+    // isMultiplayer is a dependency because we need to stop/start this effect when switching game modes.
     if (gameState.phase === 'gameover' || isMultiplayer) return;
     const p = gameState.players[gameState.cur];
     if (!p || !p.isAuto) return;
+
+    // Use a shorter delay for immediate re-rolls (like sum 7 or no result) to keep the pace up.
+    // Otherwise, use 2s so the human player can follow the game.
+    const isReRoll = gameState.phase === 'roll' && !gameState.rolled && !gameState.lastRoll;
+    const delay = isReRoll ? 500 : 2000;
 
     const timer = setTimeout(() => {
       if (gameState.phase === 'roll' && !gameState.rolled) {
@@ -234,7 +241,7 @@ export default function PizzaGame() {
       } else if (gameState.phase === 'pick7') {
         doEndTurn();
       }
-    }, 2000);
+    }, delay);
 
     return () => clearTimeout(timer);
   }, [gameState.cur, gameState.phase, gameState.rolled, isMultiplayer]);
@@ -336,7 +343,7 @@ export default function PizzaGame() {
     showModal(
       <div style={{ textAlign: 'center', padding: '20px' }}>
         <div style={{ fontSize: '3rem', marginBottom: '10px' }}>🍕</div>
-        <div className="modal-title" style={{ color: player.color, fontSize: '2.5rem' }}>התור של{player.name}</div>
+        <div className="modal-title" style={{ color: player.color, fontSize: '2.5rem' }}>התור של {player.name}</div>
         <div className="modal-sub">הכן את הפיצות הטובות ביותר בעיר!</div>
         <button className="start-btn" onClick={closeModal}>קדימה!</button>
       </div>
@@ -432,10 +439,6 @@ export default function PizzaGame() {
           next.rolled = false;
           next.lastRoll = null as any;
           next.phase = 'roll';
-          setTimeout(() => {
-              const rollBtn = document.querySelector('.roll-btn') as HTMLButtonElement | null;
-              if (rollBtn && !rollBtn.disabled) rollBtn.click();
-          }, 50);
         } else {
           next.phase = 'action';
           setTimeout(() => {
@@ -507,9 +510,22 @@ export default function PizzaGame() {
         next.phase = 'gameover';
       } else {
         if (!next.custDeck.length) {
-          next.custDeck = shuffle(CUSTOMERS.filter(c => c.req.length > 3));
+          next.custDeck = shuffle(CUSTOMERS.filter(c => c.id !== 'c01'));
         }
-        p.customer = { ...next.custDeck.shift() };
+
+        if (p.isAuto) {
+          // AI players only get basic customers (no toppings) so they don't get stuck
+          const basicIdx = next.custDeck.findIndex(c => 
+            c.req.every((r: any) => INGREDIENTS[r as IngredientType].basic)
+          );
+          if (basicIdx !== -1) {
+            p.customer = { ...next.custDeck.splice(basicIdx, 1)[0] };
+          } else {
+            p.customer = { ...BASIC_CUSTOMER };
+          }
+        } else {
+          p.customer = { ...next.custDeck.shift() };
+        }
       }
       return next;
     });
@@ -1368,7 +1384,7 @@ export default function PizzaGame() {
                           <img src="/pizza-game/assets/pizza-removebg-preview.png" alt="פיצה" />
                         </div>
                         {(p.customer.req as IngredientType[]).filter(r => !basicIngs.includes(r)).map((t, idx) => (
-                           <span key={idx} className={`board-cust-need ${(p.hand[t] || 0) >= 1 ? 'have' : ''}`}>
+                           <span key={idx} className={`board-cust-need${(p.hand[t] || 0) >= 1 ? ' have' : ''}`}>
                              <img src={INGREDIENTS[t].img} className="ing-icon tiny" alt={t} />
                            </span>
                         ))}

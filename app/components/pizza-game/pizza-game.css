@@ -142,7 +142,7 @@
 /* Main Play Area */
 #play-area { display: flex; flex: 1; min-height: 0; }
 #active-area { flex: 1 ; padding: 16px; padding-bottom: 0; display: flex; flex-direction: column; gap: 16px; overflow-y: auto; }
-#controls-row { height: max-content; margin-bottom: 80px; }
+#controls-row { height: max-content; }
 
 /* Board */
 .board-wrapper {
@@ -186,7 +186,10 @@
 .board-cust-quote { color: #ddd; line-height: 1.3; }
 .board-cust-needs { display: flex; flex-wrap: wrap; gap: 4px; justify-content: center; }
 .board-cust-need.have { opacity: 1; }
-.board-cust-need { opacity: 0.6; }
+.board-cust-need-pizza.have { opacity: 1; }
+.board-cust-need { opacity: 0.6; display: flex; align-items: center; justify-content: center;}
+.board-cust-need-pizza { opacity: 0.6; width: 100%; }
+.board-cust-need > .ing-icon { width: 80px; }
 .board-cust-price { font-size: 0.9rem; font-weight: 700; color: var(--gold); margin-top: 5px; background: rgba(0,0,0,0.3); padding: 4px 8px; border-radius: 6px; }
 .board-cust-img { display: flex; justify-content: center; margin-bottom: 4px; }
 .board-cust-img img { width: 90%; max-height: 120px; object-fit: contain; filter: drop-shadow(0 4px 8px rgba(0,0,0,0.6)); }
@@ -275,7 +278,7 @@
 
 .board-bottom-bar {
   display: flex;
-  justify-content: space-between;
+  justify-content: flex-start;
   align-items: center;
   margin-top: 16px;
 }
@@ -487,11 +490,11 @@
 .bank-grid { display: flex; flex-direction: column; gap: 6px; }
 .bank-row  { display: flex; justify-content: space-between; align-items: center; background: var(--bg3); border-radius: 8px; padding: 7px 10px; 
   .ing-icon {
-    width: 80px;
+    width: 60px;
     }
 }
 .bank-count { font-weight: 700; color: var(--gold); }
-.board-cust-need-pizza img { width: 80%; }
+.board-cust-need-pizza img { width: 140px; margin-inline: auto; }
 #mobile-actions-wrapper { display: none; }
 
 /* Responsive adjustments */
@@ -655,6 +658,7 @@
   #controls-row { 
     justify-content: center !important; 
     flex-wrap: wrap !important; 
+    margin-bottom: 80px;
   }
   
   .board-body-row {
@@ -673,12 +677,6 @@
     justify-content: space-between;
     gap: 12px;
 
-    .board-cust-need{
-    .ing-icon{
-      width: auto;
-      height: auto;
-    }
-  }
   }
   .board-cust-header {
     align-items: center;
@@ -688,9 +686,8 @@
   .board-cust-img img { max-height: 45px; }
   .board-cust-name { font-size: 0.95rem; align-self: flex-end; margin-bottom: 0; line-height: 1.2; }
   .board-cust-quote { display: block; align-self: flex-start; line-height: 1.1; margin-top: 2px; color: #ccc; }
-  
+  .board-cust-need-pizza img { margin-inline: 0; }
   .board-cust-needs { width: 100%; display: flex; justify-content: space-around; align-items: center; flex-wrap: nowrap; margin-top: 10px; }
-  .board-cust-need .ing-icon { width: 36px; height: 36px; }
   .board-cust-price { display: none; }
   
   .board-slots-inner-row {
@@ -741,7 +738,6 @@
   .surprise-card-name { grid-area: name; font-size: 0.95rem; margin: 0; }
   .surprise-card-desc { grid-area: desc; font-size: 0.75rem; margin: 0; }
   .surprise-card-btn { grid-area: btn; width: max-content; margin: 0; padding: 6px 16px; }
-  .board-cust-need-pizza img { width: 100%; }
 }
 
 
