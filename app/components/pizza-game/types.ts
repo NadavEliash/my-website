@@ -28,6 +28,7 @@ export interface GameState {
   winMode: 'score' | 'bank';
   sidePanelOpen: boolean;
   actionsDrawerOpen: boolean;
+  autoRoll?: boolean;
 }
 
 export interface RoomPlayer {

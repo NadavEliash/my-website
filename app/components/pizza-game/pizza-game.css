@@ -136,7 +136,7 @@
 #players-strip { display: flex; gap: 12px; padding: 16px 20px; overflow-x: auto; background: var(--bg2); border-bottom: 1px solid var(--border); }
 .player-chip { flex-shrink: 0; padding: 8px 12px; border-radius: 12px; background: var(--bg3); border: 2px solid transparent; min-width: 140px; cursor: default; transition: border-color .2s; }
 .player-chip.active { border-color: var(--gold); box-shadow: 0 0 20px rgba(245,197,24,0.3); }
-.chip-name   { display: flex; justify-content: start; gap: 16px; font-weight: 700; margin-bottom: 12px; }
+.chip-name   { display: flex; justify-content: flex-start; gap: 16px; font-weight: 700; margin-bottom: 12px; }
 .chip-score  { color: var(--gold); font-weight: 700; }
 
 /* Main Play Area */
@@ -325,11 +325,8 @@
 
 .roll-results { background: rgba(255,255,255,0.04); border: 1px solid var(--border); border-radius: 10px; padding: 10px 14px; width: 100%; }
 .roll-results-title { font-size: 1rem; font-weight: 800; color: var(--gold); margin-bottom: 6px; text-align: center; }
-.roll-result-item   { color: var(--text); padding: 2px 0; display: flex; align-items: center; justify-content: center; gap: 8px; font-size: 0.85rem;
-  .ing-icon {
-    width: 80px;
-    }
-}
+.roll-result-item   { color: var(--text); padding: 2px 0; display: flex; align-items: center; justify-content: center; gap: 8px; font-size: 0.85rem; }
+.roll-result-item .ing-icon { width: 80px; }
 
 #action-buttons { display: flex; flex-direction: column; gap: 8px; min-width: 180px; }
 .action-btn { width: 100%; padding: 8px 14px; font-size: 0.9rem; background: var(--bg3); color: var(--text); border: 1px solid var(--border); border-radius: 10px; text-align: center; }
@@ -467,10 +464,13 @@
   flex-shrink: 0; background: var(--bg3); border-radius: 8px;
   padding: 4px 8px; display: flex; align-items: center; gap: 5px;
   font-size: 0.8rem; border: 1px solid var(--border);
+  width: 160px;
+  height: 60px;
 }
+.trade-summary-item .ing-icon { width: 60px; }
 
 /* Modal */
-#modal-overlay { position: fixed; inset: 0; z-index: 2000; background: rgba(0,0,0,0.75); backdrop-filter: blur(4px); display: flex; align-items: center; justify-content: center; padding: 20px; }
+#modal-overlay { position: fixed; inset: 0; z-index: 12000; background: rgba(0,0,0,0.75); backdrop-filter: blur(4px); display: flex; align-items: center; justify-content: center; padding: 20px; }
 #modal-box { background: var(--bg3); border: 1px solid var(--border); border-radius: 20px; padding: 28px; max-width: 520px; width: 100%; box-shadow: var(--shadow); max-height: 85vh; overflow-y: auto; }
 .modal-title { font-size: 2rem; font-weight: 900; color: var(--orange); margin-bottom: 8px; }
 .modal-sub   { color: var(--muted); margin-bottom: 20px; }
@@ -488,11 +488,8 @@
 #side-panel-header { display: none; }
 .section-title { font-size: 0.8rem; color: var(--muted); font-weight: 600; margin-bottom: 8px; text-transform: uppercase; letter-spacing: .05em; }
 .bank-grid { display: flex; flex-direction: column; gap: 6px; }
-.bank-row  { display: flex; justify-content: space-between; align-items: center; background: var(--bg3); border-radius: 8px; padding: 7px 10px; 
-  .ing-icon {
-    width: 60px;
-    }
-}
+.bank-row  { display: flex; justify-content: space-between; align-items: center; background: var(--bg3); border-radius: 8px; padding: 7px 10px; }
+.bank-row .ing-icon { width: 60px; }
 .bank-count { font-weight: 700; color: var(--gold); }
 .board-cust-need-pizza img { width: 140px; margin-inline: auto; }
 #mobile-actions-wrapper { display: none; }
@@ -535,7 +532,7 @@
     right: 0;
     width: 85%;
     max-width: 320px;
-    z-index: 2000;
+    z-index: 11000;
     background: var(--bg2);
     border-left: 2px solid var(--border);
     box-shadow: -10px 0 40px rgba(0,0,0,0.8);
@@ -591,17 +588,13 @@
     bottom: 0;
     left: 0;
     right: 0;
-    z-index: 1000;
+    z-index: 10000;
     background: var(--bg);
     border-top: 2px solid var(--border);
     box-shadow: 0 -10px 40px rgba(0,0,0,0.8);
   }
 
-  #dice-area {
-    .roll-btn {
-      display: none;
-    }
-  }
+  #dice-area .roll-btn { display: none; }
 
   #actions-drawer-header {
     display: flex;

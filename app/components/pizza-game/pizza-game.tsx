@@ -216,35 +216,48 @@ export default function PizzaGame() {
   };
 
   useEffect(() => {
-    // We only automate actions for local games (non-multiplayer) when it's an AI's turn.
-    // isMultiplayer is a dependency because we need to stop/start this effect when switching game modes.
-    if (gameState.phase === 'gameover' || isMultiplayer) return;
+    // We only automate actions for local games or for the current player in multiplayer.
+    if (gameState.phase === 'gameover') return;
     const p = gameState.players[gameState.cur];
-    if (!p || !p.isAuto) return;
+    if (!p) return;
 
-    // Use a shorter delay for immediate re-rolls (like sum 7 or no result) to keep the pace up.
-    // Otherwise, use 2s so the human player can follow the game.
-    const isReRoll = gameState.phase === 'roll' && !gameState.rolled && !gameState.lastRoll;
-    const delay = isReRoll ? 500 : 2000;
+    // Only the person whose turn it is should trigger automation
+    if (!isMyTurn) return;
+
+    // Automation logic
+    const isReRoll = gameState.autoRoll;
+    const isAiTurn = p.isAuto;
+
+    if (!isReRoll && !isAiTurn) return;
+
+    // Use a longer delay for re-rolls so the user can see what happened.
+    const delay = 800;
 
     const timer = setTimeout(() => {
-      if (gameState.phase === 'roll' && !gameState.rolled) {
+      if (isReRoll) {
+        // If it's a re-roll, trigger the roll.
+        console.log("Triggering auto re-roll for irrelevant result");
         doRoll();
-      } else if (gameState.phase === 'action') {
-        const canBake = (p.customer.req as IngredientType[]).every(t => (p.hand[t] || 0) >= 1);
-        if (canBake) {
-          doBake();
-          setTimeout(doEndTurn, 1000);
-        } else {
+      } else if (isAiTurn) {
+        // Standard AI turn logic
+        if (gameState.phase === 'roll' && !gameState.rolled) {
+          doRoll();
+        } else if (gameState.phase === 'action') {
+          const canBake = (p.customer.req as IngredientType[]).every(t => (p.hand[t] || 0) >= 1);
+          if (canBake) {
+            doBake();
+            setTimeout(doEndTurn, 1000);
+          } else {
+            doEndTurn();
+          }
+        } else if (gameState.phase === 'pick7') {
           doEndTurn();
         }
-      } else if (gameState.phase === 'pick7') {
-        doEndTurn();
       }
     }, delay);
 
     return () => clearTimeout(timer);
-  }, [gameState.cur, gameState.phase, gameState.rolled, isMultiplayer]);
+  }, [gameState.cur, gameState.phase, gameState.rolled, gameState.autoRoll, isMultiplayer, isMyTurn]);
 
   const closeModal = () => {
     if (modalTimer.current) clearTimeout(modalTimer.current);
@@ -358,7 +371,7 @@ export default function PizzaGame() {
   const doRoll = () => {
     if (gameState.phase !== 'roll' || gameState.rolled) return;
     window.scrollTo(0, document.body.scrollHeight);
-    updateGameState(prev => ({ ...prev, rolled: true, lastRoll: null }));
+    updateGameState(prev => ({ ...prev, rolled: true, lastRoll: null, autoRoll: false }));
 
     let cycles = 0;
     const TOTAL_CYCLES = 10;
@@ -422,9 +435,10 @@ export default function PizzaGame() {
       if (sum === 7) {
         const p = next.players[next.cur];
         if (p.isAuto) {
+          // AI automatically re-rolls on 7 since it can't pick yet.
           next.rolled = false; 
-          next.lastRoll = null as any; 
           next.phase = 'roll';
+          next.autoRoll = true;
           return next;
         }
         next.phase = 'pick7';
@@ -436,9 +450,10 @@ export default function PizzaGame() {
       } else {
         const gotResult = distributeIngredients(next, sum);
         if (!gotResult) {
+          // Nobody got anything, we set up for an automatic re-roll.
           next.rolled = false;
-          next.lastRoll = null as any;
           next.phase = 'roll';
+          next.autoRoll = true;
         } else {
           next.phase = 'action';
           setTimeout(() => {
@@ -907,13 +922,13 @@ export default function PizzaGame() {
                 <div className="modal-title">שליחת הצעת החלפה</div>
                 <div className="modal-sub">שלח את ההצעה הבאה ל<strong style={{ color: op.color }}>{op.name}</strong>:</div>
                 <div style={{ background: 'rgba(255,140,60,0.05)', borderRadius: '12px', padding: '15px', margin: '15px 0', textAlign: 'right' }}>
-                  <div style={{ fontWeight: 'bold', marginBottom: '10px', color: 'var(--gold)' }}>⬇️ אתה נותן:</div>
+                  <div style={{ fontWeight: 'bold', marginBottom: '10px', color: 'var(--gold)' }}>אתה נותן:</div>
                   <div style={{ display: 'flex', flexWrap: 'wrap', gap: '5px' }}>{renderSummary(tradeState.give)}</div>
-                  <div style={{ fontWeight: 'bold', margin: '20px 0 10px', color: 'var(--gold)' }}>⬆️ אתה מקבל:</div>
+                  <div style={{ fontWeight: 'bold', margin: '20px 0 10px', color: 'var(--gold)' }}>אתה מקבל:</div>
                   <div style={{ display: 'flex', flexWrap: 'wrap', gap: '5px' }}>{renderSummary(tradeState.take)}</div>
                 </div>
                 <div style={{ display: 'flex', gap: '12px' }}>
-                  <button className="start-btn" style={{ flex: 2 }} onClick={sendTradeRequestOnline}>📨 שלח הצעה</button>
+                  <button className="start-btn" style={{ flex: 2 }} onClick={sendTradeRequestOnline}>שלח הצעה</button>
                   <button className="modal-close" style={{ flex: 1 }} onClick={closeTradeModal}>ביטול</button>
                 </div>
               </div>
@@ -931,15 +946,15 @@ export default function PizzaGame() {
               <div className="modal-sub"><strong style={{ color: p.color }}>{p.name}</strong> מציע לך עסקה:</div>
               
               <div style={{ background: 'rgba(255,140,60,0.05)', borderRadius: '12px', padding: '15px', margin: '15px 0', textAlign: 'right' }}>
-                <div style={{ fontWeight: 'bold', marginBottom: '10px', color: 'var(--green)' }}>⬇️ מה שתקבל.י:</div>
+                <div style={{ fontWeight: 'bold', marginBottom: '10px', color: 'var(--green)' }}>מה שתקבל.י:</div>
                 <div style={{ display: 'flex', flexWrap: 'wrap', gap: '5px' }}>{renderSummary(tradeState.give)}</div>
-                <div style={{ fontWeight: 'bold', margin: '20px 0 10px', color: 'var(--red)' }}>⬆️ מה שתיתנ.י:</div>
+                <div style={{ fontWeight: 'bold', margin: '20px 0 10px', color: 'var(--red)' }}>מה שתיתנ.י:</div>
                 <div style={{ display: 'flex', flexWrap: 'wrap', gap: '5px' }}>{renderSummary(tradeState.take)}</div>
               </div>
               <div style={{ fontSize: '1rem', color: 'var(--text)', margin: '25px 0 15px' }}>האם <span style={{ color: op.color, fontWeight: 900 }}>{op.name}</span> מאשר/ת?</div>
               <div style={{ display: 'flex', gap: '12px' }}>
-                <button className="start-btn" style={{ flex: 2 }} onClick={confirmPlayerExchange}>✅ מאשר.ת!</button>
-                <button className="modal-close" style={{ flex: 1 }} onClick={closeTradeModal}>❌ מסרב.ת</button>
+                <button className="start-btn" style={{ flex: 2 }} onClick={confirmPlayerExchange}>מאשר.ת!</button>
+                <button className="modal-close" style={{ flex: 1 }} onClick={closeTradeModal}>מסרב.ת</button>
               </div>
             </div>
           </div>
@@ -1321,7 +1336,9 @@ export default function PizzaGame() {
   };
 
   const renderGame = () => {
-    const p = gameState.players[gameState.cur];
+    const turnP = gameState.players[gameState.cur];
+    const myP = isMultiplayer && myPlayerIndex !== -1 ? gameState.players[myPlayerIndex] : turnP;
+    const p = myP; // Render the local player's board (or the current turn player's if local)
     if (!p) return null;
 
     const basicIngs: IngredientType[] = ['DOUGH', 'SAUCE', 'CHEESE'];
@@ -1343,7 +1360,7 @@ export default function PizzaGame() {
           </div>
           <div className="header-round">סיבוב {gameState.round}</div>
           <div className="header-info">
-            תור: <strong style={{ color: p.color }}>{p.name}</strong>
+            תור: <strong style={{ color: turnP.color }}>{turnP.name}</strong>
           </div>
         </header>
 
@@ -1459,11 +1476,11 @@ export default function PizzaGame() {
                      <div className="roll-results-title"> יצא {gameState.lastRoll.sum}</div>
                      {gameState.lastRoll.sum === 7 ? (
                        <div className="roll-result-item">
-                         <strong>{gameState.players[gameState.cur].isAuto ? 'השחקן אוטומטי ומטיל שוב...' : 'בחר מצרך או הטל שוב!'}</strong>
+                         <strong>{gameState.players[gameState.cur].isAuto ? 'מטיל שוב...' : 'בחר מצרך!'}</strong>
                        </div>
                      ) : gameState.lastRoll.results.length === 0 ? (
                        <div className="roll-result-item">
-                         <strong>אף אחד לא קיבל מצרך, מטילים שוב...</strong>
+                         <strong>מטילים שוב...</strong>
                        </div>
                      ) : (
                        gameState.lastRoll.results.map((r, i) => (
@@ -1755,32 +1772,27 @@ export default function PizzaGame() {
                       return next;
                     });
                     setPendingTradeOffer(null);
-                  }}>✅ מאשר/ת!</button>
+                  }}>מאשר/ת!</button>
                   <button className="modal-close" style={{ flex: 1 }} onClick={() => {
                     if (socket) socket.emit('trade-response', { toSocketId: pendingTradeOffer.fromSocketId, accepted: false });
                     setPendingTradeOffer(null);
-                  }}>❌ מסרב/ת</button>
+                  }}>מסרב/ת</button>
                 </div>
               </div>
             </div>
           </div>
         )}
 
-        {isMultiplayer && !isMyTurn && (
-          <div style={{
-            position: 'fixed', inset: 0, zIndex: 50,
-            background: 'rgba(0,0,0,0.55)',
-            display: 'flex', flexDirection: 'column',
-            alignItems: 'center', justifyContent: 'center',
-            pointerEvents: 'none',
-          }}>
+        {isMultiplayer && !isMyTurn && !pendingTradeOffer && (
+          <div id="modal-overlay">
             <div style={{
               background: 'var(--bg2)', borderRadius: '18px', padding: '28px 36px',
               textAlign: 'center', border: '2px solid var(--orange)',
               pointerEvents: 'none',
+              boxShadow: '0 0 50px rgba(0,0,0,0.8)'
             }}>
               <div style={{ fontSize: '2.5rem', marginBottom: '10px' }}>⏳</div>
-              <div style={{ fontSize: '1.4rem', fontWeight: 700, color: 'var(--orange)' }}>{p.name} משחק.ת</div>
+              <div style={{ fontSize: '1.4rem', fontWeight: 700, color: 'var(--orange)' }}>{turnP.name} משחק.ת</div>
               <div style={{ color: 'var(--muted)', marginTop: '6px' }}>ממתין לתורך...</div>
             </div>
           </div>
