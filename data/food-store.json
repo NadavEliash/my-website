@@ -1,0 +1,10 @@
+{
+  "products": [],
+  "orders": [],
+  "settings": {
+    "availabilityStart": "17:00",
+    "availabilityEnd": "22:00",
+    "slotMinutes": 15,
+    "open": false
+  }
+}
