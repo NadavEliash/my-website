@@ -4,16 +4,18 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
-    "socket-server": "node server/server.js",
-    "dev-full": "concurrently \"npm run dev\" \"npm run socket-server\"",
+    "server": "node server/server.js",
+    "dev-full": "concurrently \"npm run dev\" \"npm run server\"",
     "build": "next build",
     "start": "next start",
     "lint": "next lint"
   },
   "dependencies": {
     "@react-three/fiber": "^8.16.2",
+    "dotenv": "^17.4.2",
     "express": "^5.2.1",
     "lucide-react": "^0.356.0",
+    "mongodb": "^7.3.0",
     "next": "^15.5.16",
     "react": "^18",
     "react-colorful": "^5.6.1",

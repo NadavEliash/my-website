@@ -38,7 +38,7 @@ export default function Navbar() {
     const [hide, setHide] = useState(false)
 
     useEffect(()=>{
-        setHide(pathname === "/animation_portfolio" || pathname === "/pizza")
+        setHide(pathname !== "/")
     },[pathname])
 
     return (
