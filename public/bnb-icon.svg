@@ -1,0 +1,4 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 100">
+  <text y=".9em" font-size="90">🩴</text>
+  <text y=".9em" font-size="90" transform="translate(200,0) scale(-1,1)">🩴</text>
+</svg>
