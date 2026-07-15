@@ -21,7 +21,8 @@ const config: Config = {
         slideDown: 'slideDown 1s ease-in-out',
         opacity: 'opacity 3s ease-in-out',
         swipe: 'swipe 1.4s ease-in-out infinite',
-        swipeDown: 'swipeDown 1s ease-in-out infinite'
+        swipeDown: 'swipeDown 1s ease-in-out infinite',
+        nudge: 'nudge 0.7s ease-in-out infinite'
       },
       keyframes: {
         pulse: {
@@ -59,6 +60,10 @@ const config: Config = {
           '20%': { opacity: '1' },
           '50%': { opacity: '1' },
           '100%': { rotate: '-50deg', transform: 'translateX(40px) translateY(-30px)', opacity: '0' },
+        },
+        nudge: {
+          '0%, 100%': { transform: 'scale(1)' },
+          '50%': { transform: 'scale(1.15)' },
         }
       },
       transitionProperty: {
