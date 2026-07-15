@@ -1,35 +1,36 @@
 import { NextRequest, NextResponse } from 'next/server'
-import fs from 'fs/promises'
-import path from 'path'
+import { getFoodDb } from '@/lib/food-db'
 
-const DATA_PATH = path.join(process.cwd(), 'data', 'food-store.json')
-
-async function readStore() {
-  const raw = await fs.readFile(DATA_PATH, 'utf-8')
-  return JSON.parse(raw)
-}
-
-async function writeStore(data: object) {
-  await fs.writeFile(DATA_PATH, JSON.stringify(data, null, 2), 'utf-8')
+const DEFAULTS = {
+  open: false,
+  bitPhone: '',
+  payboxPhone: '',
+  scheduleDays: [],
 }
 
 export async function GET() {
   try {
-    const store = await readStore()
-    return NextResponse.json(store.settings)
-  } catch {
-    return NextResponse.json({ error: 'Failed to read settings' }, { status: 500 })
+    const db = await getFoodDb()
+    const doc = await db.collection('settings').findOne({ _id: 'main' as unknown as never })
+    return NextResponse.json(doc ? { ...DEFAULTS, ...doc, _id: undefined } : DEFAULTS)
+  } catch (e) {
+    console.error('[food/settings GET]', e)
+    return NextResponse.json({ error: 'שגיאה בטעינת הגדרות' }, { status: 500 })
   }
 }
 
 export async function PUT(req: NextRequest) {
   try {
     const body = await req.json()
-    const store = await readStore()
-    store.settings = body
-    await writeStore(store)
-    return NextResponse.json(store.settings)
-  } catch {
-    return NextResponse.json({ error: 'Failed to save settings' }, { status: 500 })
+    const db = await getFoodDb()
+    await db.collection('settings').updateOne(
+      { _id: 'main' as unknown as never },
+      { $set: body },
+      { upsert: true }
+    )
+    return NextResponse.json(body)
+  } catch (e) {
+    console.error('[food/settings PUT]', e)
+    return NextResponse.json({ error: 'שגיאה בשמירת הגדרות' }, { status: 500 })
   }
 }

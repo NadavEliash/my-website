@@ -1,45 +1,46 @@
 import { NextRequest, NextResponse } from 'next/server'
-import fs from 'fs/promises'
-import path from 'path'
+import { getFoodDb } from '@/lib/food-db'
 
-const DATA_PATH = path.join(process.cwd(), 'data', 'food-store.json')
-
-async function readStore() {
-  const raw = await fs.readFile(DATA_PATH, 'utf-8')
-  return JSON.parse(raw)
-}
-
-async function writeStore(data: object) {
-  await fs.writeFile(DATA_PATH, JSON.stringify(data, null, 2), 'utf-8')
+async function notifySocket(payload: object) {
+  try {
+    await fetch('http://localhost:3001/api/food/notify', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload),
+    })
+  } catch {
+    // socket server may not be running
+  }
 }
 
 export async function GET() {
   try {
-    const store = await readStore()
-    return NextResponse.json(store.orders)
-  } catch {
-    return NextResponse.json({ error: 'Failed to read orders' }, { status: 500 })
+    const db = await getFoodDb()
+    const orders = await db.collection('orders').find({}, { projection: { _id: 0 } }).sort({ createdAt: -1 }).toArray()
+    return NextResponse.json(orders)
+  } catch (e) {
+    console.error('[food/orders GET]', e)
+    return NextResponse.json({ error: 'שגיאה בטעינת הזמנות' }, { status: 500 })
   }
 }
 
-// POST: if body has `orders` array → replace all (used for status updates)
-//       if body has a single order object → append
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json()
-    const store = await readStore()
+    const db = await getFoodDb()
 
     if (Array.isArray(body.orders)) {
-      // Replace entire orders array (used for status patching)
-      store.orders = body.orders
+      await db.collection('orders').deleteMany({})
+      if (body.orders.length > 0) await db.collection('orders').insertMany(body.orders)
+      await notifySocket({ type: 'order-updated' })
+      return NextResponse.json(body.orders)
     } else {
-      // Append a new order
-      store.orders = [...store.orders, body]
+      await db.collection('orders').insertOne({ ...body, _id: undefined })
+      await notifySocket({ type: 'new-order', order: body })
+      return NextResponse.json(body)
     }
-
-    await writeStore(store)
-    return NextResponse.json(store.orders)
-  } catch {
-    return NextResponse.json({ error: 'Failed to save order' }, { status: 500 })
+  } catch (e) {
+    console.error('[food/orders POST]', e)
+    return NextResponse.json({ error: 'שגיאה בשמירת ההזמנה' }, { status: 500 })
   }
 }

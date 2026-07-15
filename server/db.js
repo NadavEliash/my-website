@@ -1,30 +1,51 @@
-require('dotenv').config({ path: require('path').join(__dirname, '../.env') })
+﻿require('dotenv').config({ path: require('path').join(__dirname, '../.env') })
 
 const { MongoClient } = require('mongodb')
 
-const client = new MongoClient(process.env.MONGODB_URI, {
+const bnbClient = new MongoClient(process.env.MONGODB_BNB_URI, {
   tls: true,
   tlsAllowInvalidCertificates: true,
 })
-let _db = null
+
+const foodClient = new MongoClient(process.env.MONGODB_FOOD_URI, {
+  tls: true,
+  tlsAllowInvalidCertificates: true,
+})
+
+let _bnbDb = null
+let _foodDb = null
 
 async function connectDB() {
-  await client.connect()
-  _db = client.db('dead-sea-bnb')
-  console.log('✓ MongoDB connected')
+  await bnbClient.connect()
+  _bnbDb = bnbClient.db('dead-sea-bnb')
+  console.log('Connected to BnB MongoDB')
   await seedIfEmpty()
+
+  foodClient.connect()
+    .then(() => {
+      _foodDb = foodClient.db('food-store')
+      console.log('Connected to Food MongoDB')
+    })
+    .catch(err => {
+      console.error('Food MongoDB connection failed:', err.message)
+    })
 }
 
 function db() {
-  if (!_db) throw new Error('DB not connected')
-  return _db
+  if (!_bnbDb) throw new Error('BnB DB not connected')
+  return _bnbDb
+}
+
+function foodDb() {
+  if (!_foodDb) throw new Error('Food DB not connected')
+  return _foodDb
 }
 
 async function seedIfEmpty() {
-  const count = await _db.collection('hosts').countDocuments()
+  const count = await _bnbDb.collection('hosts').countDocuments()
   if (count > 0) return
 
-  await _db.collection('hosts').insertOne({
+  await _bnbDb.collection('hosts').insertOne({
     hostId: 'dead-sea-suite',
     username: 'nadav',
     name: 'נדב',
@@ -72,7 +93,7 @@ async function seedIfEmpty() {
         'Check-in after 15:00, check-out by 11:00',
         'No smoking inside the suite',
         'Pets allowed with prior approval',
-        'Quiet hours 23:00 – 08:00',
+        'Quiet hours 23:00 - 08:00',
       ],
     },
     images: [
@@ -85,7 +106,7 @@ async function seedIfEmpty() {
     unavailableDates: [],
   })
 
-  console.log('✓ Seeded initial host data')
+  console.log('Seeded initial host data')
 }
 
-module.exports = { connectDB, db }
+module.exports = { connectDB, db, foodDb }

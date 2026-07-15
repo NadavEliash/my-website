@@ -1,24 +1,17 @@
-'use client'
+﻿'use client'
 
 import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
-import type { OrderItem } from '@/app/food/types'
+import { ChevronRight, Check } from 'lucide-react'
+import type { OrderItem, Settings } from '@/app/food/types'
 
-type CartData = {
-  items: OrderItem[]
-  timeSlot: string
-}
-
-type SuccessData = {
-  id: string
-  customerName: string
-  timeSlot: string
-  total: number
-}
+type CartData = { items: OrderItem[]; timeSlot: string }
+type SuccessData = { id: string; customerName: string; timeSlot: string; total: number }
 
 export default function CheckoutPage() {
   const router = useRouter()
   const [cartData, setCartData] = useState<CartData | null>(null)
+  const [settings, setSettings] = useState<Settings | null>(null)
   const [customerName, setCustomerName] = useState('')
   const [phone, setPhone] = useState('')
   const [submitting, setSubmitting] = useState(false)
@@ -27,11 +20,9 @@ export default function CheckoutPage() {
 
   useEffect(() => {
     const raw = localStorage.getItem('food-cart')
-    if (!raw) {
-      router.push('/food')
-      return
-    }
+    if (!raw) { router.push('/food'); return }
     setCartData(JSON.parse(raw))
+    fetch('/api/food/settings').then(r => r.json()).then(setSettings)
   }, [router])
 
   if (!cartData) return null
@@ -39,13 +30,9 @@ export default function CheckoutPage() {
   const total = cartData.items.reduce((sum, item) => sum + item.price * item.quantity, 0)
 
   async function handlePlaceOrder() {
-    if (!customerName.trim() || !phone.trim()) {
-      setError('Please fill in your name and phone number.')
-      return
-    }
+    if (!customerName.trim() || !phone.trim()) { setError('יש למלא שם וטלפון.'); return }
     setError('')
     setSubmitting(true)
-
     const order = {
       id: crypto.randomUUID(),
       customerName: customerName.trim(),
@@ -56,58 +43,78 @@ export default function CheckoutPage() {
       status: 'pending' as const,
       createdAt: new Date().toISOString(),
     }
-
     try {
-      const res = await fetch('/api/food/orders', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(order),
-      })
-
-      if (!res.ok) throw new Error('Failed to place order')
-
+      const res = await fetch('/api/food/orders', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(order) })
+      if (!res.ok) throw new Error()
       localStorage.removeItem('food-cart')
-      setSuccess({
-        id: order.id,
-        customerName: order.customerName,
-        timeSlot: order.timeSlot,
-        total,
-      })
+      setSuccess({ id: order.id, customerName: order.customerName, timeSlot: order.timeSlot, total })
     } catch {
-      setError('Something went wrong. Please try again.')
+      setError('משהו השתבש. נסה שוב.')
     } finally {
       setSubmitting(false)
     }
   }
 
+  function buildBitLink(t: number) {
+    if (!settings?.bitPhone) return null
+    return `https://www.bitpay.co.il/app/me/send-money/${settings.bitPhone}?sum=${t.toFixed(2)}&description=${encodeURIComponent('הזמנת אוכל')}`
+  }
+
+  function buildPayboxLink() {
+    if (!settings?.payboxPhone) return null
+    return `https://payboxapp.page.link/?link=https://paybox.co.il/qpay/${settings.payboxPhone}&apn=com.paybox.android&ibi=com.paybox.paybox`
+  }
+
   if (success) {
+    const bitLink = buildBitLink(success.total)
+    const payboxLink = buildPayboxLink()
     return (
-      <div className="min-h-screen bg-amber-50 flex flex-col items-center justify-center px-4">
-        <div className="bg-white rounded-3xl shadow-xl p-8 max-w-md w-full text-center">
-          <div className="text-6xl mb-4">🎉</div>
-          <h1 className="text-2xl font-bold text-gray-800 mb-2">Order Placed!</h1>
-          <p className="text-gray-500 mb-6">
-            Thanks, <span className="font-semibold text-amber-600">{success.customerName}</span>! Your order is confirmed.
-          </p>
-          <div className="bg-amber-50 rounded-xl p-4 text-left space-y-2 mb-6">
-            <div className="flex justify-between text-sm">
-              <span className="text-gray-500">Order ID</span>
-              <span className="font-mono text-xs text-gray-700">{success.id.slice(0, 8)}…</span>
+      <div className="min-h-screen bg-gray-50 flex flex-col items-center justify-center px-4" dir="rtl">
+        <div className="bg-white rounded-2xl border border-gray-100 p-8 w-full max-w-sm">
+          <div className="w-10 h-10 rounded-full bg-gray-900 flex items-center justify-center mb-5">
+            <Check size={18} className="text-white" />
+          </div>
+          <h1 className="text-xl font-bold text-gray-900 mb-1">ההזמנה התקבלה</h1>
+          <p className="text-gray-400 text-sm mb-6">תודה, {success.customerName}. ההזמנה שלך נקלטה במערכת.</p>
+
+          <div className="border border-gray-100 rounded-xl divide-y divide-gray-50 mb-6 text-sm">
+            <div className="flex justify-between px-4 py-3">
+              <span className="text-gray-500">שעת איסוף</span>
+              <span className="font-medium text-gray-800">{success.timeSlot}</span>
             </div>
-            <div className="flex justify-between text-sm">
-              <span className="text-gray-500">⏰ Time Slot</span>
-              <span className="font-semibold text-gray-800">{success.timeSlot}</span>
-            </div>
-            <div className="flex justify-between text-sm">
-              <span className="text-gray-500">Total</span>
-              <span className="font-bold text-amber-600">₪{success.total.toFixed(2)}</span>
+            <div className="flex justify-between px-4 py-3">
+              <span className="text-gray-500">סה״כ לתשלום</span>
+              <span className="font-bold text-gray-900">₪{success.total.toFixed(2)}</span>
             </div>
           </div>
-          <button
-            onClick={() => router.push('/food')}
-            className="w-full bg-amber-500 hover:bg-amber-600 text-white font-bold py-3 rounded-full transition"
-          >
-            Back to Menu
+
+          {(bitLink || payboxLink) && (
+            <div className="space-y-2 mb-4">
+              <p className="text-xs font-medium text-gray-500 mb-2">תשלום</p>
+              {bitLink && (
+                <a href={bitLink} target="_blank" rel="noopener noreferrer"
+                  className="flex items-center justify-between w-full border border-blue-200 bg-blue-50 text-blue-800 font-semibold px-4 py-3.5 rounded-xl text-sm transition hover:bg-blue-100">
+                  <span>שלם עם Bit</span>
+                  <span className="text-xs font-mono text-blue-400">₪{success.total.toFixed(2)}</span>
+                </a>
+              )}
+              {payboxLink && (
+                <a href={payboxLink} target="_blank" rel="noopener noreferrer"
+                  className="flex items-center justify-between w-full border border-green-200 bg-green-50 text-green-800 font-semibold px-4 py-3.5 rounded-xl text-sm transition hover:bg-green-100">
+                  <span>שלם עם Paybox</span>
+                  <span className="text-xs font-mono text-green-400">₪{success.total.toFixed(2)}</span>
+                </a>
+              )}
+              <div className="flex items-center justify-between w-full border border-gray-100 bg-gray-50 text-gray-300 font-semibold px-4 py-3.5 rounded-xl text-sm select-none">
+                <span>Google Pay</span>
+                <span className="text-xs">בקרוב</span>
+              </div>
+            </div>
+          )}
+
+          <button onClick={() => router.push('/food')}
+            className="w-full border border-gray-200 text-gray-600 font-medium py-3 rounded-xl text-sm hover:bg-gray-50 transition">
+            חזרה לתפריט
           </button>
         </div>
       </div>
@@ -115,82 +122,90 @@ export default function CheckoutPage() {
   }
 
   return (
-    <div className="min-h-screen bg-amber-50">
-      <div className="bg-gradient-to-r from-amber-500 to-orange-500 text-white py-8 px-4 text-center shadow-lg">
-        <h1 className="text-3xl font-bold">🛒 Checkout</h1>
-      </div>
+    <div className="min-h-screen bg-gray-50" dir="rtl">
+      <header className="bg-gray-900 text-white px-4 pt-10 pb-6">
+        <button onClick={() => router.push('/food')} className="flex items-center gap-1 text-gray-400 text-sm mb-4 hover:text-white transition">
+          <ChevronRight size={16} />
+          <span>תפריט</span>
+        </button>
+        <h1 className="text-2xl font-bold tracking-tight">סיום הזמנה</h1>
+      </header>
 
-      <div className="max-w-lg mx-auto px-4 py-8 space-y-6">
-
-        {/* Order Summary */}
-        <div className="bg-white rounded-2xl shadow-md p-6">
-          <h2 className="text-lg font-bold text-gray-800 mb-4">📋 Order Summary</h2>
-          <div className="space-y-3">
+      <main className="px-4 py-6 max-w-lg mx-auto space-y-4">
+        <div className="bg-white rounded-xl border border-gray-100 overflow-hidden">
+          <div className="px-4 py-3 border-b border-gray-50">
+            <h2 className="text-sm font-semibold text-gray-700">סיכום</h2>
+          </div>
+          <div className="divide-y divide-gray-50">
             {cartData.items.map(item => (
-              <div key={item.productId} className="flex justify-between items-center">
-                <div>
-                  <span className="font-medium text-gray-800">{item.productName}</span>
-                  <span className="text-gray-400 text-sm ml-2">× {item.quantity}</span>
+              <div key={item.productId} className="px-4 py-3">
+                <div className="flex justify-between items-start">
+                  <span className="font-semibold text-gray-900 text-sm">₪{(item.price * item.quantity).toFixed(2)}</span>
+                  <div className="text-right">
+                    <span className="text-sm text-gray-800">{item.productName}</span>
+                    <span className="text-gray-400 text-xs mr-1">× {item.quantity}</span>
+                  </div>
                 </div>
-                <span className="text-amber-600 font-semibold">
-                  ₪{(item.price * item.quantity).toFixed(2)}
-                </span>
+                {item.selectedOptions && item.selectedOptions.length > 0 && (
+                  <div className="flex flex-wrap gap-1.5 mt-1.5 justify-end">
+                    {item.selectedOptions.map(sel => (
+                      <span key={sel.optionId} className="text-xs bg-gray-100 text-gray-500 px-2 py-0.5 rounded-md">
+                        {sel.label}: {sel.choice}{sel.priceAdd > 0 ? ` (+₪${sel.priceAdd % 1 === 0 ? sel.priceAdd : sel.priceAdd.toFixed(2)})` : ''}
+                      </span>
+                    ))}
+                  </div>
+                )}
               </div>
             ))}
           </div>
-          <div className="border-t border-gray-100 mt-4 pt-4 flex justify-between items-center">
-            <div className="text-gray-500 text-sm">
-              ⏰ <span className="font-medium text-gray-700">{cartData.timeSlot}</span>
-            </div>
-            <div className="text-xl font-bold text-gray-800">
-              Total: <span className="text-amber-600">₪{total.toFixed(2)}</span>
+          <div className="flex justify-between items-center px-4 py-3 bg-gray-50">
+            <span className="font-bold text-gray-900">₪{total.toFixed(2)}</span>
+            <div className="text-right">
+              <span className="text-xs text-gray-400">שעת איסוף: </span>
+              <span className="text-sm font-medium text-gray-700">{cartData.timeSlot}</span>
             </div>
           </div>
         </div>
 
-        {/* Customer Details */}
-        <div className="bg-white rounded-2xl shadow-md p-6 space-y-4">
-          <h2 className="text-lg font-bold text-gray-800 mb-2">Your Details</h2>
-          <div>
-            <label className="block text-sm font-medium text-gray-600 mb-1">Full Name</label>
-            <input
-              type="text"
-              value={customerName}
-              onChange={e => setCustomerName(e.target.value)}
-              placeholder="e.g. John Doe"
-              className="w-full border border-gray-200 rounded-xl px-4 py-2.5 text-gray-800 focus:outline-none focus:ring-2 focus:ring-amber-400 transition"
-            />
+        <div className="bg-white rounded-xl border border-gray-100 overflow-hidden">
+          <div className="px-4 py-3 border-b border-gray-50">
+            <h2 className="text-sm font-semibold text-gray-700">פרטים אישיים</h2>
           </div>
-          <div>
-            <label className="block text-sm font-medium text-gray-600 mb-1">Phone Number</label>
-            <input
-              type="tel"
-              value={phone}
-              onChange={e => setPhone(e.target.value)}
-              placeholder="e.g. 050-1234567"
-              className="w-full border border-gray-200 rounded-xl px-4 py-2.5 text-gray-800 focus:outline-none focus:ring-2 focus:ring-amber-400 transition"
-            />
+          <div className="px-4 py-4 space-y-3">
+            <div>
+              <label className="block text-xs font-medium text-gray-500 mb-1.5">שם מלא</label>
+              <input
+                type="text"
+                dir="rtl"
+                value={customerName}
+                onChange={e => setCustomerName(e.target.value)}
+                placeholder="ישראל ישראלי"
+                className="w-full border border-gray-200 rounded-lg px-3 py-3 text-gray-800 text-right text-sm focus:outline-none focus:ring-2 focus:ring-gray-900 transition"
+              />
+            </div>
+            <div>
+              <label className="block text-xs font-medium text-gray-500 mb-1.5">מספר טלפון</label>
+              <input
+                type="tel"
+                dir="rtl"
+                value={phone}
+                onChange={e => setPhone(e.target.value)}
+                placeholder="050-1234567"
+                className="w-full border border-gray-200 rounded-lg px-3 py-3 text-gray-800 text-right text-sm focus:outline-none focus:ring-2 focus:ring-gray-900 transition"
+              />
+            </div>
+            {error && <p className="text-red-500 text-xs text-right">{error}</p>}
           </div>
-          {error && <p className="text-red-500 text-sm">{error}</p>}
         </div>
 
-        {/* Actions */}
-        <div className="flex gap-3">
-          <button
-            onClick={() => router.push('/food')}
-            className="flex-1 border-2 border-amber-300 text-amber-700 font-semibold py-3 rounded-full hover:bg-amber-50 transition"
-          >
-            ← Back
-          </button>
-          <button
-            onClick={handlePlaceOrder}
-            disabled={submitting}
-            className="flex-2 flex-grow-[2] bg-amber-500 hover:bg-amber-600 disabled:bg-amber-200 text-white font-bold py-3 rounded-full transition shadow-md"
-          >
-            {submitting ? 'Placing…' : 'Place Order ✓'}
-          </button>
-        </div>
-      </div>
+        <button
+          onClick={handlePlaceOrder}
+          disabled={submitting}
+          className="w-full bg-gray-900 hover:bg-gray-800 disabled:bg-gray-200 disabled:text-gray-400 text-white font-semibold py-4 rounded-xl transition text-sm"
+        >
+          {submitting ? 'שולח...' : 'אישור הזמנה'}
+        </button>
+      </main>
     </div>
   )
 }

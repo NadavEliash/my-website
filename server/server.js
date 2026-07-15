@@ -186,6 +186,16 @@ async function handleBnbRequest(req, res) {
     return;
   }
 
+  // POST /api/food/notify — called by Next.js API to broadcast food events
+  if (req.url === '/api/food/notify' && req.method === 'POST') {
+    readBody(req, res, async (data) => {
+      io.to('food-orders').emit('food-update', data);
+      res.writeHead(200);
+      res.end(JSON.stringify({ ok: true }));
+    });
+    return;
+  }
+
   res.writeHead(404);
   res.end(JSON.stringify({ error: 'Not found' }));
 }
@@ -198,9 +208,9 @@ const io = new Server(server, {
 });
 
 server.on('request', (req, res) => {
-  if (req.url?.startsWith('/api/bnb/')) {
+  if (req.url?.startsWith('/api/bnb/') || req.url === '/api/food/notify') {
     handleBnbRequest(req, res).catch(err => {
-      console.error('BnB API error:', err);
+      console.error('API error:', err);
       if (!res.writableEnded) {
         res.writeHead(500);
         res.end(JSON.stringify({ error: 'Internal server error' }));
@@ -254,6 +264,10 @@ io.on('connection', (socket) => {
     });
 
     if (callback) callback({ success: true });
+  });
+
+  socket.on('join-food-orders', () => {
+    socket.join('food-orders');
   });
 
   socket.on('sync-game', ({ roomId, G }) => {

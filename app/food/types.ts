@@ -1,17 +1,46 @@
+export type OptionChoice = {
+  label: string
+  priceAdd: number  // 0 = no extra charge
+}
+
+export type ProductOption = {
+  id: string
+  label: string
+  choices: OptionChoice[]
+  required: boolean
+  multiple?: boolean  // allow selecting more than one choice
+}
+
+export type SelectedOption = {
+  optionId: string
+  label: string
+  choice: string
+  priceAdd: number
+}
+
 export type Product = {
   id: string
   name: string
   description: string
   price: number
-  image: string // URL
+  image: string
   available: boolean
+  options?: ProductOption[]
+}
+
+export type ScheduleDay = {
+  id: string
+  date: string        // "YYYY-MM-DD"
+  start: string       // "HH:MM"
+  end: string         // "HH:MM"
+  slotMinutes: number // 15, 30, or 60
 }
 
 export type Settings = {
-  availabilityStart: string // "HH:MM"
-  availabilityEnd: string   // "HH:MM"
-  slotMinutes: number       // 15, 30, or 60
   open: boolean
+  bitPhone?: string
+  payboxPhone?: string
+  scheduleDays?: ScheduleDay[]
 }
 
 export type OrderItem = {
@@ -19,6 +48,7 @@ export type OrderItem = {
   productName: string
   quantity: number
   price: number
+  selectedOptions?: SelectedOption[]
 }
 
 export type Order = {
@@ -26,7 +56,7 @@ export type Order = {
   customerName: string
   phone: string
   items: OrderItem[]
-  timeSlot: string // "HH:MM"
+  timeSlot: string
   total: number
   status: 'pending' | 'confirmed' | 'done'
   createdAt: string
