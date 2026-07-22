@@ -2,9 +2,11 @@
 
 import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
-import { Clock, Plus, ArrowLeft, Trash2 } from 'lucide-react'
-import type { Product, ProductOption, OptionChoice, SelectedOption, Settings, OrderItem } from '@/app/food/types'
+import { Clock, Plus, ArrowLeft, Trash2, ChevronRight } from 'lucide-react'
+import type { Product, ProductOption, OptionChoice, SelectedOption, Settings, OrderItem, Order } from '@/app/food/types'
+import { MAX_PER_SLOT } from '@/app/food/types'
 import { generateSlots } from '@/app/food/utils'
+import AnalogClock, { type ClockSlot } from '@/app/components/food/analog-clock'
 
 // a single ordered unit: optionId -> chosen choices
 type Unit = Record<string, OptionChoice[]>
@@ -51,7 +53,7 @@ function OptionsPicker({ product, selection, onPick }: OptionsPickerProps) {
                     <span>{choice.label}</span>
                     {choice.priceAdd > 0 && (
                       <span className="font-normal text-gray-400">
-                        +₪{choice.priceAdd % 1 === 0 ? choice.priceAdd : choice.priceAdd.toFixed(2)}
+                        + ₪{choice.priceAdd % 1 === 0 ? choice.priceAdd : choice.priceAdd.toFixed(2)}
                       </span>
                     )}
                   </button>
@@ -71,20 +73,28 @@ export default function FoodStorePage() {
   const [products, setProducts] = useState<Product[]>([])
   const [settings, setSettings] = useState<Settings | null>(null)
   const [cart, setCart] = useState<CartMap>({})
+  const [orders, setOrders] = useState<Order[]>([])
   const [expandedId, setExpandedId] = useState<string | null>(null)
   // product whose + button is currently nudging (hint to add another)
   const [hintId, setHintId] = useState<string | null>(null)
   const [selectedDate, setSelectedDate] = useState('')
   const [selectedSlot, setSelectedSlot] = useState('')
+  // two-step flow: pick products, then pick a pickup time window
+  const [step, setStep] = useState<'menu' | 'time'>('menu')
   const [loading, setLoading] = useState(true)
   const [loadingDots, setLoadingDots] = useState('')
 
   useEffect(() => {
     async function load() {
-      const [pRes, sRes] = await Promise.all([fetch('/api/food/products'), fetch('/api/food/settings')])
-      const [prods, sett] = await Promise.all([pRes.json(), sRes.json()])
+      const [pRes, sRes, oRes] = await Promise.all([
+        fetch('/api/food/products'),
+        fetch('/api/food/settings'),
+        fetch('/api/food/orders'),
+      ])
+      const [prods, sett, ords] = await Promise.all([pRes.json(), sRes.json(), oRes.json()])
       setProducts(prods)
       setSettings(sett)
+      setOrders(Array.isArray(ords) ? ords : [])
       setLoading(false)
     }
     load()
@@ -102,6 +112,16 @@ export default function FoodStorePage() {
   const slots = selectedDayConfig
     ? generateSlots(selectedDayConfig.start, selectedDayConfig.end, selectedDayConfig.slotMinutes)
     : []
+
+  // count orders already booked per slot on the selected day, to cap each slot
+  const slotCounts: Record<string, number> = {}
+  for (const o of orders) {
+    if (o.pickupDate === selectedDate && o.pickupTime) {
+      slotCounts[o.pickupTime] = (slotCounts[o.pickupTime] ?? 0) + 1
+    }
+  }
+  const clockSlots: ClockSlot[] = slots.map(t => ({ time: t, disabled: (slotCounts[t] ?? 0) >= MAX_PER_SLOT }))
+  const selectedSlotFull = !!selectedSlot && (slotCounts[selectedSlot] ?? 0) >= MAX_PER_SLOT
 
   function formatDisplayDate(dateStr: string) {
     const d = new Date(dateStr + 'T00:00:00')
@@ -173,6 +193,11 @@ export default function FoodStorePage() {
     return () => { clearInterval(interval); clearTimeout(clearBurst); setHintId(null) }
   }, [expandedId])
 
+  // if the cart empties (e.g. all orders removed), fall back to the menu step
+  useEffect(() => {
+    if (totalItems === 0 && step === 'time') setStep('menu')
+  }, [totalItems, step])
+
   // clicking + expands the product and appends another order section
   function addToCart(product: Product) {
     setExpandedId(product.id)
@@ -236,7 +261,12 @@ export default function FoodStorePage() {
       }
     }
     const timeSlot = selectedDate ? `${formatDisplayDate(selectedDate)} · ${selectedSlot}` : selectedSlot
-    localStorage.setItem('food-cart', JSON.stringify({ items, timeSlot }))
+    localStorage.setItem('food-cart', JSON.stringify({
+      items,
+      timeSlot,
+      pickupDate: selectedDate,
+      pickupTime: selectedSlot,
+    }))
     router.push('/food/checkout')
   }
 
@@ -268,12 +298,18 @@ export default function FoodStorePage() {
   return (
     <div className="min-h-screen bg-gray-50" dir="rtl">
       <header className="bg-gray-900 text-white px-4 pt-10 pb-6">
-        <h1 className="text-2xl font-bold tracking-tight">התפריט</h1>
-        <p className="text-gray-400 text-sm mt-1">הכנה טרייה לפי הזמנה</p>
+        {step === 'time' && (
+          <button onClick={() => setStep('menu')} className="flex items-center gap-1 text-gray-400 text-sm mb-4 hover:text-white transition">
+            <ChevronRight size={16} />
+            <span>חזרה לתפריט</span>
+          </button>
+        )}
+        <h1 className="text-2xl font-bold tracking-wide">{step === 'menu' ? 'התפריט' : 'בחירת מועד איסוף'}</h1>
+        <p className="text-gray-400 text-lg mt-1">{step === 'menu' ? 'מה בא לכם לאכול' : 'מתי תרצו את ההזמנה?'}</p>
       </header>
 
       <main className="px-4 py-6 max-w-2xl mx-auto">
-        {availableProducts.length === 0 ? (
+        {step === 'menu' && (availableProducts.length === 0 ? (
           <div className="text-center py-24">
             <p className="text-gray-400">אין פריטים זמינים כרגע.</p>
           </div>
@@ -369,10 +405,10 @@ export default function FoodStorePage() {
               )
             })}
           </div>
-        )}
+        ))}
 
-        {totalItems > 0 && scheduleDays.length > 0 && (
-          <div className="mt-8 space-y-4">
+        {step === 'time' && scheduleDays.length > 0 && (
+          <div className="space-y-4">
             {/* step 1: pick a date */}
             <div>
               <div className="flex items-center gap-2 mb-3">
@@ -396,58 +432,69 @@ export default function FoodStorePage() {
               </div>
             </div>
 
-            {/* step 2: pick a time slot for the selected date */}
+            {/* step 2: pick a time slot on the clock (drag the hand; full slots are greyed out) */}
             {selectedDate && slots.length > 0 && (
               <div>
-                <h2 className="text-sm font-semibold text-gray-700 mb-3">בחר שעה</h2>
-                <div className="flex flex-wrap gap-2">
-                  {slots.map(slot => (
-                    <button
-                      key={slot}
-                      onClick={() => setSelectedSlot(slot)}
-                      className={`px-3 py-1.5 rounded-lg border text-sm font-medium transition ${
-                        selectedSlot === slot
-                          ? 'bg-gray-900 border-gray-900 text-white'
-                          : 'bg-white border-gray-200 text-gray-600 hover:border-gray-400'
-                      }`}
-                    >
-                      {slot}
-                    </button>
-                  ))}
-                </div>
+                <h2 className="text-sm font-semibold text-gray-700 mb-1">בחרו שעה</h2>
+                <p className="text-xs text-gray-400 mb-1">גררו את מחוג השעון לשעה הרצויה. שעות מלאות מסומנות באפור.</p>
+                <AnalogClock slots={clockSlots} value={selectedSlot} onChange={setSelectedSlot} />
+                {clockSlots.length > 0 && clockSlots.every(s => s.disabled) ? (
+                  <p className="text-xs text-amber-600 text-center mt-1">כל החלונות ביום זה מלאים</p>
+                ) : selectedSlotFull ? (
+                  <p className="text-xs text-amber-600 text-center mt-1">החלון מלא, בחרו שעה אחרת</p>
+                ) : null}
               </div>
             )}
           </div>
         )}
 
-        {totalItems > 0 && scheduleDays.length === 0 && (
-          <p className="text-xs text-gray-400 mt-6 text-center">אין מועדי איסוף זמינים כרגע.</p>
+        {step === 'time' && scheduleDays.length === 0 && (
+          <p className="text-sm text-gray-400 text-center py-12">אין מועדי איסוף זמינים כרגע.</p>
         )}
 
-        {totalItems > 0 && scheduleDays.length > 0 && (!selectedDate || !selectedSlot) && (
+        {step === 'time' && scheduleDays.length > 0 && (!selectedDate || !selectedSlot) && (
           <p className="text-xs text-gray-400 mt-3">יש לבחור תאריך ושעה כדי להמשיך</p>
         )}
       </main>
 
       {totalItems > 0 && (
         <div className="fixed bottom-0 inset-x-0 p-4 bg-white border-t border-gray-100 safe-area-bottom">
-          {hasUnmetRequired && (
-            <p className="text-xs text-center text-amber-600 mb-2">יש להשלים בחירות חובה בכל ההזמנות</p>
+          {step === 'menu' ? (
+            <>
+              {hasUnmetRequired && (
+                <p className="text-xs text-center text-amber-600 mb-2">יש להשלים בחירות חובה בכל ההזמנות</p>
+              )}
+              <button
+                onClick={() => setStep('time')}
+                disabled={hasUnmetRequired}
+                className="w-full flex items-center justify-between bg-gray-900 hover:bg-gray-800 disabled:bg-gray-200 disabled:text-gray-400 text-white font-semibold px-5 py-4 rounded-xl transition"
+              >
+                <div className="flex flex-col items-start">
+                  <span className="text-sm">{totalItems} פריטים נבחרו</span>
+                  {cartTotal > 0 && <span className="text-xs text-gray-400">₪{cartTotal.toFixed(2)}</span>}
+                </div>
+                <div className="flex items-center gap-2 text-sm">
+                  <span>המשך לבחירת חלון זמן</span>
+                  <ArrowLeft size={16} />
+                </div>
+              </button>
+            </>
+          ) : (
+            <button
+              onClick={handleProceed}
+              disabled={!selectedSlot || !selectedDate || hasUnmetRequired || selectedSlotFull}
+              className="w-full flex items-center justify-between bg-gray-900 hover:bg-gray-800 disabled:bg-gray-200 disabled:text-gray-400 text-white font-semibold px-5 py-4 rounded-xl transition"
+            >
+              <div className="flex flex-col items-start">
+                <span className="text-sm">{totalItems} פריטים</span>
+                {cartTotal > 0 && <span className="text-xs text-gray-400">₪{cartTotal.toFixed(2)}</span>}
+              </div>
+              <div className="flex items-center gap-2 text-sm">
+                <span>המשך לתשלום</span>
+                <ArrowLeft size={16} />
+              </div>
+            </button>
           )}
-          <button
-            onClick={handleProceed}
-            disabled={!selectedSlot || !selectedDate || hasUnmetRequired}
-            className="w-full flex items-center justify-between bg-gray-900 hover:bg-gray-800 disabled:bg-gray-200 disabled:text-gray-400 text-white font-semibold px-5 py-4 rounded-xl transition"
-          >
-            <div className="flex flex-col items-start">
-              <span className="text-sm">{totalItems} פריטים נבחרו</span>
-              {cartTotal > 0 && <span className="text-xs text-gray-400">₪{cartTotal.toFixed(2)}</span>}
-            </div>
-            <div className="flex items-center gap-2 text-sm">
-              <span>המשך לתשלום</span>
-              <ArrowLeft size={16} />
-            </div>
-          </button>
         </div>
       )}
 

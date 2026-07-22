@@ -11,7 +11,10 @@ export const metadata: Metadata = {
   metadataBase: new URL('https://nadaveliash.com'),
   title: "Nadav Eliash",
   description: "Frontend/Fullstack Developer",
-  
+  icons: {
+    icon: "/icon.svg",
+  },
+
   openGraph: {
     title: "Nadav Eliash",
     description: "Frontend/Fullstack Developer",
@@ -46,9 +49,6 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <head>
-        <link rel="icon" href="./assets/icon.svg" sizes="any" />
-      </head>
       <body className={`${roboto.className} text-white/80`}>
         <Navbar />
         <main className="">

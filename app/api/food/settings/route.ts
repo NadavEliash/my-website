@@ -6,6 +6,7 @@ const DEFAULTS = {
   bitPhone: '',
   payboxPhone: '',
   scheduleDays: [],
+  deliveryOptions: [],
 }
 
 export async function GET() {

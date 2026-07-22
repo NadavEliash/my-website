@@ -36,12 +36,22 @@ export type ScheduleDay = {
   slotMinutes: number // 15, 30, or 60
 }
 
+export type DeliveryOption = {
+  id: string
+  label: string
+  price: number
+}
+
 export type Settings = {
   open: boolean
   bitPhone?: string
   payboxPhone?: string
   scheduleDays?: ScheduleDay[]
+  deliveryOptions?: DeliveryOption[]
 }
+
+// max orders allowed per single time slot
+export const MAX_PER_SLOT = 3
 
 export type OrderItem = {
   productId: string
@@ -51,13 +61,25 @@ export type OrderItem = {
   selectedOptions?: SelectedOption[]
 }
 
+export type OrderStatus = 'waiting' | 'approved' | 'sent'
+
 export type Order = {
   id: string
   customerName: string
   phone: string
   items: OrderItem[]
-  timeSlot: string
+  timeSlot: string           // human-readable display, e.g. "ד׳ 15.7 · 18:00"
+  pickupDate?: string        // "YYYY-MM-DD" — structured, for time-based logic
+  pickupTime?: string        // "HH:MM"
+  delivery?: { label: string; price: number }
   total: number
-  status: 'pending' | 'confirmed' | 'done'
+  status: OrderStatus
   createdAt: string
+}
+
+// legacy orders used pending/confirmed/done — map them to the current model
+export function normalizeStatus(s: string): OrderStatus {
+  if (s === 'confirmed' || s === 'approved') return 'approved'
+  if (s === 'done' || s === 'sent') return 'sent'
+  return 'waiting'
 }

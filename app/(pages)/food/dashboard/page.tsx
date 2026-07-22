@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState } from 'react'
 import { Upload, Trash2, Plus, X, ChevronDown, ChevronUp } from 'lucide-react'
-import type { Product, ProductOption, Settings, ScheduleDay } from '@/app/food/types'
+import type { Product, ProductOption, Settings, ScheduleDay, DeliveryOption } from '@/app/food/types'
 import { generateSlots } from '@/app/food/utils'
 
 const EMPTY_PRODUCT: Omit<Product, 'id'> = {
@@ -348,11 +348,12 @@ export default function DashboardPage() {
   const [deleteId, setDeleteId] = useState<string | null>(null)
   const fileInputRef = useRef<HTMLInputElement>(null)
   const [settings, setSettings] = useState<Settings>({
-    open: false, bitPhone: '', payboxPhone: '', scheduleDays: [],
+    open: false, bitPhone: '', payboxPhone: '', scheduleDays: [], deliveryOptions: [],
   })
   const [newDay, setNewDay] = useState<Omit<ScheduleDay, 'id'>>({
     date: '', start: '12:00', end: '20:00', slotMinutes: 30,
   })
+  const [newDelivery, setNewDelivery] = useState<{ label: string; price: number }>({ label: '', price: 0 })
   const [settingsMsg, setSettingsMsg] = useState('')
 
   useEffect(() => {
@@ -410,15 +411,20 @@ export default function DashboardPage() {
   }
 
   async function saveSettings() {
-    // flush a date typed into the form but not yet added, so it isn't silently lost on save
+    // flush entries typed into the forms but not yet added, so they aren't silently lost on save
     let toSave = settings
     if (newDay.date && newDay.start && newDay.end) {
       const day: ScheduleDay = { ...newDay, id: crypto.randomUUID() }
       const scheduleDays = [...(settings.scheduleDays ?? []), day].sort((a, b) => a.date.localeCompare(b.date))
-      toSave = { ...settings, scheduleDays }
-      setSettings(toSave)
+      toSave = { ...toSave, scheduleDays }
       setNewDay(d => ({ ...d, date: '' }))
     }
+    if (newDelivery.label.trim()) {
+      const opt: DeliveryOption = { ...newDelivery, label: newDelivery.label.trim(), id: crypto.randomUUID() }
+      toSave = { ...toSave, deliveryOptions: [...(toSave.deliveryOptions ?? []), opt] }
+      setNewDelivery({ label: '', price: 0 })
+    }
+    setSettings(toSave)
     await fetch('/api/food/settings', { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(toSave) })
     setSettingsMsg('נשמר')
     setTimeout(() => setSettingsMsg(''), 2000)
@@ -433,6 +439,17 @@ export default function DashboardPage() {
 
   function removeScheduleDay(id: string) {
     setSettings(s => ({ ...s, scheduleDays: (s.scheduleDays ?? []).filter(d => d.id !== id) }))
+  }
+
+  function addDeliveryOption() {
+    if (!newDelivery.label.trim()) return
+    const opt: DeliveryOption = { ...newDelivery, label: newDelivery.label.trim(), id: crypto.randomUUID() }
+    setSettings(s => ({ ...s, deliveryOptions: [...(s.deliveryOptions ?? []), opt] }))
+    setNewDelivery({ label: '', price: 0 })
+  }
+
+  function removeDeliveryOption(id: string) {
+    setSettings(s => ({ ...s, deliveryOptions: (s.deliveryOptions ?? []).filter(o => o.id !== id) }))
   }
 
   function formatDisplayDate(dateStr: string) {
@@ -635,6 +652,62 @@ export default function DashboardPage() {
                 >
                   <Plus size={12} />
                   הוסף תאריך
+                </button>
+              </div>
+            </div>
+
+            <div className="bg-white rounded-xl border border-gray-100 p-4 space-y-4">
+              <p className="text-sm font-semibold text-gray-800">אפשרויות משלוח</p>
+              <p className="text-xs text-gray-400">הוסף אפשרויות איסוף/משלוח עם מחיר. אם לא הוגדרו, השדה יוסתר מהלקוח.</p>
+
+              {(settings.deliveryOptions ?? []).length > 0 && (
+                <div className="space-y-2">
+                  {(settings.deliveryOptions ?? []).map(opt => (
+                    <div key={opt.id} className="flex items-center justify-between border border-gray-100 rounded-lg px-3 py-2.5">
+                      <div className="min-w-0">
+                        <p className="text-sm font-medium text-gray-800">{opt.label}</p>
+                        <p className="text-xs text-gray-400 mt-0.5">{opt.price > 0 ? `₪${opt.price % 1 === 0 ? opt.price : opt.price.toFixed(2)}` : 'ללא תוספת תשלום'}</p>
+                      </div>
+                      <button onClick={() => removeDeliveryOption(opt.id)} className="p-1.5 text-gray-300 hover:text-red-400 transition flex-shrink-0 mr-2">
+                        <Trash2 size={13} />
+                      </button>
+                    </div>
+                  ))}
+                </div>
+              )}
+
+              <div className="border border-dashed border-gray-200 rounded-lg p-3 space-y-3">
+                <div className="flex items-end gap-2">
+                  <div className="flex-1">
+                    <label className="block text-xs text-gray-400 mb-1">שם האפשרות</label>
+                    <input
+                      type="text"
+                      value={newDelivery.label}
+                      onChange={e => setNewDelivery(d => ({ ...d, label: e.target.value }))}
+                      placeholder="למשל: משלוח עד הבית"
+                      className="w-full border border-gray-200 rounded-lg px-3 py-2 text-gray-800 text-sm text-right focus:outline-none focus:ring-2 focus:ring-gray-900"
+                    />
+                  </div>
+                  <div className="relative w-24 flex-shrink-0">
+                    <label className="block text-xs text-gray-400 mb-1">מחיר (₪)</label>
+                    <input
+                      type="number"
+                      min={0}
+                      step={0.5}
+                      value={newDelivery.price || ''}
+                      placeholder="0"
+                      onChange={e => setNewDelivery(d => ({ ...d, price: parseFloat(e.target.value) || 0 }))}
+                      className="w-full border border-gray-200 rounded-lg px-3 py-2 text-gray-800 text-sm focus:outline-none focus:ring-2 focus:ring-gray-900"
+                    />
+                  </div>
+                </div>
+                <button
+                  onClick={addDeliveryOption}
+                  disabled={!newDelivery.label.trim()}
+                  className="w-full flex items-center justify-center gap-1.5 bg-gray-900 hover:bg-gray-700 disabled:bg-gray-100 disabled:text-gray-300 text-white text-xs font-medium py-2.5 rounded-lg transition"
+                >
+                  <Plus size={12} />
+                  הוסף אפשרות משלוח
                 </button>
               </div>
             </div>

@@ -1,12 +1,45 @@
-﻿'use client'
+'use client'
 
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { useRouter } from 'next/navigation'
-import { ChevronRight, Check } from 'lucide-react'
-import type { OrderItem, Settings } from '@/app/food/types'
+import { ChevronRight, Check, Copy } from 'lucide-react'
+import type { OrderItem, Settings, Order } from '@/app/food/types'
 
-type CartData = { items: OrderItem[]; timeSlot: string }
-type SuccessData = { id: string; customerName: string; timeSlot: string; total: number }
+type CartData = { items: OrderItem[]; timeSlot: string; pickupDate?: string; pickupTime?: string }
+
+// Bit/Paybox have no public deep link that pre-fills recipient + amount (and Paybox's old
+// page.link is dead since Firebase Dynamic Links shut down). So instead of a fake redirect,
+// we show the exact phone + amount with one-tap copy — the customer pays manually in the app.
+function PaymentOption({ name, phone, amount, colorClass }: { name: string; phone: string; amount: string; colorClass: string }) {
+  const [copied, setCopied] = useState<'amount' | 'phone' | null>(null)
+  function copy(text: string, which: 'amount' | 'phone') {
+    navigator.clipboard?.writeText(text).catch(() => {})
+    setCopied(which)
+    setTimeout(() => setCopied(null), 1500)
+  }
+  return (
+    <div className={`rounded-xl border p-3 ${colorClass}`}>
+      <div className="flex items-center justify-between mb-2">
+        <span className="font-semibold text-sm">{name}</span>
+        <span className="text-xs opacity-60">תשלום ידני באפליקציה</span>
+      </div>
+      <div className="space-y-1.5">
+        <button onClick={() => copy(phone, 'phone')} className="flex items-center justify-between w-full bg-white/70 hover:bg-white rounded-lg px-3 py-2 text-sm transition">
+          <span className="flex items-center gap-1.5 text-xs opacity-80">
+            {copied === 'phone' ? <><Check size={12} /> הועתק</> : <><Copy size={12} /> העתק מספר</>}
+          </span>
+          <span className="font-mono font-medium" dir="ltr">{phone}</span>
+        </button>
+        <button onClick={() => copy(amount, 'amount')} className="flex items-center justify-between w-full bg-white/70 hover:bg-white rounded-lg px-3 py-2 text-sm transition">
+          <span className="flex items-center gap-1.5 text-xs opacity-80">
+            {copied === 'amount' ? <><Check size={12} /> הועתק</> : <><Copy size={12} /> העתק סכום</>}
+          </span>
+          <span className="font-bold" dir="ltr">₪{amount}</span>
+        </button>
+      </div>
+    </div>
+  )
+}
 
 export default function CheckoutPage() {
   const router = useRouter()
@@ -14,9 +47,11 @@ export default function CheckoutPage() {
   const [settings, setSettings] = useState<Settings | null>(null)
   const [customerName, setCustomerName] = useState('')
   const [phone, setPhone] = useState('')
-  const [submitting, setSubmitting] = useState(false)
-  const [success, setSuccess] = useState<SuccessData | null>(null)
+  const [deliveryId, setDeliveryId] = useState('')
+  const [step, setStep] = useState<'details' | 'pay'>('details')
   const [error, setError] = useState('')
+  const [orderError, setOrderError] = useState('')
+  const placedRef = useRef(false)
 
   useEffect(() => {
     const raw = localStorage.getItem('food-cart')
@@ -25,102 +60,111 @@ export default function CheckoutPage() {
     fetch('/api/food/settings').then(r => r.json()).then(setSettings)
   }, [router])
 
-  if (!cartData) return null
+  const deliveryOptions = settings?.deliveryOptions ?? []
+  const selectedDelivery = deliveryOptions.find(o => o.id === deliveryId)
+  const itemsTotal = cartData ? cartData.items.reduce((sum, item) => sum + item.price * item.quantity, 0) : 0
+  const total = itemsTotal + (selectedDelivery?.price ?? 0)
 
-  const total = cartData.items.reduce((sum, item) => sum + item.price * item.quantity, 0)
+  // name must contain at least 3 letters; phone at least 9 digits
+  const nameValid = (customerName.match(/\p{L}/gu)?.length ?? 0) >= 3
+  const phoneValid = phone.replace(/\D/g, '').length >= 9
+  const deliveryValid = deliveryOptions.length === 0 || !!selectedDelivery
 
-  async function handlePlaceOrder() {
-    if (!customerName.trim() || !phone.trim()) { setError('יש למלא שם וטלפון.'); return }
-    setError('')
-    setSubmitting(true)
-    const order = {
+  // create the order when the customer reaches the final (payment) step — never before
+  async function placeOrder() {
+    if (placedRef.current || !cartData) return
+    placedRef.current = true
+    const order: Order = {
       id: crypto.randomUUID(),
       customerName: customerName.trim(),
       phone: phone.trim(),
-      items: cartData!.items,
-      timeSlot: cartData!.timeSlot,
+      items: cartData.items,
+      timeSlot: cartData.timeSlot,
+      pickupDate: cartData.pickupDate,
+      pickupTime: cartData.pickupTime,
+      delivery: selectedDelivery ? { label: selectedDelivery.label, price: selectedDelivery.price } : undefined,
       total,
-      status: 'pending' as const,
+      status: 'waiting',
       createdAt: new Date().toISOString(),
     }
     try {
       const res = await fetch('/api/food/orders', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(order) })
       if (!res.ok) throw new Error()
       localStorage.removeItem('food-cart')
-      setSuccess({ id: order.id, customerName: order.customerName, timeSlot: order.timeSlot, total })
     } catch {
-      setError('משהו השתבש. נסה שוב.')
-    } finally {
-      setSubmitting(false)
+      placedRef.current = false
+      setOrderError('שמירת ההזמנה נכשלה, נסו שוב.')
     }
   }
 
-  function buildBitLink(t: number) {
-    if (!settings?.bitPhone) return null
-    return `https://www.bitpay.co.il/app/me/send-money/${settings.bitPhone}?sum=${t.toFixed(2)}&description=${encodeURIComponent('הזמנת אוכל')}`
+  useEffect(() => {
+    if (step === 'pay') placeOrder()
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [step])
+
+  function goToPay() {
+    if (!nameValid) { setError('יש להזין שם מלא (לפחות 3 אותיות).'); return }
+    if (!phoneValid) { setError('יש להזין מספר טלפון תקין.'); return }
+    if (!deliveryValid) { setError('יש לבחור אפשרות משלוח.'); return }
+    setError('')
+    setStep('pay')
   }
 
-  function buildPayboxLink() {
-    if (!settings?.payboxPhone) return null
-    return `https://payboxapp.page.link/?link=https://paybox.co.il/qpay/${settings.payboxPhone}&apn=com.paybox.android&ibi=com.paybox.paybox`
-  }
+  if (!cartData) return null
 
-  if (success) {
-    const bitLink = buildBitLink(success.total)
-    const payboxLink = buildPayboxLink()
+  // ── final step: thank-you + payment ──────────────────────────────────────────
+  if (step === 'pay') {
     return (
       <div className="min-h-screen bg-gray-50 flex flex-col items-center justify-center px-4" dir="rtl">
         <div className="bg-white rounded-2xl border border-gray-100 p-8 w-full max-w-sm">
           <div className="w-10 h-10 rounded-full bg-gray-900 flex items-center justify-center mb-5">
             <Check size={18} className="text-white" />
           </div>
-          <h1 className="text-xl font-bold text-gray-900 mb-1">ההזמנה התקבלה</h1>
-          <p className="text-gray-400 text-sm mb-6">תודה, {success.customerName}. ההזמנה שלך נקלטה במערכת.</p>
+          <h1 className="text-xl font-bold text-gray-900 mb-1">תודה {customerName.trim()}!</h1>
+          <p className="text-gray-400 text-sm mb-6">ההזמנה שלכם תיקלט לאחר ביצוע התשלום.</p>
 
           <div className="border border-gray-100 rounded-xl divide-y divide-gray-50 mb-6 text-sm">
             <div className="flex justify-between px-4 py-3">
               <span className="text-gray-500">שעת איסוף</span>
-              <span className="font-medium text-gray-800">{success.timeSlot}</span>
+              <span className="font-medium text-gray-800">{cartData.timeSlot}</span>
             </div>
+            {selectedDelivery && (
+              <div className="flex justify-between px-4 py-3">
+                <span className="text-gray-500">{selectedDelivery.label}</span>
+                <span className="font-medium text-gray-800">{selectedDelivery.price > 0 ? `₪${selectedDelivery.price.toFixed(2)}` : 'חינם'}</span>
+              </div>
+            )}
             <div className="flex justify-between px-4 py-3">
               <span className="text-gray-500">סה״כ לתשלום</span>
-              <span className="font-bold text-gray-900">₪{success.total.toFixed(2)}</span>
+              <span className="font-bold text-gray-900">₪{total.toFixed(2)}</span>
             </div>
           </div>
 
-          {(bitLink || payboxLink) && (
+          {orderError && <p className="text-red-500 text-xs text-center mb-3">{orderError}</p>}
+
+          {(settings?.bitPhone || settings?.payboxPhone) && (
             <div className="space-y-2 mb-4">
-              <p className="text-xs font-medium text-gray-500 mb-2">תשלום</p>
-              {bitLink && (
-                <a href={bitLink} target="_blank" rel="noopener noreferrer"
-                  className="flex items-center justify-between w-full border border-blue-200 bg-blue-50 text-blue-800 font-semibold px-4 py-3.5 rounded-xl text-sm transition hover:bg-blue-100">
-                  <span>שלם עם Bit</span>
-                  <span className="text-xs font-mono text-blue-400">₪{success.total.toFixed(2)}</span>
-                </a>
+              <p className="text-xs font-medium text-gray-500">תשלום</p>
+              <p className="text-xs text-gray-400 mb-1">פתחו את האפליקציה, שלחו את הסכום למספר המופיע. אפשר להעתיק בלחיצה.</p>
+              {settings?.bitPhone && (
+                <PaymentOption name="Bit" phone={settings.bitPhone} amount={total.toFixed(2)} colorClass="border-blue-200 bg-blue-50 text-blue-800" />
               )}
-              {payboxLink && (
-                <a href={payboxLink} target="_blank" rel="noopener noreferrer"
-                  className="flex items-center justify-between w-full border border-green-200 bg-green-50 text-green-800 font-semibold px-4 py-3.5 rounded-xl text-sm transition hover:bg-green-100">
-                  <span>שלם עם Paybox</span>
-                  <span className="text-xs font-mono text-green-400">₪{success.total.toFixed(2)}</span>
-                </a>
+              {settings?.payboxPhone && (
+                <PaymentOption name="Paybox" phone={settings.payboxPhone} amount={total.toFixed(2)} colorClass="border-green-200 bg-green-50 text-green-800" />
               )}
-              <div className="flex items-center justify-between w-full border border-gray-100 bg-gray-50 text-gray-300 font-semibold px-4 py-3.5 rounded-xl text-sm select-none">
-                <span>Google Pay</span>
-                <span className="text-xs">בקרוב</span>
-              </div>
             </div>
           )}
 
-          <button onClick={() => router.push('/food')}
+          <button onClick={() => setStep('details')}
             className="w-full border border-gray-200 text-gray-600 font-medium py-3 rounded-xl text-sm hover:bg-gray-50 transition">
-            חזרה לתפריט
+            חזרה לעריכת הזמנה
           </button>
         </div>
       </div>
     )
   }
 
+  // ── details step: summary + personal details + delivery ──────────────────────
   return (
     <div className="min-h-screen bg-gray-50" dir="rtl">
       <header className="bg-gray-900 text-white px-4 pt-10 pb-6">
@@ -157,6 +201,12 @@ export default function CheckoutPage() {
                 )}
               </div>
             ))}
+            {selectedDelivery && (
+              <div className="flex justify-between items-center px-4 py-3">
+                <span className="font-semibold text-gray-900 text-sm">{selectedDelivery.price > 0 ? `₪${selectedDelivery.price.toFixed(2)}` : 'חינם'}</span>
+                <span className="text-sm text-gray-800">{selectedDelivery.label}</span>
+              </div>
+            )}
           </div>
           <div className="flex justify-between items-center px-4 py-3 bg-gray-50">
             <span className="font-bold text-gray-900">₪{total.toFixed(2)}</span>
@@ -166,6 +216,34 @@ export default function CheckoutPage() {
             </div>
           </div>
         </div>
+
+        {deliveryOptions.length > 0 && (
+          <div className="bg-white rounded-xl border border-gray-100 overflow-hidden">
+            <div className="px-4 py-3 border-b border-gray-50">
+              <h2 className="text-sm font-semibold text-gray-700">אופן קבלת ההזמנה</h2>
+            </div>
+            <div className="px-4 py-4 flex flex-wrap gap-2">
+              {deliveryOptions.map(opt => (
+                <button
+                  key={opt.id}
+                  onClick={() => setDeliveryId(opt.id)}
+                  className={`px-3 py-2 rounded-lg border text-sm font-medium transition flex items-center gap-1.5 ${
+                    deliveryId === opt.id
+                      ? 'bg-gray-900 border-gray-900 text-white'
+                      : 'bg-white border-gray-200 text-gray-700 hover:border-gray-400'
+                  }`}
+                >
+                  <span>{opt.label}</span>
+                  {opt.price > 0 && (
+                    <span className={deliveryId === opt.id ? 'text-gray-300 font-normal' : 'text-gray-400 font-normal'}>
+                      +₪{opt.price % 1 === 0 ? opt.price : opt.price.toFixed(2)}
+                    </span>
+                  )}
+                </button>
+              ))}
+            </div>
+          </div>
+        )}
 
         <div className="bg-white rounded-xl border border-gray-100 overflow-hidden">
           <div className="px-4 py-3 border-b border-gray-50">
@@ -199,11 +277,10 @@ export default function CheckoutPage() {
         </div>
 
         <button
-          onClick={handlePlaceOrder}
-          disabled={submitting}
-          className="w-full bg-gray-900 hover:bg-gray-800 disabled:bg-gray-200 disabled:text-gray-400 text-white font-semibold py-4 rounded-xl transition text-sm"
+          onClick={goToPay}
+          className="w-full bg-gray-900 hover:bg-gray-800 text-white font-semibold py-4 rounded-xl transition text-sm"
         >
-          {submitting ? 'שולח...' : 'אישור הזמנה'}
+          מעבר לתשלום
         </button>
       </main>
     </div>
