@@ -123,6 +123,13 @@ export default function FoodStorePage() {
   const clockSlots: ClockSlot[] = slots.map(t => ({ time: t, disabled: (slotCounts[t] ?? 0) >= MAX_PER_SLOT }))
   const selectedSlotFull = !!selectedSlot && (slotCounts[selectedSlot] ?? 0) >= MAX_PER_SLOT
 
+  // default the time picker to the earliest available window instead of leaving it empty
+  useEffect(() => {
+    if (selectedSlot) return
+    const firstEnabled = clockSlots.find(s => !s.disabled)
+    if (firstEnabled) setSelectedSlot(firstEnabled.time)
+  }, [clockSlots, selectedSlot])
+
   function formatDisplayDate(dateStr: string) {
     const d = new Date(dateStr + 'T00:00:00')
     return d.toLocaleDateString('he-IL', { weekday: 'short', day: 'numeric', month: 'numeric' })

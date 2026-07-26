@@ -50,7 +50,9 @@ export default function AnalogClock({ slots, value, onChange }: Props) {
     if (best.time !== value) onChange(best.time)
   }
 
-  const selAngle = value ? toAngle(value) : null
+  // fall back to the earliest enabled window so the dial defaults to a real time, not --:--
+  const effectiveValue = value || enabled[0]?.time || ''
+  const selAngle = effectiveValue ? toAngle(effectiveValue) : null
   const hand = selAngle != null ? pointOnDial(selAngle, HAND) : null
 
   return (
@@ -77,7 +79,7 @@ export default function AnalogClock({ slots, value, onChange }: Props) {
       {/* slot markers */}
       {slots.map(s => {
         const p = pointOnDial(toAngle(s.time), R - 2)
-        const isSel = s.time === value
+        const isSel = s.time === effectiveValue
         return (
           <circle
             key={s.time}
@@ -97,7 +99,7 @@ export default function AnalogClock({ slots, value, onChange }: Props) {
 
       {/* center label */}
       <text x={CX} y={CY + 34} textAnchor="middle" className="fill-gray-900" fontSize={20} fontWeight="700">
-        {value || '--:--'}
+        {effectiveValue || ''}
       </text>
     </svg>
   )

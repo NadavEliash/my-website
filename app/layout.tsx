@@ -8,7 +8,7 @@ import Navbar from "./components/navbar"
 const roboto = Roboto_Condensed({ subsets: ["latin"] })
 
 export const metadata: Metadata = {
-  metadataBase: new URL('https://nadaveliash.com'),
+  metadataBase: new URL('https://www.nadaveliash.com'),
   title: "Nadav Eliash",
   description: "Frontend/Fullstack Developer",
   icons: {
@@ -16,26 +16,16 @@ export const metadata: Metadata = {
   },
 
   openGraph: {
+    type: "website",
+    url: "https://nadaveliash.com",
     title: "Nadav Eliash",
     description: "Frontend/Fullstack Developer",
-    siteName: 'Nadav Eliash',
+    siteName: "Nadav Eliash",
     images: [
       {
-        url: "/api/og",
-        width: 600,
-        height: 315,
-        alt: "Nadav Eliash"
-      }
-    ],
-  },
-  twitter: {
-    title: "Nadav Eliash",
-    description: "Frontend/Fullstack Developer",
-    images: [
-      {
-        url: "/api/og",
-        width: 600,
-        height: 315,
+        url: "/og.png",
+        width: 1200,
+        height: 630,
         alt: "Nadav Eliash"
       }
     ],

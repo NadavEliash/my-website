@@ -2,40 +2,78 @@
 
 import { useEffect, useRef, useState } from 'react'
 import { useRouter } from 'next/navigation'
+import Image from 'next/image'
 import { ChevronRight, Check, Copy } from 'lucide-react'
 import type { OrderItem, Settings, Order } from '@/app/food/types'
 
 type CartData = { items: OrderItem[]; timeSlot: string; pickupDate?: string; pickupTime?: string }
 
 // Bit/Paybox have no public deep link that pre-fills recipient + amount (and Paybox's old
-// page.link is dead since Firebase Dynamic Links shut down). So instead of a fake redirect,
-// we show the exact phone + amount with one-tap copy — the customer pays manually in the app.
-function PaymentOption({ name, phone, amount, colorClass }: { name: string; phone: string; amount: string; colorClass: string }) {
-  const [copied, setCopied] = useState<'amount' | 'phone' | null>(null)
-  function copy(text: string, which: 'amount' | 'phone') {
-    navigator.clipboard?.writeText(text).catch(() => {})
-    setCopied(which)
-    setTimeout(() => setCopied(null), 1500)
+// page.link is dead since Firebase Dynamic Links shut down). So "קח אותי לתשלום" just opens
+// the app (via its store link, which offers "Open" when installed) and the customer pastes
+// the copied number manually. Verify these links match your region's listing if needed.
+const PAY_APPS = {
+  Bit: {
+    label: 'ביט',
+    icon: '/bit.svg',
+    btnClass: 'bg-blue-500 hover:bg-blue-600',
+    ios: 'https://apps.apple.com/app/id1182007739',
+    android: 'https://play.google.com/store/apps/details?id=com.bnhp.payments.paymentsapp',
+  },
+  Paybox: {
+    label: 'פייבוקס',
+    icon: '/paybox.jpg',
+    btnClass: 'bg-emerald-500 hover:bg-emerald-600',
+    ios: 'https://apps.apple.com/il/app/paybox/id1499167765',
+    android: 'https://play.google.com/store/apps/details?id=com.payboxapp',
+  },
+} as const
+type PayApp = keyof typeof PAY_APPS
+
+function openPayApp(app: PayApp) {
+  const isIOS = /iphone|ipad|ipod/i.test(navigator.userAgent || '')
+  const url = isIOS ? PAY_APPS[app].ios : PAY_APPS[app].android
+  window.open(url, '_blank', 'noopener,noreferrer')
+}
+
+function PaymentModal({ app, phone, total, onClose }: { app: PayApp; phone: string; total: string; onClose: () => void }) {
+  const [copied, setCopied] = useState(false)
+  function copyPhone() {
+    navigator.clipboard?.writeText(phone).catch(() => {})
+    setCopied(true)
   }
   return (
-    <div className={`rounded-xl border p-3 ${colorClass}`}>
-      <div className="flex items-center justify-between mb-2">
-        <span className="font-semibold text-sm">{name}</span>
-        <span className="text-xs opacity-60">תשלום ידני באפליקציה</span>
-      </div>
-      <div className="space-y-1.5">
-        <button onClick={() => copy(phone, 'phone')} className="flex items-center justify-between w-full bg-white/70 hover:bg-white rounded-lg px-3 py-2 text-sm transition">
-          <span className="flex items-center gap-1.5 text-xs opacity-80">
-            {copied === 'phone' ? <><Check size={12} /> הועתק</> : <><Copy size={12} /> העתק מספר</>}
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 px-4" dir="rtl" onClick={onClose}>
+      <div className="bg-white rounded-2xl p-6 w-full max-w-sm" onClick={e => e.stopPropagation()}>
+        <Image src={PAY_APPS[app].icon} alt={PAY_APPS[app].label} width={48} height={48} className="rounded-xl mx-auto mb-3" />
+        <h2 className="text-lg font-bold text-gray-900 text-center mb-5">מיד תועברו לאפליקציית {PAY_APPS[app].label}</h2>
+
+        <button onClick={copyPhone} className="flex items-center justify-between w-full bg-gray-100 hover:bg-gray-200 rounded-xl px-4 py-3 mb-4 transition">
+          <span className="flex items-center gap-1.5 text-xs text-gray-500">
+            {copied ? <><Check size={14} /> הועתק</> : <><Copy size={14} /> העתקת מספר</>}
           </span>
-          <span className="font-mono font-medium" dir="ltr">{phone}</span>
+          <span className="font-mono font-semibold text-gray-900 text-base" dir="ltr">{phone}</span>
         </button>
-        <button onClick={() => copy(amount, 'amount')} className="flex items-center justify-between w-full bg-white/70 hover:bg-white rounded-lg px-3 py-2 text-sm transition">
-          <span className="flex items-center gap-1.5 text-xs opacity-80">
-            {copied === 'amount' ? <><Check size={12} /> הועתק</> : <><Copy size={12} /> העתק סכום</>}
-          </span>
-          <span className="font-bold" dir="ltr">₪{amount}</span>
-        </button>
+
+        <div className="bg-gray-50 rounded-xl px-4 py-3 mb-4 text-center">
+          <p className="text-xs text-gray-400 mb-1">באפליקציה בחרו</p>
+          <p className="text-sm font-medium text-gray-800">העברה ← העברה למס׳ טלפון ← הדבק</p>
+        </div>
+        
+        <span className='text-3xl font-semibold text-gray-900 text-center mb-4 block'>סה"כ ₪{total}</span>
+
+        {!copied && <p className="text-xs text-amber-600 text-center mb-2">יש להעתיק את המספר</p>}
+
+        <div className="flex gap-2">
+          <button onClick={onClose}
+            className="flex-1 border border-gray-200 text-gray-600 font-medium py-3 rounded-xl text-sm hover:bg-gray-50 transition">
+            ביטול
+          </button>
+          <button onClick={() => openPayApp(app)} disabled={!copied}
+            className={`flex-1 text-white font-semibold py-3 rounded-xl text-sm transition ${copied ? PAY_APPS[app].btnClass : 'bg-gray-300 cursor-not-allowed'}`}>
+            לתשלום באפליקציה
+          </button>
+        </div>
       </div>
     </div>
   )
@@ -49,6 +87,7 @@ export default function CheckoutPage() {
   const [phone, setPhone] = useState('')
   const [deliveryId, setDeliveryId] = useState('')
   const [step, setStep] = useState<'details' | 'pay'>('details')
+  const [payApp, setPayApp] = useState<PayApp | null>(null)
   const [error, setError] = useState('')
   const [orderError, setOrderError] = useState('')
   const placedRef = useRef(false)
@@ -136,22 +175,31 @@ export default function CheckoutPage() {
             )}
             <div className="flex justify-between px-4 py-3">
               <span className="text-gray-500">סה״כ לתשלום</span>
-              <span className="font-bold text-gray-900">₪{total.toFixed(2)}</span>
+              <span className="font-bold text-gray-900">₪{total.toFixed(0)}</span>
             </div>
           </div>
 
           {orderError && <p className="text-red-500 text-xs text-center mb-3">{orderError}</p>}
 
           {(settings?.bitPhone || settings?.payboxPhone) && (
-            <div className="space-y-2 mb-4">
-              <p className="text-xs font-medium text-gray-500">תשלום</p>
-              <p className="text-xs text-gray-400 mb-1">פתחו את האפליקציה, שלחו את הסכום למספר המופיע. אפשר להעתיק בלחיצה.</p>
-              {settings?.bitPhone && (
-                <PaymentOption name="Bit" phone={settings.bitPhone} amount={total.toFixed(2)} colorClass="border-blue-200 bg-blue-50 text-blue-800" />
-              )}
-              {settings?.payboxPhone && (
-                <PaymentOption name="Paybox" phone={settings.payboxPhone} amount={total.toFixed(2)} colorClass="border-green-200 bg-green-50 text-green-800" />
-              )}
+            <div className="mb-4">
+              <p className="text-xs text-gray-400 text-center mb-2">בחרו אמצעי תשלום</p>
+              <div className="flex gap-2">
+                {settings?.bitPhone && (
+                  <button onClick={() => setPayApp('Bit')}
+                    className="flex-1 flex items-center justify-around gap-2 border border-gray-200 hover:border-gray-400 bg-white text-gray-800 font-semibold py-3 rounded-xl text-lg transition">
+                    {PAY_APPS.Bit.label}
+                    <Image src={PAY_APPS.Bit.icon} alt="" width={48} height={48} className="rounded-md" />
+                  </button>
+                )}
+                {settings?.payboxPhone && (
+                  <button onClick={() => setPayApp('Paybox')}
+                    className="flex-1 flex items-center justify-around gap-2 border border-gray-200 hover:border-gray-400 bg-white text-gray-800 font-semibold py-3 rounded-xl text-lg transition">
+                    {PAY_APPS.Paybox.label}
+                    <Image src={PAY_APPS.Paybox.icon} alt="" width={48} height={48} className="rounded-md" />
+                  </button>
+                )}
+              </div>
             </div>
           )}
 
@@ -160,6 +208,15 @@ export default function CheckoutPage() {
             חזרה לעריכת הזמנה
           </button>
         </div>
+
+        {payApp && (
+          <PaymentModal
+            app={payApp}
+            phone={payApp === 'Bit' ? settings!.bitPhone! : settings!.payboxPhone!}
+            total={total.toFixed(0)}
+            onClose={() => setPayApp(null)}
+          />
+        )}
       </div>
     )
   }

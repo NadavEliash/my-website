@@ -8,15 +8,10 @@ export const metadata: Metadata = {
   title,
   description,
   openGraph: {
+    type: 'website',
     title,
     description,
-    images: [{ url: '/api/og?app=bnb', width: 1200, height: 630, alt: title }],
-  },
-  twitter: {
-    card: 'summary_large_image',
-    title,
-    description,
-    images: ['/api/og?app=bnb'],
+    images: [{ url: '/bnb-og.png', width: 1200, height: 630, alt: title }],
   },
 }
 

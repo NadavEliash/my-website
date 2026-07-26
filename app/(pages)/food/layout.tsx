@@ -1,4 +1,13 @@
 import type { Metadata } from "next"
+import localFont from "next/font/local"
+
+const ploni = localFont({
+  src: [
+    { path: "../../../fonts/ploni-regular-aaa.woff", weight: "400", style: "normal" },
+    { path: "../../../fonts/ploni-bold-aaa.woff", weight: "700", style: "normal" },
+    { path: "../../../fonts/ploni-black-aaa.woff", weight: "900", style: "normal" },
+  ],
+})
 
 const title = "הזמנת אוכל אונליין"
 const description = "בוחרים מהתפריט, קובעים זמן איסוף ומשלמים — הכול מהנייד."
@@ -10,15 +19,10 @@ export const metadata: Metadata = {
     icon: "/pizza.svg",
   },
   openGraph: {
+    type: "website",
     title,
     description,
-    images: [{ url: "/api/og?app=food", width: 1200, height: 630, alt: title }],
-  },
-  twitter: {
-    card: "summary_large_image",
-    title,
-    description,
-    images: ["/api/og?app=food"],
+    images: [{ url: "/food-og.png", width: 1200, height: 630, alt: title }],
   },
 }
 
@@ -27,5 +31,5 @@ export default function FoodLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  return <>{children}</>
+  return <div className={ploni.className}>{children}</div>
 }
