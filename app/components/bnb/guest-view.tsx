@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
+import Image from 'next/image'
 import {
   Wifi, Car, UtensilsCrossed, Wind, Waves, Eye, Star,
   MapPin, Camera, Plus, Minus, ChevronRight, ChevronLeft,
@@ -223,7 +224,7 @@ export default function GuestView({ hostId }: Props) {
                   ].join(' ')}
                 >
                   {img.url
-                    ? <img src={img.url} alt={img.label[lang]} className="absolute inset-0 w-full h-full object-cover" />
+                    ? <Image src={img.url} alt={img.label[lang]} fill sizes="(max-width: 768px) 50vw, 25vw" className="object-cover" />
                     : (
                       <div className="text-center text-white/50 group-hover:text-white/70 transition-colors">
                         <Camera className={`mx-auto mb-1 ${i === 0 ? 'w-10 h-10 mb-2' : 'w-5 h-5'}`} />

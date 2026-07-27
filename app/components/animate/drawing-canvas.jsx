@@ -26,48 +26,65 @@ export default function DrawingCanvas({
     const [transformGap, setTransformGap] = useState({ x: 0, y: 0 })
     const [drawingActions, setDrawingActions] = useState([])
 
+    // latest-value refs: let the trigger-scoped effects below read fresh values
+    // without widening their dependency lists (which would re-fire them incorrectly).
+    // redrawImageRef / pointerHandlersRef are assigned near the bottom, after those
+    // functions are defined.
+    const contextRef = useRef(context); contextRef.current = context
+    const currentLayerIdxRef = useRef(currentLayerIdx); currentLayerIdxRef.current = currentLayerIdx
+    const layerRef = useRef(layer); layerRef.current = layer
+    const redrawImageRef = useRef(null)
+    const pointerHandlersRef = useRef({})
+
+    // init: size the canvas and store its 2d context, then paint any existing actions
     useEffect(() => {
-        if (canvasRef.current) {
-            const canvas = canvasRef.current
+        const canvas = canvasRef.current
+        if (!canvas) return
+        canvas.width = canvasSize.width
+        canvas.height = canvasSize.height
+        setContext(canvas.getContext('2d'))
+        redrawImageRef.current?.(layerRef.current.drawingActions)
+    }, [canvasSize.width, canvasSize.height])
 
-            canvas.width = canvasSize.width
-            canvas.height = canvasSize.height
-            const ctx = canvas.getContext('2d')
-            setContext(ctx)
-
-            redrawImage(layer.drawingActions)
+    // attach touch handlers once; the ref keeps them pointing at the latest closures
+    useEffect(() => {
+        const canvas = canvasRef.current
+        if (!canvas) return
+        const ts = (e) => pointerHandlersRef.current.onDown(e, true)
+        const tm = (e) => pointerHandlersRef.current.onMove(e, true)
+        const te = (e) => pointerHandlersRef.current.onUp(e)
+        canvas.addEventListener('touchstart', ts, { passive: false })
+        canvas.addEventListener('touchmove', tm, { passive: false })
+        canvas.addEventListener('touchend', te, { passive: false })
+        return () => {
+            canvas.removeEventListener('touchstart', ts)
+            canvas.removeEventListener('touchmove', tm)
+            canvas.removeEventListener('touchend', te)
         }
     }, [])
 
+    // when this layer's actions change, write them back into the shared layers array
     useEffect(() => {
-        if (canvasRef.current) {
-            const canvas = canvasRef.current
-            canvas.addEventListener('touchstart', (e) => onDown(e, true), { passive: false })
-            canvas.addEventListener('touchmove', (e) => onMove(e, true), { passive: false })
-            canvas.addEventListener('touchend', (e) => onUp(e), { passive: false })
-        }
-    }, [])
-
-    useEffect(() => {
-        if (context && idx === currentLayerIdx) {
+        if (contextRef.current && idx === currentLayerIdxRef.current) {
             const id = layer.id
-            const newLayer = { id, drawingActions }
-
-            const newLayers = layers.filter(frame => frame.id !== id)
-            newLayers.splice(currentLayerIdx, 0, newLayer)
-            setLayers(newLayers)
+            setLayers(prev => {
+                const newLayers = prev.filter(frame => frame.id !== id)
+                newLayers.splice(currentLayerIdxRef.current, 0, { id, drawingActions })
+                return newLayers
+            })
         }
-    }, [drawingActions])
+    }, [drawingActions, idx, layer.id, setLayers])
+
+    // repaint whenever the shared layers change (undo, frame switch, etc.)
+    useEffect(() => {
+        if (contextRef.current) {
+            contextRef.current.clearRect(0, 0, canvasSize.width, canvasSize.height)
+            redrawImageRef.current?.(layerRef.current?.drawingActions)
+        }
+    }, [layers, canvasSize.width, canvasSize.height])
 
     useEffect(() => {
-        if (context) {
-            context.clearRect(0, 0, canvasSize.width, canvasSize.height)
-            redrawImage(layer?.drawingActions)
-        }
-    }, [layers])
-
-    useEffect(() => {
-        setDrawingActions(layer.drawingActions)
+        setDrawingActions(layerRef.current.drawingActions)
     }, [clear])
 
     // EVENT HANDLING
@@ -317,6 +334,10 @@ export default function DrawingCanvas({
         })
         newContext.stroke()
     }
+
+    // mirror render-scoped functions into refs read by the mount/trigger effects above
+    redrawImageRef.current = redrawImage
+    pointerHandlersRef.current = { onDown, onMove, onUp }
 
     return (
         <>

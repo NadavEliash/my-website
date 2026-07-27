@@ -1,5 +1,9 @@
 'use client';
 
+/* eslint-disable @next/next/no-img-element -- game UI renders ~20 tiny, CSS-sized transparent
+   PNG sprites (ingredient icons, customer/pizza art) at many different context-dependent sizes;
+   next/image adds width/height/fill plumbing per site for negligible gain on assets this small. */
+
 import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { io, Socket } from 'socket.io-client';
 import './pizza-game.css';
@@ -160,6 +164,11 @@ export default function PizzaGame() {
     : -1;
   const isMyTurn = !isMultiplayer || (myPlayerIndex !== -1 && myPlayerIndex === gameState.cur);
   const prevIsMyTurn = useRef(isMyTurn);
+  // doRoll/doBake/doEndTurn are defined further down; these refs let the automation effect
+  // call the latest versions without listing them as deps (which would reschedule it every render)
+  const doRollRef = useRef<() => void>(() => {});
+  const doBakeRef = useRef<() => void>(() => {});
+  const doEndTurnRef = useRef<() => void>(() => {});
 
   useEffect(() => {
     if (!prevIsMyTurn.current && isMyTurn && gameState.phase !== 'setup' && gameState.phase !== 'waiting' && gameState.phase !== 'gameover') {
@@ -173,7 +182,7 @@ export default function PizzaGame() {
       );
     }
     prevIsMyTurn.current = isMyTurn;
-  }, [isMyTurn, gameState.phase]);
+  }, [isMyTurn, gameState.phase, gameState.cur, gameState.players]);
 
 
 
@@ -236,28 +245,27 @@ export default function PizzaGame() {
     const timer = setTimeout(() => {
       if (isReRoll) {
         // If it's a re-roll, trigger the roll.
-        console.log("Triggering auto re-roll for irrelevant result");
-        doRoll();
+        doRollRef.current();
       } else if (isAiTurn) {
         // Standard AI turn logic
         if (gameState.phase === 'roll' && !gameState.rolled) {
-          doRoll();
+          doRollRef.current();
         } else if (gameState.phase === 'action') {
           const canBake = (p.customer.req as IngredientType[]).every(t => (p.hand[t] || 0) >= 1);
           if (canBake) {
-            doBake();
-            setTimeout(doEndTurn, 1000);
+            doBakeRef.current();
+            setTimeout(() => doEndTurnRef.current(), 1000);
           } else {
-            doEndTurn();
+            doEndTurnRef.current();
           }
         } else if (gameState.phase === 'pick7') {
-          doEndTurn();
+          doEndTurnRef.current();
         }
       }
     }, delay);
 
     return () => clearTimeout(timer);
-  }, [gameState.cur, gameState.phase, gameState.rolled, gameState.autoRoll, isMultiplayer, isMyTurn]);
+  }, [gameState.cur, gameState.phase, gameState.rolled, gameState.autoRoll, gameState.players, isMultiplayer, isMyTurn]);
 
   const closeModal = () => {
     if (modalTimer.current) clearTimeout(modalTimer.current);
@@ -545,6 +553,11 @@ export default function PizzaGame() {
       return next;
     });
   };
+
+  // keep the automation effect's refs pointing at the latest action closures
+  doRollRef.current = doRoll;
+  doBakeRef.current = doBake;
+  doEndTurnRef.current = doEndTurn;
 
   const doBuySlot = () => {
     const p = gameState.players[gameState.cur];

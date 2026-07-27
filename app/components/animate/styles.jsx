@@ -18,7 +18,7 @@ export default function Styles({
             lineWidth,
             strokeStyle
         })
-    }, [(lineWidth), (strokeStyle)])
+    }, [lineWidth, strokeStyle, setStyles])
     
     useEffect(() => {
         const newDotSize = lineWidth > 22 ? 6

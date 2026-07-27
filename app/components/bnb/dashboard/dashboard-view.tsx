@@ -6,8 +6,9 @@ import { clearSession } from './login-gate'
 import type { Host } from '../types'
 import { AmenityKey } from '../types'
 import CalendarPicker from '../calendar-picker'
+import NextImage from 'next/image'
 import {
-  Home, Image, Settings, MapPin, ScrollText, CalendarDays,
+  Home, Image as ImageIcon, Settings, MapPin, ScrollText, CalendarDays,
   Plus, Trash2, Loader2, Check, ExternalLink, LogOut, Save, Upload, X,
 } from 'lucide-react'
 import { uploadImage } from '../cloudinary'
@@ -28,7 +29,7 @@ const AMENITY_LABELS: Record<AmenityKey, string> = {
 
 const TABS: { id: Tab; label: string; icon: React.ReactNode }[] = [
   { id: 'general',  label: 'כללי',      icon: <Home className="w-4 h-4" /> },
-  { id: 'images',   label: 'תמונות',    icon: <Image className="w-4 h-4" /> },
+  { id: 'images',   label: 'תמונות',    icon: <ImageIcon className="w-4 h-4" /> },
   { id: 'details',  label: 'פרטים',     icon: <Settings className="w-4 h-4" /> },
   { id: 'rules',    label: 'כללי בית',  icon: <ScrollText className="w-4 h-4" /> },
   { id: 'location', label: 'מיקום',     icon: <MapPin className="w-4 h-4" /> },
@@ -304,7 +305,7 @@ function ImagesTab({ host, patch, token, onError }: { host: Host; patch: (p: Par
               {uploading[i]
                 ? <Loader2 className="w-6 h-6 animate-spin text-gray-400" />
                 : img.url
-                  ? <img src={img.url} alt="" className="w-full h-full object-cover" />
+                  ? <NextImage src={img.url} alt="" fill sizes="128px" className="object-cover" />
                   : <span className="text-2xl">📷</span>}
             </div>
             <div className="flex-1 min-w-0">

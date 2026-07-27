@@ -16,25 +16,29 @@ export default function Layer({
     const [currentLayer, setCurrentLayer] = useState(null)
     const [isDragging, setIsDragging] = useState(false)
 
+    // latest-value refs for values the repaint effects read but shouldn't re-trigger on
+    const backgroundRef = useRef(background); backgroundRef.current = background
+    const layerRef = useRef(layer); layerRef.current = layer
+    const drawTransparentGridRef = useRef(null)
+    const drawLayerRef = useRef(null)
+
     useEffect(() => {
-        if (canvasRef.current) {
-            const canvas = canvasRef.current
-            canvas.width = canvasSize.width
-            canvas.height = canvasSize.height
-            const ctx = canvas.getContext('2d')
-            setContext(ctx)
-        }
-    }, [])
+        const canvas = canvasRef.current
+        if (!canvas) return
+        canvas.width = canvasSize.width
+        canvas.height = canvasSize.height
+        setContext(canvas.getContext('2d'))
+    }, [canvasSize.width, canvasSize.height])
 
     useEffect(() => {
         const newContext = canvasRef.current.getContext('2d')
         if (idx === 0) {
-            newContext.fillStyle = background
+            newContext.fillStyle = backgroundRef.current
             newContext.fillRect(0, 0, canvasSize.width, canvasSize.height)
         } else {
-            drawTransparentGrid()
+            drawTransparentGridRef.current()
         }
-    }, [context])
+    }, [context, idx, canvasSize.width, canvasSize.height])
 
     useEffect(() => {
         if (idx === 0) {
@@ -42,17 +46,18 @@ export default function Layer({
             newContext.fillStyle = background
             newContext.fillRect(0, 0, canvasSize.width, canvasSize.height)
         }
-    }, [[layers], background])
+    }, [layers, background, idx, canvasSize.width, canvasSize.height])
 
     useEffect(() => {
         const newContext = canvasRef.current.getContext('2d')
         newContext.clearRect(0, 0, canvasSize.width, canvasSize.height)
-        if (idx !== 0) drawTransparentGrid()
+        if (idx !== 0) drawTransparentGridRef.current()
 
-        if (layer.drawingActions && layer.drawingActions.length) {
-            drawLayer(newContext, layer.drawingActions)
+        const actions = layerRef.current?.drawingActions
+        if (actions && actions.length) {
+            drawLayerRef.current(newContext, actions)
         }
-    }, [layers])
+    }, [layers, canvasSize.width, canvasSize.height, idx])
 
     const drawTransparentGrid = async () => {
         if (context) {
@@ -76,6 +81,9 @@ export default function Layer({
             }
         }
     }
+
+    drawTransparentGridRef.current = drawTransparentGrid
+    drawLayerRef.current = drawLayer
 
     const onDrag = (idx) => {
         if (!isDragging) {

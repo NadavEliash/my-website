@@ -16,33 +16,37 @@ export default function Frame({
     const [isDragging, setIsDragging] = useState(false)
     const [currentFrame, setCurrentFrame] = useState(null)
 
+    // latest-value refs so repaint effects read fresh `background`/`drawLayer` without
+    // making them triggers (a background change must not re-fill and wipe the thumbnail)
+    const backgroundRef = useRef(background); backgroundRef.current = background
+    const drawLayerRef = useRef(null)
+
     useEffect(() => {
-        if (canvasRef.current) {
-            const canvas = canvasRef.current
-            canvas.width = canvasSize.width
-            canvas.height = canvasSize.height
-            const ctx = canvas.getContext('2d')
-            setContext(ctx)
-            ctx.fillStyle = background
-            ctx.fillRect(0, 0, canvas.width, canvas.height)
-        }
-    }, [])
+        const canvas = canvasRef.current
+        if (!canvas) return
+        canvas.width = canvasSize.width
+        canvas.height = canvasSize.height
+        const ctx = canvas.getContext('2d')
+        setContext(ctx)
+        ctx.fillStyle = backgroundRef.current
+        ctx.fillRect(0, 0, canvas.width, canvas.height)
+    }, [canvasSize.width, canvasSize.height])
 
     useEffect(() => {
         if (frame.layers) {
             const newContext = canvasRef.current.getContext('2d', { willReadFrequently: true })
-            newContext.fillStyle = background
+            newContext.fillStyle = backgroundRef.current
             newContext.fillRect(0, 0, canvasSize.width, canvasSize.height)
 
             if (frame.layers.length) {
                 for (let i = 1; i < frame.layers.length; i++) {
                     if (frame.layers[i].drawingActions?.length) {
-                        drawLayer(newContext, frame.layers[i].drawingActions, i === frame.layers.length - 1 ? true : false)
+                        drawLayerRef.current(newContext, frame.layers[i].drawingActions, i === frame.layers.length - 1 ? true : false)
                     }
                 }
             }
         }
-    }, [frame])
+    }, [frame, canvasSize.width, canvasSize.height])
 
     const drawLayer = async (ctx, actions, last) => {
         for (const action of actions) {
@@ -63,6 +67,7 @@ export default function Frame({
             setFrames(prev => [...prev])
         }
     }
+    drawLayerRef.current = drawLayer
 
     const onDrag = (idx) => {
         if (!isDragging) {

@@ -9,32 +9,33 @@ export default function OnionSkin({
     const canvasRef = useRef()
     const [context, setContext] = useState(null)
 
+    // drawFrmae is defined below; a ref lets the onionSkin effect call it without it being a dep
+    const drawFrmaeRef = useRef(null)
+
     useEffect(() => {
-        if (canvasRef.current) {
-            const canvas = canvasRef.current
-            canvas.width = canvasSize.width
-            canvas.height = canvasSize.height
-            const ctx = canvas.getContext('2d')
-            setContext(ctx)
-        }
-    }, [])
+        const canvas = canvasRef.current
+        if (!canvas) return
+        canvas.width = canvasSize.width
+        canvas.height = canvasSize.height
+        setContext(canvas.getContext('2d'))
+    }, [canvasSize.width, canvasSize.height])
 
     useEffect(() => {
         if (canvasRef.current) {
             const newContext = canvasRef.current.getContext('2d')
             newContext.clearRect(0, 0, canvasSize.width, canvasSize.height)
             if (onionSkin[0].layers && onionSkin[0].layers.length) {
-                drawFrmae(newContext, onionSkin[0].layers)
+                drawFrmaeRef.current(newContext, onionSkin[0].layers)
             }
         }
-    }, [onionSkin])
+    }, [onionSkin, canvasSize.width, canvasSize.height])
 
     useEffect(() => {
         if (currentFrameIdx === 0) {
             const newContext = canvasRef.current.getContext('2d')
             newContext.clearRect(0, 0, canvasSize.width, canvasSize.height)
         }
-    }, [currentFrameIdx])
+    }, [currentFrameIdx, canvasSize.width, canvasSize.height])
 
     const drawFrmae = async (ctx, layers) => {
         const newContext = canvasRef.current.getContext('2d')
@@ -42,6 +43,7 @@ export default function OnionSkin({
             drawLayer(newContext, layers[i].drawingActions)
         }
     }
+    drawFrmaeRef.current = drawFrmae
 
     const drawLayer = async (ctx, actions) => {
         for (const action of actions) {

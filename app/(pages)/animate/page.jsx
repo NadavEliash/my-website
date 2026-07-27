@@ -9,6 +9,8 @@ import OnionSkin from "../../components/animate/onion-skin"
 import Styles from "../../components/animate/styles"
 import Backgrounds from "../../components/animate/backgrounds"
 
+// aliased: this file also uses the browser's global `new Image()` in loadImage below
+import NextImage from "next/image"
 import { Sue_Ellen_Francisco } from 'next/font/google'
 
 import {
@@ -31,6 +33,18 @@ const sue_ellen = Sue_Ellen_Francisco({ subsets: ['latin'], weight: '400' })
 // export const metadata: Metadata = {
 //     title: 'Animate Online',
 // }
+
+// pure helpers — no component state, so they live at module scope (stable identity)
+const generateId = () => Math.floor(Math.random() * 99999) + ''
+
+const loadImage = (url) => {
+    return new Promise((resolve, reject) => {
+        const image = new Image()
+        image.onload = () => resolve(image)
+        image.onerror = () => reject(new Error('Failed to load image'))
+        image.src = url
+    })
+}
 
 export default function Animate() {
 
@@ -59,14 +73,22 @@ export default function Animate() {
 
     const [background, setBackground] = useState("white")
 
+    // "latest value" refs so the once-registered effects below always read fresh state/handlers
+    // without re-subscribing (and without the stale-closure bug the deps warnings flagged)
+    const framesRef = useRef(frames)
+    framesRef.current = frames
+    const currentFrameIdxRef = useRef(currentFrameIdx)
+    currentFrameIdxRef.current = currentFrameIdx
+    const undoRef = useRef(() => {})
+    const toggleAnimationRef = useRef(() => {})
+
     useEffect(() => {
-        document.addEventListener("keydown", (e) => {
-            if (e.key === 'z' && e.ctrlKey) {
-                console.log('undo')
-                undo()
-            }
-            if (e.key === 'space') toggleAnimation()
-        })
+        const onKeyDown = (e) => {
+            if (e.key === 'z' && e.ctrlKey) undoRef.current()
+            if (e.key === 'space') toggleAnimationRef.current()
+        }
+        document.addEventListener("keydown", onKeyDown)
+        return () => document.removeEventListener("keydown", onKeyDown)
     }, [])
 
     useEffect(() => {
@@ -80,33 +102,39 @@ export default function Animate() {
     }, [])
 
     useEffect(() => {
+        const initialLayers = [{ id: generateId(), drawingActions: [] }, { id: generateId(), drawingActions: [] }]
         setActionHistory([])
-        setLayers([{ id: generateId(), drawingActions: [] }, { id: generateId(), drawingActions: [] }])
+        setLayers(initialLayers)
         setCurrentLayerIdx(1)
-        setFrames([{ id: generateId(), layers }])
+        setFrames([{ id: generateId(), layers: initialLayers }])
         setCurrentFrameIdx(0)
     }, [])
 
+    // when the current layers change, persist them into the current frame.
+    // functional update + idx ref avoids depending on `frames`/`currentFrameIdx`
+    // (which would re-fire on every frame write and loop forever).
     useEffect(() => {
-        if (frames[currentFrameIdx]) {
-            const id = frames[currentFrameIdx].id
-            const newFrame = { id, layers }
-
-            const newFrames = frames.filter(frame => frame.id !== id)
-            newFrames.splice(currentFrameIdx, 0, newFrame)
-            setFrames(newFrames)
-        }
+        const idx = currentFrameIdxRef.current
+        setFrames(prevFrames => {
+            const currentFrame = prevFrames[idx]
+            if (!currentFrame) return prevFrames
+            const newFrames = prevFrames.filter(frame => frame.id !== currentFrame.id)
+            newFrames.splice(idx, 0, { id: currentFrame.id, layers })
+            return newFrames
+        })
     }, [layers])
 
+    // when the current frame changes, load its layers. reads `frames`/`clear` via ref /
+    // functional update so switching a frame doesn't reload on unrelated frame writes.
     useEffect(() => {
-        if (frames[currentFrameIdx]) {
-            setLayers([...frames[currentFrameIdx].layers])
-            setClear(!clear)
-            setCurrentLayerIdx(frames[currentFrameIdx].layers.length - 1)
-
+        const currentFrames = framesRef.current
+        if (currentFrames[currentFrameIdx]) {
+            setLayers([...currentFrames[currentFrameIdx].layers])
+            setClear(prev => !prev)
+            setCurrentLayerIdx(currentFrames[currentFrameIdx].layers.length - 1)
 
             if (currentFrameIdx >= 1) {
-                setOnionSkin([frames[currentFrameIdx - 1]])
+                setOnionSkin([currentFrames[currentFrameIdx - 1]])
             }
         }
     }, [currentFrameIdx])
@@ -164,26 +192,17 @@ export default function Animate() {
         }
     }
 
-    // UTILS
-
-    const generateId = () => {
-        return Math.floor(Math.random() * 99999) + ''
-    }
-
-    const loadImage = (url) => {
-        return new Promise((resolve, reject) => {
-            const image = new Image()
-            image.onload = () => resolve(image)
-            image.onerror = () => reject(new Error('Failed to load image'))
-            image.src = url
-        })
-    }
-
     // ANIMATION OPTIONS
 
     const toggleAnimation = () => {
         setIsPlay(!isPlay)
     }
+
+    // keep the keydown listener's refs pointing at the latest closures
+    useEffect(() => {
+        undoRef.current = undo
+        toggleAnimationRef.current = toggleAnimation
+    })
 
     const download = () => {
         setIsDownload(true)
@@ -328,9 +347,8 @@ export default function Animate() {
                 <ChevronUp className="md:hidden absolute bottom-0 left-1/2 -translate-x-1/2 w-20 h-6 text-black bg-gray-200 rounded-t-2xl z-20" onClick={() => handleBars("frames")} />
             </div>
             <div id="mobile-msg" className="absolute left-0 top-1/2 -translate-y-1/2 md:hidden">
-                <img src="https://res.cloudinary.com/dnvbfkgsb/image/upload/v1715596174/WIP.png" alt="mobile version still not available" width={1080} height={1980}
-                    className="opacity-100">
-                </img>
+                <NextImage src="https://res.cloudinary.com/dnvbfkgsb/image/upload/v1715596174/WIP.png" alt="mobile version still not available" width={1080} height={1980}
+                    className="opacity-100" />
                 <h1 className="mx-6 mt-6 text-xl text-center"><span className="text-2xl">Sorry,</span><br />Still working on the mobile version.. <br />Meanwhile, try the Desktop version!</h1>
             </div>
         </>

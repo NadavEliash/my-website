@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
+import Image from 'next/image'
 import { fetchAllHosts } from './api'
 import type { Host, Lang } from './types'
 import { Star, MapPin, Loader2, AlertCircle, Wifi, Wind, UtensilsCrossed, Car, Waves, Eye } from 'lucide-react'
@@ -120,8 +121,8 @@ function PropertyCard({ host, lang, gradient }: { host: Host; lang: Lang; gradie
       {/* Image */}
       <div className={`relative h-56 bg-gradient-to-br ${gradient} shrink-0 overflow-hidden`}>
         {showImg
-          ? <img src={firstImg!.url} alt={title} onError={() => setImgError(true)}
-              className="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" />
+          ? <Image src={firstImg!.url!} alt={title} onError={() => setImgError(true)} fill sizes="(max-width: 768px) 100vw, 33vw"
+              className="object-cover group-hover:scale-105 transition-transform duration-300" />
           : (
             <div className="absolute inset-0 flex flex-col items-center justify-center text-white/40 group-hover:text-white/60 transition-colors">
               <span className="text-4xl mb-2">🏖️</span>

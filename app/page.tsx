@@ -72,6 +72,17 @@ const pages: page[] = [
   // },
 ]
 
+const text: line[] = [
+  { str: "Hi there!", color: "text-pink-300" },
+  { str: "+Welcome", color: "text-blue-400" },
+  { str: ".to", color: "text-yellow-100" },
+  { str: "(", color: "text-yellow-400" },
+  { str: "{", color: "text-pink-300" },
+  { str: " my_website ", color: "text-sky-300" },
+  { str: "}", color: "text-pink-300" },
+  { str: ")", color: "text-yellow-400" },
+]
+
 export default function Home() {
 
   const [prevPage, setPrevPage] = useState(pages.length - 1)
@@ -87,49 +98,28 @@ export default function Home() {
   }])
 
   useEffect(() => {
-    setTimeout(() => {
-      runText()
-    }, 1000);
+    // type out the intro text one letter at a time, then reveal the swipe hint
+    const runText = () => {
+      const strLength = text.reduce((acc, current) => acc + current.str.length, 0)
+      const newString: line[] = []
+      text.forEach(line => {
+        const letters = line.str.split("")
+        for (let i = 0; i < letters.length; i++) {
+          newString.push({ str: letters[i], color: line.color })
+        }
+      })
+      for (let i = 0; i < strLength; i++) {
+        const newLetter = { str: newString[i].str, color: newString[i].color }
+        setTimeout(() => {
+          setString(prev => [...prev, newLetter])
+        }, i * 70)
+      }
+    }
 
-    setTimeout(() => {
-      setSwipeFade(true)
-    }, 5600)
+    const t1 = setTimeout(runText, 1000)
+    const t2 = setTimeout(() => setSwipeFade(true), 5600)
+    return () => { clearTimeout(t1); clearTimeout(t2) }
   }, [])
-
-  const text: line[] = [
-    {
-      str: "Hi there!",
-      color: "text-pink-300"
-    },
-    {
-      str: "+Welcome",
-      color: "text-blue-400"
-    },
-    {
-      str: ".to",
-      color: "text-yellow-100"
-    },
-    {
-      str: "(",
-      color: "text-yellow-400"
-    },
-    {
-      str: "{",
-      color: "text-pink-300"
-    },
-    {
-      str: " my_website ",
-      color: "text-sky-300"
-    },
-    {
-      str: "}",
-      color: "text-pink-300"
-    },
-    {
-      str: ")",
-      color: "text-yellow-400"
-    },
-  ]
 
   const setPages = (val: number) => {
     if (val > 0) {
@@ -176,26 +166,6 @@ export default function Home() {
       if (touchEnd! - touchStart! > 30) {
         setPages(-1)
       }
-    }
-  }
-
-  const runText = () => {
-    const strLength = text.reduce((acc, current) => acc + current.str.length, 0)
-
-    let newString: line[] = []
-
-    text.forEach(line => {
-      const letters = line.str.split("")
-      for (let i = 0; i < letters.length; i++) {
-        newString.push({ str: letters[i], color: line.color })
-      }
-    })
-
-    for (let i = 0; i < strLength; i++) {
-      const newLetter = { str: newString[i].str, color: newString[i].color }
-      setTimeout(() => {
-        setString(prev => [...prev, newLetter])
-      }, i * 70);
     }
   }
 

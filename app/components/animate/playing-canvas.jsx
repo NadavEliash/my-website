@@ -12,44 +12,49 @@ export default function PlayingCanvas({
     const canvasRef = useRef(null)
     const [context, setContext] = useState(null)
 
-    let frameIdx = 0
-    let mediaRecorder
+    // these persist across renders (a plain `let` would reset every render — the lint warning)
+    const frameIdxRef = useRef(0)
+    const mediaRecorderRef = useRef(null)
+    // latest-value refs so the play/download intervals read fresh values without re-subscribing
+    const framesRef = useRef(frames); framesRef.current = frames
+    const drawFrameRef = useRef(null)
+    const recordVideoRef = useRef(null)
 
     useEffect(() => {
-        frameIdx = 0
-
-        if (canvasRef.current) {
-            const canvas = canvasRef.current
-            canvas.width = canvasSize.width
-            canvas.height = canvasSize.height
-            const ctx = canvas.getContext('2d')
-            setContext(ctx)
-        }
-    })
+        const canvas = canvasRef.current
+        if (!canvas) return
+        canvas.width = canvasSize.width
+        canvas.height = canvasSize.height
+        setContext(canvas.getContext('2d'))
+    }, [canvasSize.width, canvasSize.height])
 
     useEffect(() => {
         if (isPlay && !isDownload) {
+            frameIdxRef.current = 0
             const id = setInterval(() => {
-                frameIdx < frames.length ? frameIdx++ : frameIdx = 0
-                drawFrame(frames[frameIdx])
+                const frames = framesRef.current
+                frameIdxRef.current < frames.length ? frameIdxRef.current++ : frameIdxRef.current = 0
+                drawFrameRef.current(frames[frameIdxRef.current])
             }, 83.33)
 
             return () => {
                 clearInterval(id)
             }
         }
-    }, [isPlay])
+    }, [isPlay, isDownload])
 
     useEffect(() => {
         if (!isPlay && isDownload) {
-            recordVideo()
+            recordVideoRef.current()
+            frameIdxRef.current = 0
             const id = setInterval(() => {
-                if (frameIdx < frames.length) {
-                    drawFrame(frames[frameIdx])
-                    frameIdx++
+                const frames = framesRef.current
+                if (frameIdxRef.current < frames.length) {
+                    drawFrameRef.current(frames[frameIdxRef.current])
+                    frameIdxRef.current++
                 } else {
                     clearInterval(id)
-                    mediaRecorder.stop()
+                    mediaRecorderRef.current.stop()
                 }
             }, 83.33)
 
@@ -57,7 +62,7 @@ export default function PlayingCanvas({
                 clearInterval(id)
             }
         }
-    }, [isDownload])
+    }, [isPlay, isDownload])
 
     const drawFrame = (frame) => {
         const newContext = canvasRef.current.getContext('2d')
@@ -71,9 +76,9 @@ export default function PlayingCanvas({
 
     const recordVideo = () => {
         if (isDownload) {
-            const newContext = canvasRef.current.getContext('2d')
             const videoStream = canvasRef.current.captureStream(30)
-            mediaRecorder = new MediaRecorder(videoStream)
+            const mediaRecorder = new MediaRecorder(videoStream)
+            mediaRecorderRef.current = mediaRecorder
             let chunks = []
             let videoURL
 
@@ -98,6 +103,9 @@ export default function PlayingCanvas({
             }
         }
     }
+
+    drawFrameRef.current = drawFrame
+    recordVideoRef.current = recordVideo
 
     return (
         <canvas ref={canvasRef} width={500} height={500}

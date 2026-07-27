@@ -73,20 +73,20 @@ export default function Projects() {
     const [guidDisplay, setGuidDisplay] = useState<boolean>(true)
     const [fadeOut, setFadeOut] = useState<boolean>(false)
 
+    // sync the visible project to the URL param (re-runs on client-side route changes)
     useEffect(() => {
         const projectParam = params.project;
         if (projectParam) {
             const idx = projects.findIndex((project) => project.params === projectParam[0])
             setCurrentView(idx)
         }
+    }, [params.project])
 
-        setTimeout(() => {
-            setGuidDisplay(false)
-        }, 1500)
-
-        setTimeout(() => {
-            setFadeOut(true)
-        }, 3000)
+    // one-time intro: hide the wheel guide, then fade it out
+    useEffect(() => {
+        const t1 = setTimeout(() => setGuidDisplay(false), 1500)
+        const t2 = setTimeout(() => setFadeOut(true), 3000)
+        return () => { clearTimeout(t1); clearTimeout(t2) }
     }, [])
 
     const handleDown = () => {

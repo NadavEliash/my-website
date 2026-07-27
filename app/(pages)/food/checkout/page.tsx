@@ -60,7 +60,7 @@ function PaymentModal({ app, phone, total, onClose }: { app: PayApp; phone: stri
           <p className="text-sm font-medium text-gray-800">העברה ← העברה למס׳ טלפון ← הדבק</p>
         </div>
         
-        <span className='text-3xl font-semibold text-gray-900 text-center mb-4 block'>סה"כ ₪{total}</span>
+        <span className='text-3xl font-semibold text-gray-900 text-center mb-4 block'>סה״כ ₪{total}</span>
 
         {!copied && <p className="text-xs text-amber-600 text-center mb-2">יש להעתיק את המספר</p>}
 

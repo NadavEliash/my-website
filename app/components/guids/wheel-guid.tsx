@@ -1,5 +1,6 @@
 'use client'
 
+import Image from 'next/image'
 import { Sue_Ellen_Francisco } from 'next/font/google'
 import { useEffect, useState } from 'react'
 
@@ -27,7 +28,7 @@ export default function WheelGuid({
                 <div className='flex px-16 py-6'>
                     <h1 className={`${sue_ellen.className} text-[2rem] tracking-wider text-center`}>You can use the wheel to navigate through</h1>
                     <div className='animate-bounce'>
-                        <img src="/arrow.png" alt="arrow" className="w-32 ml-6 mt-4" />
+                        <Image src="/arrow.png" alt="arrow" width={2181} height={1243} className="w-32 h-auto ml-6 mt-4" />
                     </div>
                 </div>
                 <div className="w-[180px] h-[300px] rotate-[-25deg] ml-[50%] mt-2">
