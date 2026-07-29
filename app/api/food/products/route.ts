@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { getFoodDb } from '@/lib/food-db'
+import { staffFromRequest } from '@/lib/food-auth'
 
 export async function GET() {
   try {
@@ -14,6 +15,7 @@ export async function GET() {
 
 export async function POST(req: NextRequest) {
   try {
+    if (!staffFromRequest(req)) return NextResponse.json({ error: 'לא מורשה' }, { status: 401 })
     const { products } = await req.json()
     const db = await getFoodDb()
     await db.collection('products').deleteMany({})

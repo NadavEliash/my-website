@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { getFoodDb } from '@/lib/food-db'
+import { staffFromRequest } from '@/lib/food-auth'
 
 async function notifySocket(payload: object) {
   try {
@@ -30,6 +31,8 @@ export async function POST(req: NextRequest) {
     const db = await getFoodDb()
 
     if (Array.isArray(body.orders)) {
+      // bulk replace = staff editing/deleting/status changes — staff only
+      if (!staffFromRequest(req)) return NextResponse.json({ error: 'לא מורשה' }, { status: 401 })
       await db.collection('orders').deleteMany({})
       if (body.orders.length > 0) await db.collection('orders').insertMany(body.orders)
       await notifySocket({ type: 'order-updated' })

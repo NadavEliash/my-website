@@ -11,13 +11,8 @@ const dongle = Dongle({ weight: ["400"], subsets: ["latin"] })
 const pages = [
     {
         href: '/',
-        icon: <Home className="w-6 h-6 p-0.5 my-1" />,
-        title: 'Home'
-    },
-    {
-        href: '/about',
         icon: '',
-        title: 'About'
+        title: 'Home'
     },
     {
         href: '/code_portfolio',
@@ -38,7 +33,7 @@ export default function Navbar() {
     const [hide, setHide] = useState(false)
 
     useEffect(()=>{
-        setHide(pathname !== "/")
+        setHide(pathname !== "/" && pathname !== "/about" && pathname !== "/code_portfolio")
     },[pathname])
 
     return (
@@ -48,13 +43,12 @@ export default function Navbar() {
                 onClick={() => setDisplay(!display)}>
                 {pages.map(page =>
                     <Link key={page.href} href={page.href} title={page.icon ? page.title : ''}
-                        className="py-1 px-4 h-20 flex items-center bg-[rgb(16,16,37)] shadow-sm shadow-white/50 w-full cursor-pointer text-center md:h-10 md:w-fit md:bg-white/10 md:rounded-lg md:hover:bg-white/20">
+                        className="py-1 px-4 h-20 flex items-center bg-gray-200 shadow-sm shadow-white/50 w-full cursor-pointer text-center md:h-10 md:w-fit md:bg-white/10 md:rounded-lg md:hover:bg-white/20">
                         {page.icon
                             ? page.icon
-                            : <h1 className="mt-[3px] text-white">{page.title}</h1>}
+                            : <h1 className="mt-[3px] text-gray-900">{page.title}</h1>}
                     </Link>
                 )}
-                <h1 className="absolute right-4 top-3 text-3xl text-white">nadaveliash.com</h1>
             </nav>}
             {!hide && <Menu className={`md:hidden ${display ? 'opacity-0' : 'opacity-100'} transition-opacity absolute flex left-2 top-2 w-8 h-8 text-black z-50 bg-gray-100/80 rounded-lg p-1`} onClick={() => setDisplay(!display)} />}
             {!hide && <div className={`${display ? 'opacity-1' : 'opacity-0 pointer-events-none'} transition-all duration-500 absolute top-0 w-full h-full bg-[rgba(16,16,37,.6)] z-40 md:hidden`}

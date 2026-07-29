@@ -2,8 +2,9 @@
 
 import { useEffect, useRef, useState } from 'react'
 import { Upload, Trash2, Plus, X, ChevronDown, ChevronUp } from 'lucide-react'
-import type { Product, ProductOption, Settings, ScheduleDay, DeliveryOption } from '@/app/food/types'
+import type { Product, ProductOption, Settings, ScheduleDay, DeliveryOption, ServiceMode } from '@/app/food/types'
 import { generateSlots } from '@/app/food/utils'
+import StaffShell from '@/app/components/food/staff-shell'
 
 const EMPTY_PRODUCT: Omit<Product, 'id'> = {
   name: '', description: '', price: 0, image: '', available: true, options: [],
@@ -348,8 +349,12 @@ export default function DashboardPage() {
   const [deleteId, setDeleteId] = useState<string | null>(null)
   const fileInputRef = useRef<HTMLInputElement>(null)
   const [settings, setSettings] = useState<Settings>({
-    open: false, bitPhone: '', payboxPhone: '', scheduleDays: [], deliveryOptions: [],
+    open: false, serviceMode: 'takeaway', bitPhone: '', payboxPhone: '', scheduleDays: [], deliveryOptions: [],
   })
+  // shared login credentials (managed here, stored separately from public settings)
+  const [credUser, setCredUser] = useState('')
+  const [credPass, setCredPass] = useState('')
+  const [credMsg, setCredMsg] = useState('')
   const [newDay, setNewDay] = useState<Omit<ScheduleDay, 'id'>>({
     date: '', start: '12:00', end: '20:00', slotMinutes: 30,
   })
@@ -359,7 +364,20 @@ export default function DashboardPage() {
   useEffect(() => {
     fetch('/api/food/products').then(r => r.json()).then(setProducts)
     fetch('/api/food/settings').then(r => r.json()).then(s => setSettings(prev => ({ ...prev, ...s })))
+    fetch('/api/food/auth').then(r => r.json()).then(d => { if (d.user) setCredUser(d.user) }).catch(() => {})
   }, [])
+
+  async function saveCredentials() {
+    if (!credUser.trim() || !credPass) { setCredMsg('יש להזין שם וסיסמה'); return }
+    const res = await fetch('/api/food/auth', {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ name: credUser.trim(), password: credPass }),
+    })
+    setCredMsg(res.ok ? 'פרטי הכניסה עודכנו' : 'שגיאה בעדכון')
+    if (res.ok) setCredPass('')
+    setTimeout(() => setCredMsg(''), 2500)
+  }
 
   async function saveProducts(updated: Product[]) {
     setSaving(true)
@@ -468,8 +486,9 @@ export default function DashboardPage() {
   }
 
   return (
+    <StaffShell>
     <div className="min-h-screen bg-gray-50" dir="rtl">
-      <header className="bg-gray-900 text-white px-4 pt-10 pb-6">
+      <header className="bg-gray-900 text-white px-4 pt-4 pb-6">
         <h1 className="text-2xl font-bold tracking-tight">ניהול</h1>
         <p className="text-gray-400 text-sm mt-1">ניהול החנות ומוצרים</p>
       </header>
@@ -580,6 +599,37 @@ export default function DashboardPage() {
               </div>
             </div>
 
+            <div className="bg-white rounded-xl border border-gray-100 p-4 space-y-3">
+              <div>
+                <p className="text-sm font-semibold text-gray-800">אופן מכירה</p>
+                <p className="text-xs text-gray-400 mt-0.5">
+                  {(settings.serviceMode ?? 'takeaway') === 'in-house'
+                    ? 'הגשה במקום — ללא בחירת מועד'
+                    : 'איסוף / משלוח — הלקוח בוחר חלון זמן'}
+                </p>
+              </div>
+              <div className="grid grid-cols-2 gap-2">
+                {([
+                  { mode: 'takeaway' as ServiceMode, label: 'איסוף / משלוח' },
+                  { mode: 'in-house' as ServiceMode, label: 'הגשה במקום' },
+                ]).map(({ mode, label }) => {
+                  const active = (settings.serviceMode ?? 'takeaway') === mode
+                  return (
+                    <button
+                      key={mode}
+                      onClick={() => setSettings(s => ({ ...s, serviceMode: mode }))}
+                      className={`py-3 rounded-lg border text-sm font-medium transition ${
+                        active ? 'bg-gray-900 border-gray-900 text-white' : 'bg-white border-gray-200 text-gray-700 hover:border-gray-400'
+                      }`}
+                    >
+                      {label}
+                    </button>
+                  )
+                })}
+              </div>
+            </div>
+
+            {(settings.serviceMode ?? 'takeaway') !== 'in-house' && (
             <div className="bg-white rounded-xl border border-gray-100 p-4 space-y-4">
               <p className="text-sm font-semibold text-gray-800">מועדי הזמנות</p>
               <p className="text-xs text-gray-400">הוסף תאריכים ושעות שבהם לקוחות יוכלו לבחור מועד איסוף.</p>
@@ -655,7 +705,11 @@ export default function DashboardPage() {
                 </button>
               </div>
             </div>
+            )}
 
+            {/* delivery + payment are irrelevant when serving in-house */}
+            {(settings.serviceMode ?? 'takeaway') !== 'in-house' && (
+            <>
             <div className="bg-white rounded-xl border border-gray-100 p-4 space-y-4">
               <p className="text-sm font-semibold text-gray-800">אפשרויות משלוח</p>
               <p className="text-xs text-gray-400">הוסף אפשרויות איסוף/משלוח עם מחיר. אם לא הוגדרו, השדה יוסתר מהלקוח.</p>
@@ -727,6 +781,27 @@ export default function DashboardPage() {
                 Google Pay — דורש שילוב עם מעבד תשלומים (Stripe / Tranzila).
               </div>
             </div>
+            </>
+            )}
+
+            <div className="bg-white rounded-xl border border-gray-100 p-4 space-y-3">
+              <p className="text-sm font-semibold text-gray-800">פרטי כניסה</p>
+              <p className="text-xs text-gray-400">שם משתמש וסיסמה משותפים לכניסה לאזור הניהול.</p>
+              <div>
+                <label className="block text-xs text-gray-500 mb-1.5">שם משתמש</label>
+                <input type="text" value={credUser} onChange={e => setCredUser(e.target.value)} className="w-full border border-gray-200 rounded-lg px-3 py-2.5 text-gray-800 text-right text-sm focus:outline-none focus:ring-2 focus:ring-gray-900" />
+              </div>
+              <div>
+                <label className="block text-xs text-gray-500 mb-1.5">סיסמה חדשה</label>
+                <input type="password" value={credPass} onChange={e => setCredPass(e.target.value)} placeholder="הזינו סיסמה כדי לשנות" className="w-full border border-gray-200 rounded-lg px-3 py-2.5 text-gray-800 text-right text-sm focus:outline-none focus:ring-2 focus:ring-gray-900" />
+              </div>
+              <div className="flex items-center justify-between">
+                {credMsg && <span className="text-xs text-green-600 font-medium">{credMsg}</span>}
+                <button onClick={saveCredentials} disabled={!credUser.trim() || !credPass} className="mr-auto bg-gray-900 hover:bg-gray-700 disabled:bg-gray-200 disabled:text-gray-400 text-white font-medium px-4 py-2.5 rounded-lg text-sm transition">
+                  עדכן פרטי כניסה
+                </button>
+              </div>
+            </div>
 
             <div className="flex items-center justify-between">
               {settingsMsg && <span className="text-xs text-green-600 font-medium">{settingsMsg}</span>}
@@ -761,5 +836,6 @@ export default function DashboardPage() {
         </div>
       )}
     </div>
+    </StaffShell>
   )
 }

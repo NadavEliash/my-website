@@ -42,8 +42,13 @@ export type DeliveryOption = {
   price: number
 }
 
+// 'takeaway' = customers pick a pickup time window; 'in-house' = served on the
+// spot, no time management anywhere (settings, customer flow, or orders view).
+export type ServiceMode = 'takeaway' | 'in-house'
+
 export type Settings = {
   open: boolean
+  serviceMode?: ServiceMode  // defaults to 'takeaway'
   bitPhone?: string
   payboxPhone?: string
   scheduleDays?: ScheduleDay[]
@@ -61,14 +66,15 @@ export type OrderItem = {
   selectedOptions?: SelectedOption[]
 }
 
-export type OrderStatus = 'waiting' | 'approved' | 'sent'
+export type OrderStatus = 'waiting' | 'approved' | 'paid' | 'sent'
 
 export type Order = {
   id: string
   customerName: string
   phone: string
+  waitress?: string          // set when a waitress took the order in person
   items: OrderItem[]
-  timeSlot: string           // human-readable display, e.g. "ד׳ 15.7 · 18:00"
+  timeSlot: string           // human-readable display, e.g. "ד׳ 15.7 · 18:00"; empty for in-house / waitress orders
   pickupDate?: string        // "YYYY-MM-DD" — structured, for time-based logic
   pickupTime?: string        // "HH:MM"
   delivery?: { label: string; price: number }
@@ -80,6 +86,7 @@ export type Order = {
 // legacy orders used pending/confirmed/done — map them to the current model
 export function normalizeStatus(s: string): OrderStatus {
   if (s === 'confirmed' || s === 'approved') return 'approved'
+  if (s === 'paid') return 'paid'
   if (s === 'done' || s === 'sent') return 'sent'
   return 'waiting'
 }

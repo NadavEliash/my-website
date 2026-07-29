@@ -2,27 +2,31 @@
 
 import { useEffect, useState, useCallback } from 'react'
 import { io, Socket } from 'socket.io-client'
-import { Trash2, Clock } from 'lucide-react'
-import type { Order, OrderStatus } from '@/app/food/types'
+import { Trash2 } from 'lucide-react'
+import type { Order, OrderStatus, ServiceMode } from '@/app/food/types'
 import { normalizeStatus } from '@/app/food/types'
+import StaffShell from '@/app/components/food/staff-shell'
 
 type Tab = 'orders' | 'timeline'
 
 const STATUS_LABELS: Record<OrderStatus, string> = {
   waiting: 'בהמתנה',
   approved: 'מאושרת',
+  paid: 'בוצע תשלום',
   sent: 'בוצעה',
 }
 // order-card background per status (matches the reference design)
 const CARD_BG: Record<OrderStatus, string> = {
   waiting: 'bg-amber-50 border-amber-200',
   approved: 'bg-purple-100 border-purple-200',
+  paid: 'bg-blue-50 border-blue-200',
   sent: 'bg-gray-50 border-gray-200',
 }
 // order-card status pill per status
 const CARD_BADGE: Record<OrderStatus, string> = {
   waiting: 'border border-amber-300 text-amber-700',
-  approved: 'bg-green-400 text-white',
+  approved: 'bg-green-600 text-white',
+  paid: 'bg-blue-500 text-white',
   sent: 'bg-gray-200 text-gray-500',
 }
 
@@ -37,15 +41,6 @@ function itemLine(it: Order['items'][number]) {
   return it.quantity > 1 ? `${it.quantity} × ${line}` : line
 }
 
-// orders only carry a display timeSlot (e.g. "ד׳ 15.7 · 18:00") — pull the HH:MM out of it
-function slotTime(o: Order): string {
-  const m = o.timeSlot?.match(/(\d{1,2}:\d{2})/)
-  return m ? m[1] : (o.timeSlot ?? '')
-}
-function slotMinutes(o: Order): number {
-  const m = o.timeSlot?.match(/(\d{1,2}):(\d{2})/)
-  return m ? Number(m[1]) * 60 + Number(m[2]) : Infinity
-}
 
 function pickupDateTime(o: Order): Date | null {
   if (!o.pickupDate || !o.pickupTime) return null
@@ -53,7 +48,24 @@ function pickupDateTime(o: Order): Date | null {
   return isNaN(d.getTime()) ? null : d
 }
 
-// an approved order is "happening now" from its slot start until an hour after
+function pad2(n: number) { return String(n).padStart(2, '0') }
+
+// the moment an order is anchored to: its pickup slot, or (waitress / in-house
+// orders with no pickup) the time it was taken
+function reservationDate(o: Order): Date | null {
+  const p = pickupDateTime(o)
+  if (p) return p
+  const c = new Date(o.createdAt)
+  return isNaN(c.getTime()) ? null : c
+}
+
+// HH:MM for the timeline / cards
+function reservationTime(o: Order): string {
+  const d = reservationDate(o)
+  return d ? `${pad2(d.getHours())}:${pad2(d.getMinutes())}` : ''
+}
+
+// an approved pickup order is "happening now" from its slot start until an hour after
 function isNow(o: Order, now: Date | null): boolean {
   if (!now || o.status !== 'approved') return false
   const dt = pickupDateTime(o)
@@ -62,8 +74,15 @@ function isNow(o: Order, now: Date | null): boolean {
   return diff >= 0 && diff < 60 * 60 * 1000
 }
 
+// orders still to be prepared: regular ones once approved, waitress ones from
+// the moment they're taken (they have no separate approval step)
+function isActive(o: Order): boolean {
+  return o.waitress ? o.status === 'waiting' : o.status === 'approved'
+}
+
 export default function OrdersPage() {
   const [orders, setOrders] = useState<Order[]>([])
+  const [serviceMode, setServiceMode] = useState<ServiceMode>('takeaway')
   const [loading, setLoading] = useState(true)
   const [tab, setTab] = useState<Tab>('orders')
   const [updating, setUpdating] = useState<string | null>(null)
@@ -85,6 +104,14 @@ export default function OrdersPage() {
     setOrders(list)
     setLoading(false)
   }, [])
+
+  useEffect(() => {
+    fetch('/api/food/settings').then(r => r.json()).then(s => setServiceMode(s.serviceMode ?? 'takeaway')).catch(() => {})
+  }, [])
+
+  // in-house mode has no time management, so the timeline view is hidden
+  const showTimeline = serviceMode !== 'in-house'
+  useEffect(() => { if (!showTimeline && tab === 'timeline') setTab('orders') }, [showTimeline, tab])
 
   useEffect(() => {
     fetchOrders()
@@ -144,34 +171,46 @@ export default function OrdersPage() {
   }
 
   function slotLabel(o: Order) {
-    if (o.pickupDate && o.pickupTime) return `${dayLabel(o.pickupDate)} ${o.pickupTime}`.trim()
-    return o.timeSlot
+    if (o.pickupDate && o.pickupTime) return `להכנה ${dayLabel(o.pickupDate)} ${o.pickupTime}`.trim()
+    if (o.timeSlot) return o.timeSlot
+    // waitress / in-house order with no pickup slot → show when it was taken
+    const d = reservationDate(o)
+    if (!d) return ''
+    const ds = `${d.getFullYear()}-${pad2(d.getMonth() + 1)}-${pad2(d.getDate())}`
+    return `${dayLabel(ds)} ${pad2(d.getHours())}:${pad2(d.getMinutes())}`
   }
 
   const waitingCount = orders.filter(o => o.status === 'waiting').length
-  const totalRevenue = orders.filter(o => o.status !== 'waiting').reduce((sum, o) => sum + o.total, 0)
+  // waitress orders count as revenue only once paid; regular ones once past 'waiting'
+  const totalRevenue = orders
+    .filter(o => (o.waitress ? o.status === 'paid' : o.status !== 'waiting'))
+    .reduce((sum, o) => sum + o.total, 0)
 
-  // timeline: only approved (not yet done) orders, sorted by their time slot
+  // timeline: orders still to prepare, earliest reservation time first — pickup
+  // orders by their slot, waitress orders by when they were taken
   const timelineOrders = orders
-    .filter(o => o.status === 'approved')
-    .sort((a, b) => slotMinutes(a) - slotMinutes(b))
+    .filter(isActive)
+    .sort((a, b) => (reservationDate(a)?.getTime() ?? Infinity) - (reservationDate(b)?.getTime() ?? Infinity))
 
   const nowHHMM = now ? `${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}` : ''
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-white flex items-center justify-center" dir="rtl">
-        <div className="w-32 flex flex-row">
-        <p className="text-gray-500 text-xl tracking-wide">טוען הזמנות</p>
-        <span className="text-gray-500 text-xl tracking-wide">{loadingDots}</span>
+      <StaffShell>
+        <div className="min-h-screen bg-white flex items-center justify-center" dir="rtl">
+          <div className="w-32 flex flex-row">
+          <p className="text-gray-500 text-xl tracking-wide">טוען הזמנות</p>
+          <span className="text-gray-500 text-xl tracking-wide">{loadingDots}</span>
+          </div>
         </div>
-      </div>
+      </StaffShell>
     )
   }
 
   return (
+    <StaffShell>
     <div className="min-h-screen bg-gray-50" dir="rtl">
-      <header className="bg-gray-900 text-white px-4 pt-10 pb-6">
+      <header className="bg-gray-900 text-white px-4 pt-4 pb-6">
         <div className="flex items-center justify-between">
           <div>
             <h1 className="text-2xl font-bold tracking-tight">הזמנות</h1>
@@ -185,7 +224,7 @@ export default function OrdersPage() {
 
       <div className="px-4 pt-4 max-w-2xl mx-auto">
         <div className="flex border-b border-gray-200 mb-5">
-          {(['orders', 'timeline'] as Tab[]).map(t => (
+          {(showTimeline ? (['orders', 'timeline'] as Tab[]) : (['orders'] as Tab[])).map(t => (
             <button
               key={t}
               onClick={() => setTab(t)}
@@ -226,19 +265,25 @@ export default function OrdersPage() {
                       {/* header: name (right) · time (left) */}
                       <div className="flex items-center justify-between gap-3">
                         <h3 className="font-bold text-gray-900 text-lg truncate">{order.customerName}</h3>
-                        <p className="text-xs text-gray-400 mt-1 text-center" dir="ltr">{order.phone}</p>
-                        <span className="font-bold text-gray-600 flex-shrink-0">{slotLabel(order)}</span>
+                        {slotLabel(order) && <span className="font-bold text-gray-600 flex-shrink-0">{slotLabel(order)}</span>}
                       </div>
+                      {order.waitress && (
+                        <p className="text-sm text-gray-600 mt-0.5">מלצר/ית: {order.waitress}</p>
+                      )}
+                      {order.phone && 
+                        <p className="text-sm text-gray-600 mt-0.5">{order.phone}</p>
+                      }
+
 
                       {/* items, centered, with their options inline */}
                       <div className="space-y-0.5 mt-3">
                         {order.items.map(item => (
-                          <p key={item.productId} className="text-sm text-emerald-700/80">{itemLine(item)}</p>
+                          <p key={item.productId} className="text-base text-gray-800 font-semibold">{itemLine(item)}</p>
                         ))}
                       </div>
 
                       {order.delivery && (
-                        <p className="text-xs text-gray-500 text-center mt-1">{order.delivery.label}{order.delivery.price > 0 ? ` · ₪${order.delivery.price.toFixed(2)}` : ''}</p>
+                        <p className="text-sm text-gray-500 mt-1">{order.delivery.label}{order.delivery.price > 0 ? ` · ₪${order.delivery.price.toFixed(2)}` : ''}</p>
                       )}
                       <p className="font-bold text-left text-gray-900 mt-2">{priceLabel(order.total)}</p>
 
@@ -255,29 +300,62 @@ export default function OrdersPage() {
                             <Trash2 size={16} />
                           </button>
 
-                          {order.status === 'waiting' && (
-                            <button onClick={() => setStatus(order.id, 'approved')} disabled={updating === order.id}
-                              className="text-sm bg-green-500 hover:bg-green-600 disabled:bg-gray-200 text-white font-semibold px-4 py-2 rounded-lg transition">
-                              אשר הזמנה
-                            </button>
-                          )}
-                          {order.status === 'approved' && (
+                          {order.waitress ? (
+                            /* waitress flow: התקבלה → בוצעה → בוצע תשלום */
                             <>
-                              <button onClick={() => setStatus(order.id, 'waiting')} disabled={updating === order.id}
-                                className="text-xs text-gray-500 hover:text-gray-800 font-medium px-1.5 py-2 transition">
-                                בטל אישור
-                              </button>
-                              <button onClick={() => setStatus(order.id, 'sent')} disabled={updating === order.id}
-                                className="text-sm bg-gray-900 hover:bg-gray-700 disabled:bg-gray-200 text-white font-semibold px-4 py-2 rounded-lg transition">
-                                אשר ביצוע
-                              </button>
+                              {order.status === 'waiting' && (
+                                <button onClick={() => setStatus(order.id, 'sent')} disabled={updating === order.id}
+                                  className="text-sm bg-gray-900 hover:bg-gray-700 disabled:bg-gray-200 text-white font-semibold px-4 py-2 rounded-lg transition">
+                                  אשר ביצוע
+                                </button>
+                              )}
+                              {order.status === 'sent' && (
+                                <>
+                                  <button onClick={() => setStatus(order.id, 'waiting')} disabled={updating === order.id}
+                                    className="text-xs text-gray-500 hover:text-gray-800 font-medium px-1.5 py-2 transition">
+                                    בטל ביצוע
+                                  </button>
+                                  <button onClick={() => setStatus(order.id, 'paid')} disabled={updating === order.id}
+                                    className="text-sm bg-blue-500 hover:bg-blue-600 disabled:bg-gray-200 text-white font-semibold px-4 py-2 rounded-lg transition">
+                                    בוצע תשלום
+                                  </button>
+                                </>
+                              )}
+                              {order.status === 'paid' && (
+                                <button onClick={() => setStatus(order.id, 'sent')} disabled={updating === order.id}
+                                  className="text-sm border border-gray-300 text-gray-600 hover:bg-gray-100 font-semibold px-4 py-2 rounded-lg transition">
+                                  בטל תשלום
+                                </button>
+                              )}
                             </>
-                          )}
-                          {order.status === 'sent' && (
-                            <button onClick={() => setStatus(order.id, 'approved')} disabled={updating === order.id}
-                              className="text-sm border border-gray-300 text-gray-600 hover:bg-gray-100 font-semibold px-4 py-2 rounded-lg transition">
-                              בטל ביצוע
-                            </button>
+                          ) : (
+                            /* regular flow: התקבלה → מאושרת → בוצעה */
+                            <>
+                              {order.status === 'waiting' && (
+                                <button onClick={() => setStatus(order.id, 'approved')} disabled={updating === order.id}
+                                  className="text-sm bg-green-500 hover:bg-green-600 disabled:bg-gray-200 text-white font-semibold px-4 py-2 rounded-lg transition">
+                                  אשר הזמנה
+                                </button>
+                              )}
+                              {order.status === 'approved' && (
+                                <>
+                                  <button onClick={() => setStatus(order.id, 'waiting')} disabled={updating === order.id}
+                                    className="text-xs text-gray-500 hover:text-gray-800 font-medium px-1.5 py-2 transition">
+                                    בטל אישור
+                                  </button>
+                                  <button onClick={() => setStatus(order.id, 'sent')} disabled={updating === order.id}
+                                    className="text-sm bg-gray-900 hover:bg-gray-700 disabled:bg-gray-200 text-white font-semibold px-4 py-2 rounded-lg transition">
+                                    אשר ביצוע
+                                  </button>
+                                </>
+                              )}
+                              {order.status === 'sent' && (
+                                <button onClick={() => setStatus(order.id, 'approved')} disabled={updating === order.id}
+                                  className="text-sm border border-gray-300 text-gray-600 hover:bg-gray-100 font-semibold px-4 py-2 rounded-lg transition">
+                                  בטל ביצוע
+                                </button>
+                              )}
+                            </>
                           )}
                         </div>
                       </div>
@@ -306,7 +384,7 @@ export default function OrdersPage() {
                     <div key={order.id} className={`bg-white rounded-xl border p-4 flex items-start justify-between gap-3 transition ${nowBadge ? 'border-green-300 ring-2 ring-green-100' : 'border-gray-100'}`}>
                       <div className="flex items-start gap-3 min-w-0">
                         <div className={`text-center flex-shrink-0 w-14 ${nowBadge ? 'text-green-600' : 'text-gray-800'}`}>
-                          <p className="text-lg font-bold leading-none tabular-nums" dir="ltr">{slotTime(order)}</p>
+                          <p className="text-lg font-bold leading-none tabular-nums" dir="ltr">{reservationTime(order)}</p>
                           {nowBadge && <p className="text-[10px] font-medium mt-1">עכשיו</p>}
                         </div>
                         <div className="min-w-0 border-r border-gray-100 pr-3">
@@ -333,5 +411,6 @@ export default function OrdersPage() {
         )}
       </main>
     </div>
+    </StaffShell>
   )
 }

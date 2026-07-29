@@ -9,14 +9,17 @@ import type { OrderItem, Settings, Order } from '@/app/food/types'
 type CartData = { items: OrderItem[]; timeSlot: string; pickupDate?: string; pickupTime?: string }
 
 // Bit/Paybox have no public deep link that pre-fills recipient + amount (and Paybox's old
-// page.link is dead since Firebase Dynamic Links shut down). So "קח אותי לתשלום" just opens
-// the app (via its store link, which offers "Open" when installed) and the customer pastes
-// the copied number manually. Verify these links match your region's listing if needed.
+// page.link is dead since Firebase Dynamic Links shut down), so the customer still pastes
+// the copied number manually. On Android we launch the *installed* app directly via a Chrome
+// intent (falling back to the Play Store only if it isn't installed). On iOS neither app
+// publishes a URL scheme, so we can only open the App Store page (it offers "Open" when
+// installed). Verify these package names / store links match your region's listing if needed.
 const PAY_APPS = {
   Bit: {
     label: 'ביט',
     icon: '/bit.svg',
     btnClass: 'bg-blue-500 hover:bg-blue-600',
+    pkg: 'com.bnhp.payments.paymentsapp',
     ios: 'https://apps.apple.com/app/id1182007739',
     android: 'https://play.google.com/store/apps/details?id=com.bnhp.payments.paymentsapp',
   },
@@ -24,6 +27,7 @@ const PAY_APPS = {
     label: 'פייבוקס',
     icon: '/paybox.jpg',
     btnClass: 'bg-emerald-500 hover:bg-emerald-600',
+    pkg: 'com.payboxapp',
     ios: 'https://apps.apple.com/il/app/paybox/id1499167765',
     android: 'https://play.google.com/store/apps/details?id=com.payboxapp',
   },
@@ -31,9 +35,17 @@ const PAY_APPS = {
 type PayApp = keyof typeof PAY_APPS
 
 function openPayApp(app: PayApp) {
+  const info = PAY_APPS[app]
   const isIOS = /iphone|ipad|ipod/i.test(navigator.userAgent || '')
-  const url = isIOS ? PAY_APPS[app].ios : PAY_APPS[app].android
-  window.open(url, '_blank', 'noopener,noreferrer')
+  if (isIOS) {
+    // no public iOS URL scheme — App Store page shows "Open" when installed
+    window.open(info.ios, '_blank', 'noopener,noreferrer')
+    return
+  }
+  // Android: launch the installed app by package; Chrome auto-falls back to the
+  // Play Store via browser_fallback_url when the app isn't present.
+  window.location.href =
+    `intent://#Intent;package=${info.pkg};S.browser_fallback_url=${encodeURIComponent(info.android)};end`
 }
 
 function PaymentModal({ app, phone, total, onClose }: { app: PayApp; phone: string; total: string; onClose: () => void }) {
@@ -163,10 +175,12 @@ export default function CheckoutPage() {
           <p className="text-gray-400 text-sm mb-6">ההזמנה שלכם תיקלט לאחר ביצוע התשלום.</p>
 
           <div className="border border-gray-100 rounded-xl divide-y divide-gray-50 mb-6 text-sm">
-            <div className="flex justify-between px-4 py-3">
-              <span className="text-gray-500">שעת איסוף</span>
-              <span className="font-medium text-gray-800">{cartData.timeSlot}</span>
-            </div>
+            {cartData.timeSlot && (
+              <div className="flex justify-between px-4 py-3">
+                <span className="text-gray-500">שעת איסוף</span>
+                <span className="font-medium text-gray-800">{cartData.timeSlot}</span>
+              </div>
+            )}
             {selectedDelivery && (
               <div className="flex justify-between px-4 py-3">
                 <span className="text-gray-500">{selectedDelivery.label}</span>
@@ -267,10 +281,12 @@ export default function CheckoutPage() {
           </div>
           <div className="flex justify-between items-center px-4 py-3 bg-gray-50">
             <span className="font-bold text-gray-900">₪{total.toFixed(2)}</span>
-            <div className="text-right">
-              <span className="text-xs text-gray-400">שעת איסוף: </span>
-              <span className="text-sm font-medium text-gray-700">{cartData.timeSlot}</span>
-            </div>
+            {cartData.timeSlot && (
+              <div className="text-right">
+                <span className="text-xs text-gray-400">שעת איסוף: </span>
+                <span className="text-sm font-medium text-gray-700">{cartData.timeSlot}</span>
+              </div>
+            )}
           </div>
         </div>
 

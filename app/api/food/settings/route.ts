@@ -1,8 +1,10 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { getFoodDb } from '@/lib/food-db'
+import { staffFromRequest } from '@/lib/food-auth'
 
 const DEFAULTS = {
   open: false,
+  serviceMode: 'takeaway',
   bitPhone: '',
   payboxPhone: '',
   scheduleDays: [],
@@ -22,6 +24,7 @@ export async function GET() {
 
 export async function PUT(req: NextRequest) {
   try {
+    if (!staffFromRequest(req)) return NextResponse.json({ error: 'לא מורשה' }, { status: 401 })
     const body = await req.json()
     const db = await getFoodDb()
     await db.collection('settings').updateOne(

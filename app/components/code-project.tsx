@@ -31,7 +31,7 @@ export default function CodeProject({ project }: CodeProjectProps) {
 
 
     return (
-        <div className={`grid grid-cols-10 transition-all duration-1000 md:pt-28 h-full max-h-[100svh] overflow-hidden ${fredoka.className}`}>
+        <div className={`grid grid-cols-10 transition-all duration-1000 md:pt-28 h-full max-h-[100svh] overflow-hidden ${fredoka.className} text-gray-900`}>
             <div className="col-span-10 md:col-start-2 md:col-end-5 flex flex-col gap-2 md:justify-start">
                 <video src={project.video} className="md:hidden h-[35svh] object-fill" autoPlay loop onClick={() => router.push(project.src)}>
                 </video>
@@ -43,18 +43,18 @@ export default function CodeProject({ project }: CodeProjectProps) {
                     </div>
 
                     <div id="buttons" className="flex md:flex-col gap-4 mt-6 mx-6 md:mx-10">
-                        {project.params !== 'animate' && <div id="toggle-display" className="hidden group lg:flex relative w-36 h-12 bg-white/20 rounded-full items-center justify-between p-3 cursor-pointer ml-6" onClick={() => { if (project.params === 'animate') { return } else { setWideScreen(!wideScreen) } }}>
-                            <Tv2 className="w-6 h-6 group-hover:w-8 transition-all duration-300" />
-                            <Smartphone className="w-6 h-6 group-hover:w-8 transition-all duration-300" />
-                            <div className={`absolute ${wideScreen ? 'left-[4px]' : 'left-[100px] group-hover:left-[92px]'} transition-all duration-200 w-10 group-hover:w-12 h-10 rounded-full bg-white/20`}></div>
+                        {project.params !== 'animate' && <div id="toggle-display" className="hidden group lg:flex relative w-36 h-12 bg-gray-200 rounded-full items-center justify-between p-3 cursor-pointer ml-6" onClick={() => { if (project.params === 'animate') { return } else { setWideScreen(!wideScreen) } }}>
+                            <Tv2 className="w-6 h-6 transition-all duration-300" />
+                            <Smartphone className="w-6 h-6 transition-all duration-300" />
+                            <div className={`absolute ${wideScreen ? 'left-[4px]' : 'left-[100px]'} transition-all duration-200 w-10 h-10 rounded-full bg-white/60`}></div>
                         </div>}
                         <Link href={project.src} target="_blank"
-                            className="group bg-white/20 rounded-full p-3 w-24 hover:w-40 transition-all duration-300 relative hover:bg-white/30 overflow-hidden md:ml-24">
+                            className="group bg-gray-200 rounded-full p-3 w-24 hover:w-40 transition-all duration-300 relative hover:bg-gray-300 overflow-hidden md:ml-24">
                             <h1 className="">Go <span className="absolute left-0 text-transparent group-hover:left-9 group-hover:text-inherit transition-all duration-400 text-nowrap">to the App</span>
                                 <span className="absolute bottom-[10px] right-4 group-hover:right-3 text-3xl transition-all duration-300">»</span></h1>
                         </Link>
                         <Link href={project.repo} target="_blank"
-                            className="group relative w-14 hover:w-40 transition-all duration-300 h-12 bg-white/20 hover:bg-white/30 p-1 rounded-full cursor-pointer md:ml-40">
+                            className="group relative w-14 hover:w-40 transition-all duration-300 h-12 bg-gray-200 hover:bg-gray-300 p-1 rounded-full cursor-pointer md:ml-40">
                             <h1 className="scale-x-0 group-hover:scale-x-100 origin-left transition-all duration-300 ml-3 mt-2">Repository</h1>
                             <Image src={"https://www.svgrepo.com/show/450156/github.svg"} alt="github" width={40} height={40} className="absolute left-2 top-1 group-hover:left-28 transition-all duration-300"></Image>
                         </Link>

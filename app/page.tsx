@@ -5,7 +5,8 @@ import Link from "next/link";
 import Image from "next/image"
 import localFont from "next/font/local"
 import { Sue_Ellen_Francisco } from 'next/font/google'
-import { ChevronLeft, ChevronRight, ChevronsLeft } from "lucide-react"
+import profile from "./assets/profile.png"
+
 
 import { StaticImageData } from "next/image";
 import about from "./assets/about.png"
@@ -169,63 +170,37 @@ export default function Home() {
     }
   }
 
-  return (
-    <main className={`absolute left-0 top-0 h-svh w-full px-2 -z-10`}
-      onWheel={handleWheel}
-      onTouchStart={handleTouchStart}
-      onTouchMove={handleTouchMove}
-      onTouchEnd={handleTouchEnd}>
-      {/* <div className="mt-[25%] md:mt-32 md:m-20 md:w-fit h-[150px] md:h-[180px] bg-black/40 rounded-lg border-2 border-white flex flex-col" >
-        <div className="w-full py-2 bg-white/10 flex items-center gap-2">
-          <div className="w-3 h-3 ml-3 bg-red-500 rounded-full"></div>
-          <div className="w-3 h-3 bg-yellow-500 rounded-full"></div>
-          <div className="w-3 h-3 bg-green-500 rounded-full"></div>
-        </div>
-        <div className="mt-6 mx-5 md:text-xl md:w-[500px]">
-          {string.length && string.map((letter, idx) =>
-            <p key={idx} className={`${letter.color} ${menlo.className} inline transition-all leading-8 md:text-3xl`}>
-              {letter.str === '+' ? <br /> : letter.str}
-            </p>
-          )}
-          <p className="inline animate-pulse text-2xl md:text-4xl">|</p>
-        </div>
-      </div> */}
-
-      <h1 className="mt-10 sm:mt-32 text-center text-[4rem] md:text-[6rem] text-yellow-100 font-extrabold leading-[4.5rem]">{('Welcome aboard!').toUpperCase()}</h1>
-
-      <div className={`absolute w-full left-0 top-[36svh] md:hidden transition-opacity duration-200 opacity-1 ${swipeFade ? 'animate-[opacity_.5s_linear] opacity-0' : ''}`}>
-        <Image src={'https://www.svgrepo.com/show/409928/swipe-left.svg'} alt='swipe' width={50} height={50} className="absolute -top-4 w-10 h-10 invert animate-swipe" />
-        <h1 className="absolute left-1/2 -translate-x-1/2 whitespace-nowrap -top-10 text-sm">swipe to navigate, click to jump in</h1>
-      </div>
-
-      <div className="absolute bottom-12 md:top-[40%] left-1/2 -translate-x-1/2 w-[95vw] md:w-[520px] h-[400px] max-h-[50%] flex items-center justify-center gap-[460px] overflow-hidden">
-        <div className="hidden md:block" onClick={() => setPages(-1)}>
-          <ChevronLeft className="mt-2 w-10 h-10 cursor-pointer" />
-        </div>
-        {pages.map((page, idx) =>
-          <Link href={page.href} key={idx} className={`absolute bg-white/10 w-[100%] max-w-[340px] md:w-[360px] h-[400px] max-h-[100%] rounded-[30px] p-5 transition-all duration-500 grid grid-rows-12
-          ${currentPage === idx ? 'left-1/2 -translate-x-1/2 md:left-[90px] md:translate-x-0 opacity-100'
-              : nextPage === idx ? 'left-[400px] md:left-[520px] opacity-0'
-                : prevPage === idx ? '-left-[400px] opacity-0' : 'left-[100%] opacity-0'}
-            `}>
-            <div className={`rounded-xl row-span-7 h-fit border-[1px] border-white/50 overflow-hidden`}>
-              <Image key={idx} src={page.img!} alt="img" loading="eager" width={960} height={540} priority unoptimized />
-            </div>
-            <h1 className="text-xl font-bold mx-3 row-start-9 ">
-              {page.headline}
-            </h1>
-            <div className="row-span-2 mt-2">
-              {page.description.map((line, idx) =>
-                <p key={idx} className="text-justify mx-3">
-                  {line}
+return (
+        <>
+            <div className="relative mt-20 w-[92vw] mx-auto bg-black/10 p-3 rounded-lg md:mt-24 md:w-[660px] md:p-6 md:rounded-3xl">
+                <Image src={profile} alt="profile" width={100} height={100} className="rounded-full"></Image>
+                <p className="text-justify text-base md:text-lg mt-8 font-light text-gray-900">
+                    {`Hey there! My name is Nadav Eliash.`}
+                    <br />
+                    <br />
+                    {`I'm a passionate Web Developer with 2 years of experience building end-to-end applications. My strong foundation in both frontend and backend development, combined with a keen eye for design, allows me to craft visually stunning and user-friendly digital experiences.`}
+                    <br />
+                    <br />
+                    {`I've had the privilege of working with renowned brands like Mattel and Disney, as well as local organizations, where I've honed my skills in problem-solving, collaboration, and adaptability. My ability to seamlessly blend technical expertise with creative vision ensures that every project I undertake exceeds expectations.`}
+                    <br />
+                    <br />
+                    {`Let's create something amazing together. Contact me today to discuss your project.`}
                 </p>
-              )}</div>
-          </Link>)}
-        <div className="hidden md:block" onClick={() => setPages(+1)}>
-          <ChevronRight className="mt-2 w-10 h-10 cursor-pointer" />
-        </div>
-      </div>
-      {/* <SceneCanvas /> */}
-    </main>
-  );
+            <Link href='/code_portfolio' className="block max-w-60 bg-gray-100 text-gray-900 p-4 px-10 rounded-full mx-auto text-center font-bold text-lg mt-4">Code portfolio</Link>
+            </div>
+            <div className="fixed bottom-0 flex w-[100%] pb-4 md:gap-8 flex-col-reverse items-center justify-center right-2 md:flex-row md:mt-10">
+                <Link href="https://www.linkedin.com/in/nadav-eliash/" className="w-12 md:w-20 md:h-20 rounded-full">
+                    <Image src="https://www.svgrepo.com/show/452051/linkedin.svg" alt="linkedin" width={60} height={60} className="rounded-full w-full h-full bg-blue-900"></Image>
+                </Link>
+                <Link href="https://github.com/NadavEliash" className="w-12 md:w-20 md:h-20 rounded-full p-1">
+                    <Image src="https://www.svgrepo.com/show/450156/github.svg" alt="github" width={60} height={60} className="rounded-full w-full h-full"></Image>
+                </Link>
+                <Link href="https://drive.google.com/file/d/1ZaJTI-GByj5o4FIRtB2yXsgm92WZ_dIa/view?usp=drive_link" className="w-10 h-10 md:w-[72px] md:h-[72px] flex flex-col items-center p-1 md:px-3 md:py-1 m-1 bg-black/60 rounded-full">
+                    <Image src="https://www.svgrepo.com/show/384666/career-detail-document-file-info-job.svg" alt="CV" width={60} height={60} className="invert w-16 h-16">
+                    </Image>
+                    <h1 className="hidden md:block text-sm text-white">cv</h1>
+                </Link>
+            </div>
+        </>
+    )
 }
