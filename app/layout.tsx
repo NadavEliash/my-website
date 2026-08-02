@@ -41,7 +41,7 @@ export default function RootLayout({
     <html lang="en">
       <body className={`${roboto.className} text-white/80`}>
         <Navbar />
-        <main className="">
+        <main className="pb-8 m-0 h-[100svh]">
           {children}
         </main>
       </body>

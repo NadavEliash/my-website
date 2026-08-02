@@ -272,9 +272,8 @@ function ProductForm({ form, editingId, saving, uploading, uploadError, dragOver
           <label className="block text-xs font-medium text-gray-500 mb-1.5">מחיר (₪)</label>
           <input
             type="number"
-            min={0}
-            step={0.01}
-            value={form.price}
+            step={0.5}
+            value={form.price || ''}
             onChange={e => onChange({ price: parseFloat(e.target.value) || 0 })}
             className="w-full border border-gray-200 rounded-lg px-3 py-2.5 text-gray-800 text-sm focus:outline-none focus:ring-2 focus:ring-gray-900"
           />
@@ -663,7 +662,7 @@ export default function DashboardPage() {
                     type="date"
                     value={newDay.date}
                     onChange={e => setNewDay(d => ({ ...d, date: e.target.value }))}
-                    className="w-full border border-gray-200 rounded-lg px-3 py-2 text-gray-800 text-sm focus:outline-none focus:ring-2 focus:ring-gray-900"
+                    className={`w-full border border-gray-200 rounded-lg px-3 py-2 text-gray-800 text-sm focus:outline-none focus:ring-2 focus:ring-gray-900${newDay.date ? '' : ' date-empty'}`}
                   />
                 </div>
                 <div className="grid grid-cols-2 gap-2">

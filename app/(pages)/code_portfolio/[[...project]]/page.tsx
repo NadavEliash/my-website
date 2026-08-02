@@ -136,7 +136,7 @@ export default function Projects() {
     }
 
     return (
-        <div className="w-full h-svh text-white"
+        <div className="w-full"
             onWheel={handleWheel}
             onTouchStart={handleTouchStart}
             onTouchMove={handleTouch}

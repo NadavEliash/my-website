@@ -31,7 +31,7 @@ export default function CodeProject({ project }: CodeProjectProps) {
 
 
     return (
-        <div className={`grid grid-cols-10 transition-all duration-1000 md:pt-28 h-full max-h-[100svh] overflow-hidden ${fredoka.className} text-gray-900`}>
+        <div className={`grid grid-cols-10 transition-all duration-1000 md:pt-4 ${fredoka.className} text-gray-900`}>
             <div className="col-span-10 md:col-start-2 md:col-end-5 flex flex-col gap-2 md:justify-start">
                 <video src={project.video} className="md:hidden h-[35svh] object-fill" autoPlay loop onClick={() => router.push(project.src)}>
                 </video>
@@ -39,7 +39,7 @@ export default function CodeProject({ project }: CodeProjectProps) {
                     <h1 className={`text-[2.5rem] text-center  ${fredoka.className}`}>{project.title}</h1>
                     {project.subTitle && <h2 className="mb-1 text-center">{project.subTitle}</h2>}
                     <div className="">
-                        {project.description.map((line: string, idx: number) => <h2 key={idx} className="text-sm sm:text-base xl:text-lg mx-2 w-10/12">{line}</h2>)}
+                        {project.description.map((line: string, idx: number) => <h2 key={idx} className="text-sm sm:text-base xl:text-lg mx-4 w-10/12">{line}</h2>)}
                     </div>
 
                     <div id="buttons" className="flex md:flex-col gap-4 mt-6 mx-6 md:mx-10">

@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation'
 import Image from 'next/image'
 import { ChevronRight, Check, Copy } from 'lucide-react'
 import type { OrderItem, Settings, Order } from '@/app/food/types'
+import { ORDER_DRAFT_KEYS, clearOrderDrafts } from '@/app/food/utils'
 
 type CartData = { items: OrderItem[]; timeSlot: string; pickupDate?: string; pickupTime?: string }
 
@@ -48,11 +49,19 @@ function openPayApp(app: PayApp) {
     `intent://#Intent;package=${info.pkg};S.browser_fallback_url=${encodeURIComponent(info.android)};end`
 }
 
-function PaymentModal({ app, phone, total, onClose }: { app: PayApp; phone: string; total: string; onClose: () => void }) {
+function PaymentModal({ app, phone, total, error, onPay, onClose }: { app: PayApp; phone: string; total: string; error?: string; onPay: () => void | Promise<void>; onClose: () => void }) {
   const [copied, setCopied] = useState(false)
+  const [paying, setPaying] = useState(false)
   function copyPhone() {
     navigator.clipboard?.writeText(phone).catch(() => {})
     setCopied(true)
+  }
+  // save the order first, then hand off to the payment app; if saving fails the
+  // error is shown and the app isn't opened
+  async function handlePay() {
+    setPaying(true)
+    await onPay()
+    setPaying(false)
   }
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 px-4" dir="rtl" onClick={onClose}>
@@ -75,15 +84,16 @@ function PaymentModal({ app, phone, total, onClose }: { app: PayApp; phone: stri
         <span className='text-3xl font-semibold text-gray-900 text-center mb-4 block'>סה״כ ₪{total}</span>
 
         {!copied && <p className="text-xs text-amber-600 text-center mb-2">יש להעתיק את המספר</p>}
+        {error && <p className="text-xs text-red-500 text-center mb-2">{error}</p>}
 
         <div className="flex gap-2">
-          <button onClick={onClose}
-            className="flex-1 border border-gray-200 text-gray-600 font-medium py-3 rounded-xl text-sm hover:bg-gray-50 transition">
+          <button onClick={onClose} disabled={paying}
+            className="flex-1 border border-gray-200 text-gray-600 font-medium py-3 rounded-xl text-sm hover:bg-gray-50 transition disabled:opacity-50">
             ביטול
           </button>
-          <button onClick={() => openPayApp(app)} disabled={!copied}
-            className={`flex-1 text-white font-semibold py-3 rounded-xl text-sm transition ${copied ? PAY_APPS[app].btnClass : 'bg-gray-300 cursor-not-allowed'}`}>
-            לתשלום באפליקציה
+          <button onClick={handlePay} disabled={!copied || paying}
+            className={`flex-1 text-white font-semibold py-3 rounded-xl text-sm transition ${copied && !paying ? PAY_APPS[app].btnClass : 'bg-gray-300 cursor-not-allowed'}`}>
+            {paying ? 'שומר…' : 'לתשלום באפליקציה'}
           </button>
         </div>
       </div>
@@ -102,6 +112,7 @@ export default function CheckoutPage() {
   const [payApp, setPayApp] = useState<PayApp | null>(null)
   const [error, setError] = useState('')
   const [orderError, setOrderError] = useState('')
+  const [draftRestored, setDraftRestored] = useState(false)
   const placedRef = useRef(false)
 
   useEffect(() => {
@@ -109,7 +120,28 @@ export default function CheckoutPage() {
     if (!raw) { router.push('/food'); return }
     setCartData(JSON.parse(raw))
     fetch('/api/food/settings').then(r => r.json()).then(setSettings)
+    // restore any in-progress checkout details so the customer doesn't re-type them
+    try {
+      const draft = sessionStorage.getItem(ORDER_DRAFT_KEYS.checkout)
+      if (draft) {
+        const d = JSON.parse(draft)
+        if (d.customerName) setCustomerName(d.customerName)
+        if (d.phone) setPhone(d.phone)
+        if (d.deliveryId) setDeliveryId(d.deliveryId)
+        if (d.step === 'pay') setStep('pay')
+      }
+    } catch { /* ignore malformed / unavailable storage */ }
+    setDraftRestored(true)
   }, [router])
+
+  // keep the checkout draft in sync so returning to this step restores it (after
+  // restore, and never after the order is committed — that draft was just cleared)
+  useEffect(() => {
+    if (!draftRestored || placedRef.current) return
+    try {
+      sessionStorage.setItem(ORDER_DRAFT_KEYS.checkout, JSON.stringify({ customerName, phone, deliveryId, step }))
+    } catch { /* ignore unavailable storage */ }
+  }, [customerName, phone, deliveryId, step, draftRestored])
 
   const deliveryOptions = settings?.deliveryOptions ?? []
   const selectedDelivery = deliveryOptions.find(o => o.id === deliveryId)
@@ -121,9 +153,13 @@ export default function CheckoutPage() {
   const phoneValid = phone.replace(/\D/g, '').length >= 9
   const deliveryValid = deliveryOptions.length === 0 || !!selectedDelivery
 
-  // create the order when the customer reaches the final (payment) step — never before
-  async function placeOrder() {
-    if (placedRef.current || !cartData) return
+  // send the order to the server. Deliberately NOT called when the pay screen
+  // opens — only on the final "pay in app" click (see handlePay), so an order is
+  // never registered before the customer commits to paying. Returns whether the
+  // order is saved (true if it was already saved on an earlier click).
+  async function placeOrder(): Promise<boolean> {
+    if (!cartData) return false
+    if (placedRef.current) return true // already saved — allow reopening the pay app
     placedRef.current = true
     const order: Order = {
       id: crypto.randomUUID(),
@@ -141,17 +177,34 @@ export default function CheckoutPage() {
     try {
       const res = await fetch('/api/food/orders', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(order) })
       if (!res.ok) throw new Error()
-      localStorage.removeItem('food-cart')
+      // order committed — drop the cart and every saved draft so a new order starts fresh
+      clearOrderDrafts()
+      setOrderError('')
+      return true
     } catch {
       placedRef.current = false
       setOrderError('שמירת ההזמנה נכשלה, נסו שוב.')
+      return false
     }
   }
 
-  useEffect(() => {
-    if (step === 'pay') placeOrder()
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [step])
+  // final confirmation: save the order, then hand off to the payment app
+  async function handlePay() {
+    if (!payApp) return
+    const ok = await placeOrder()
+    if (ok) openPayApp(payApp)
+  }
+
+  // return to the store on the menu step (not the time picker) by resetting the
+  // saved menu-page step before navigating
+  function backToMenu() {
+    try {
+      const raw = sessionStorage.getItem(ORDER_DRAFT_KEYS.time)
+      const draft = raw ? JSON.parse(raw) : {}
+      sessionStorage.setItem(ORDER_DRAFT_KEYS.time, JSON.stringify({ ...draft, step: 'menu' }))
+    } catch { /* ignore unavailable storage */ }
+    router.push('/food')
+  }
 
   function goToPay() {
     if (!nameValid) { setError('יש להזין שם מלא (לפחות 3 אותיות).'); return }
@@ -219,7 +272,11 @@ export default function CheckoutPage() {
 
           <button onClick={() => setStep('details')}
             className="w-full border border-gray-200 text-gray-600 font-medium py-3 rounded-xl text-sm hover:bg-gray-50 transition">
-            חזרה לעריכת הזמנה
+            חזרה לסיום ההזמנה
+          </button>
+          <button onClick={backToMenu}
+            className="mt-3 w-full border border-gray-200 text-gray-600 font-medium py-3 rounded-xl text-sm hover:bg-gray-50 transition">
+            חזרה לתפריט
           </button>
         </div>
 
@@ -228,6 +285,8 @@ export default function CheckoutPage() {
             app={payApp}
             phone={payApp === 'Bit' ? settings!.bitPhone! : settings!.payboxPhone!}
             total={total.toFixed(0)}
+            error={orderError}
+            onPay={handlePay}
             onClose={() => setPayApp(null)}
           />
         )}
@@ -241,7 +300,7 @@ export default function CheckoutPage() {
       <header className="bg-gray-900 text-white px-4 pt-10 pb-6">
         <button onClick={() => router.push('/food')} className="flex items-center gap-1 text-gray-400 text-sm mb-4 hover:text-white transition">
           <ChevronRight size={16} />
-          <span>תפריט</span>
+          <span>חזרה לבחירת זמן</span>
         </button>
         <h1 className="text-2xl font-bold tracking-tight">סיום הזמנה</h1>
       </header>
@@ -255,11 +314,11 @@ export default function CheckoutPage() {
             {cartData.items.map(item => (
               <div key={item.productId} className="px-4 py-3">
                 <div className="flex justify-between items-start">
-                  <span className="font-semibold text-gray-900 text-sm">₪{(item.price * item.quantity).toFixed(2)}</span>
                   <div className="text-right">
                     <span className="text-sm text-gray-800">{item.productName}</span>
                     <span className="text-gray-400 text-xs mr-1">× {item.quantity}</span>
                   </div>
+                  <span className="font-semibold text-gray-900 text-sm">₪{(item.price * item.quantity).toFixed(2)}</span>
                 </div>
                 {item.selectedOptions && item.selectedOptions.length > 0 && (
                   <div className="flex flex-wrap gap-1.5 mt-1.5 justify-end">
@@ -274,19 +333,19 @@ export default function CheckoutPage() {
             ))}
             {selectedDelivery && (
               <div className="flex justify-between items-center px-4 py-3">
-                <span className="font-semibold text-gray-900 text-sm">{selectedDelivery.price > 0 ? `₪${selectedDelivery.price.toFixed(2)}` : 'חינם'}</span>
                 <span className="text-sm text-gray-800">{selectedDelivery.label}</span>
+                <span className="font-semibold text-gray-900 text-sm">{selectedDelivery.price > 0 ? `₪${selectedDelivery.price.toFixed(2)}` : 'חינם'}</span>
               </div>
             )}
           </div>
-          <div className="flex justify-between items-center px-4 py-3 bg-gray-50">
-            <span className="font-bold text-gray-900">₪{total.toFixed(2)}</span>
+          <div className="flex justify-between items-center px-4 py-3 bg-gray-100">
             {cartData.timeSlot && (
               <div className="text-right">
-                <span className="text-xs text-gray-400">שעת איסוף: </span>
+                <span className="text-sm font-semibold text-gray-400">שעת איסוף: </span>
                 <span className="text-sm font-medium text-gray-700">{cartData.timeSlot}</span>
               </div>
             )}
+            <span className="font-bold text-gray-900">₪{total.toFixed(2)}</span>
           </div>
         </div>
 

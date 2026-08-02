@@ -31,3 +31,8 @@ body {
     text-wrap: balance;
   }
 }
+
+/* hide native date placeholder text while keeping the calendar icon */
+input[type="date"].date-empty::-webkit-datetime-edit {
+  color: transparent;
+}

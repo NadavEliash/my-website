@@ -1,11 +1,11 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { Clock, ArrowLeft, ChevronRight } from 'lucide-react'
 import type { Product, Settings, Order } from '@/app/food/types'
 import { MAX_PER_SLOT } from '@/app/food/types'
-import { generateSlots } from '@/app/food/utils'
+import { generateSlots, ORDER_DRAFT_KEYS } from '@/app/food/utils'
 import AnalogClock, { type ClockSlot } from '@/app/components/food/analog-clock'
 import MenuSelector, { EMPTY_CART, type CartResult } from '@/app/components/food/menu-selector'
 
@@ -22,6 +22,9 @@ export default function FoodStorePage() {
   const [step, setStep] = useState<'menu' | 'time'>('menu')
   const [loading, setLoading] = useState(true)
   const [loadingDots, setLoadingDots] = useState('')
+  // gate persistence until the saved draft is restored, so the initial empty
+  // values don't overwrite it on mount
+  const [draftRestored, setDraftRestored] = useState(false)
 
   useEffect(() => {
     async function load() {
@@ -76,9 +79,35 @@ export default function FoodStorePage() {
     return d.toLocaleDateString('he-IL', { weekday: 'short', day: 'numeric', month: 'numeric' })
   }
 
-  // if the cart empties (e.g. all orders removed), fall back to the menu step
+  // restore an in-progress order draft (date / slot / step) once on mount
   useEffect(() => {
-    if (cart.count === 0 && step === 'time') setStep('menu')
+    try {
+      const raw = sessionStorage.getItem(ORDER_DRAFT_KEYS.time)
+      if (raw) {
+        const d = JSON.parse(raw)
+        if (d.selectedDate) setSelectedDate(d.selectedDate)
+        if (d.selectedSlot) setSelectedSlot(d.selectedSlot)
+        if (d.step === 'time') setStep('time')
+      }
+    } catch { /* ignore malformed / unavailable storage */ }
+    setDraftRestored(true)
+  }, [])
+
+  // keep the draft in sync with the current selections (after restore)
+  useEffect(() => {
+    if (!draftRestored) return
+    try {
+      sessionStorage.setItem(ORDER_DRAFT_KEYS.time, JSON.stringify({ selectedDate, selectedSlot, step }))
+    } catch { /* ignore unavailable storage */ }
+  }, [selectedDate, selectedSlot, step, draftRestored])
+
+  // if the cart empties (e.g. all orders removed), fall back to the menu step —
+  // but only on a genuine >0 → 0 transition, never during the restore where the
+  // cart momentarily reads empty before MenuSelector rehydrates it
+  const prevCount = useRef(cart.count)
+  useEffect(() => {
+    if (prevCount.current > 0 && cart.count === 0 && step === 'time') setStep('menu')
+    prevCount.current = cart.count
   }, [cart.count, step])
 
   function handleProceed() {
@@ -132,7 +161,7 @@ export default function FoodStorePage() {
 
       <main className="px-4 py-6 max-w-2xl mx-auto">
         {step === 'menu' && (
-          <MenuSelector products={products} onChange={setCart} />
+          <MenuSelector products={products} onChange={setCart} persistKey={ORDER_DRAFT_KEYS.cart} />
         )}
 
         {step === 'time' && scheduleDays.length > 0 && (
@@ -197,10 +226,7 @@ export default function FoodStorePage() {
                 disabled={cart.hasUnmetRequired}
                 className="w-full flex items-center justify-between bg-gray-900 hover:bg-gray-800 disabled:bg-gray-200 disabled:text-gray-400 text-white font-semibold px-5 py-4 rounded-xl transition"
               >
-                <div className="flex flex-col items-start">
-                  <span className="text-sm">{cart.count} פריטים נבחרו</span>
-                  {cart.total > 0 && <span className="text-xs text-gray-400">₪{cart.total.toFixed(2)}</span>}
-                </div>
+                <span className="text-2xl font-bold" dir="ltr">₪{cart.total.toFixed(2)}</span>
                 <div className="flex items-center gap-2 text-sm">
                   <span>{inHouse ? 'המשך לתשלום' : 'המשך לבחירת חלון זמן'}</span>
                   <ArrowLeft size={16} />
@@ -213,10 +239,7 @@ export default function FoodStorePage() {
               disabled={!selectedSlot || !selectedDate || cart.hasUnmetRequired || selectedSlotFull}
               className="w-full flex items-center justify-between bg-gray-900 hover:bg-gray-800 disabled:bg-gray-200 disabled:text-gray-400 text-white font-semibold px-5 py-4 rounded-xl transition"
             >
-              <div className="flex flex-col items-start">
-                <span className="text-sm">{cart.count} פריטים</span>
-                {cart.total > 0 && <span className="text-xs text-gray-400">₪{cart.total.toFixed(2)}</span>}
-              </div>
+              <span className="text-2xl font-bold" dir="ltr">₪{cart.total.toFixed(2)}</span>
               <div className="flex items-center gap-2 text-sm">
                 <span>המשך לתשלום</span>
                 <ArrowLeft size={16} />

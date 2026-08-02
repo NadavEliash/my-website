@@ -22,3 +22,20 @@ export function generateSlots(start: string, end: string, slotMinutes: number): 
 
   return slots
 }
+
+// ── order-draft persistence ───────────────────────────────────────────────────
+// sessionStorage keys that keep an in-progress order alive across refresh /
+// navigation, so the customer can return to any step without re-entering it.
+export const ORDER_DRAFT_KEYS = {
+  cart: 'food-cart-draft',       // raw MenuSelector cart map
+  time: 'food-time-draft',       // { selectedDate, selectedSlot, step } on the menu page
+  checkout: 'food-checkout-draft', // { customerName, phone, deliveryId, step } on checkout
+} as const
+
+// wipe every order draft (plus the committed cart) — call once an order is placed
+export function clearOrderDrafts() {
+  try {
+    localStorage.removeItem('food-cart')
+    Object.values(ORDER_DRAFT_KEYS).forEach(k => sessionStorage.removeItem(k))
+  } catch { /* ignore unavailable storage */ }
+}

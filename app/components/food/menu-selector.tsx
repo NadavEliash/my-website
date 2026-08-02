@@ -122,14 +122,41 @@ function OptionsPicker({ product, selection, onPick }: OptionsPickerProps) {
 export default function MenuSelector({
   products,
   onChange,
+  persistKey,
 }: {
   products: Product[]
   onChange: (result: CartResult) => void
+  // when set, the raw cart is kept alive in sessionStorage under this key so the
+  // customer can leave and return to their in-progress order (opt-in — the
+  // waitress page omits it so each new order starts empty)
+  persistKey?: string
 }) {
   const [cart, setCart] = useState<CartMap>({})
   const [expandedId, setExpandedId] = useState<string | null>(null)
   // product whose + button is currently nudging (hint to add another)
   const [hintId, setHintId] = useState<string | null>(null)
+  // guards persistence until the saved cart has been restored, so the initial
+  // empty cart doesn't clobber it on mount
+  const [restored, setRestored] = useState(!persistKey)
+
+  // restore a saved cart once on mount (client-only — avoids SSR/hydration issues)
+  useEffect(() => {
+    if (!persistKey) return
+    try {
+      const raw = sessionStorage.getItem(persistKey)
+      if (raw) setCart(JSON.parse(raw))
+    } catch { /* ignore malformed / unavailable storage */ }
+    setRestored(true)
+  }, [persistKey])
+
+  // keep the saved cart in sync with edits (only after the restore has run)
+  useEffect(() => {
+    if (!persistKey || !restored) return
+    try {
+      if (Object.keys(cart).length) sessionStorage.setItem(persistKey, JSON.stringify(cart))
+      else sessionStorage.removeItem(persistKey)
+    } catch { /* ignore unavailable storage */ }
+  }, [cart, persistKey, restored])
 
   // recompute the order result and notify the parent whenever the cart changes
   useEffect(() => {
