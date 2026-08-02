@@ -162,7 +162,14 @@ export default function QuestDashboard() {
                 <div className="flex flex-col gap-3">
                     <label className="text-xs font-medium text-gray-500 mb-1.5">אייקון</label>
                   <div className="w-full flex gap-2 items-center">
-                    <img src={draft.icon} alt="😎" className="w-8 h-8 border-2 border-gray-500 rounded-full p-1" />
+                    <div className="w-9 h-9 shrink-0 border-2 border-gray-300 rounded-full flex items-center justify-center overflow-hidden text-lg">
+                      {/^(https?:|\/)/.test(draft.icon) ? (
+                        // eslint-disable-next-line @next/next/no-img-element
+                        <img src={draft.icon} alt="" className="w-full h-full object-cover" />
+                      ) : (
+                        <span>{draft.icon || '🧠'}</span>
+                      )}
+                    </div>
                     <input
                       value={draft.icon}
                       onChange={e => patchDraft({ icon: e.target.value })}
@@ -195,7 +202,7 @@ export default function QuestDashboard() {
                 </div>
 
                 {draft.questions.length === 0 ? (
-                  <p className="text-gray-400 text-sm text-center py-6">אין שאלות. לחצו על "הוסף שאלה".</p>
+                  <p className="text-gray-400 text-sm text-center py-6">{'אין שאלות. לחצו על "הוסף שאלה".'}</p>
                 ) : (
                   <div className="space-y-3">
                     {draft.questions.map((q, i) => (
