@@ -7,38 +7,18 @@ const bnbClient = new MongoClient(process.env.MONGODB_BNB_URI, {
   tlsAllowInvalidCertificates: true,
 })
 
-const foodClient = new MongoClient(process.env.MONGODB_FOOD_URI, {
-  tls: true,
-  tlsAllowInvalidCertificates: true,
-})
-
 let _bnbDb = null
-let _foodDb = null
 
 async function connectDB() {
   await bnbClient.connect()
   _bnbDb = bnbClient.db('dead-sea-bnb')
   console.log('Connected to BnB MongoDB')
   await seedIfEmpty()
-
-  foodClient.connect()
-    .then(() => {
-      _foodDb = foodClient.db('food-store')
-      console.log('Connected to Food MongoDB')
-    })
-    .catch(err => {
-      console.error('Food MongoDB connection failed:', err.message)
-    })
 }
 
 function db() {
   if (!_bnbDb) throw new Error('BnB DB not connected')
   return _bnbDb
-}
-
-function foodDb() {
-  if (!_foodDb) throw new Error('Food DB not connected')
-  return _foodDb
 }
 
 async function seedIfEmpty() {
@@ -109,4 +89,4 @@ async function seedIfEmpty() {
   console.log('Seeded initial host data')
 }
 
-module.exports = { connectDB, db, foodDb }
+module.exports = { connectDB, db }

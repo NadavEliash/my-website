@@ -38,6 +38,10 @@ const morePages = [
         href: '/food/dashboard',
         title: 'Food'
     },
+    {
+        href: '/quest',
+        title: '20 Questions'
+    },
 ]
 
 export default function Navbar() {
