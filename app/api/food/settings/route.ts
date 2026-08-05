@@ -5,6 +5,7 @@ import { staffFromRequest } from '@/lib/food-auth'
 const DEFAULTS = {
   open: false,
   serviceMode: 'takeaway',
+  activeMenuId: '',
   bitPhone: '',
   payboxPhone: '',
   scheduleDays: [],

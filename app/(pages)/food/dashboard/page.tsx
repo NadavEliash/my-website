@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState } from 'react'
 import { Upload, Trash2, Plus, X, ChevronDown, ChevronUp } from 'lucide-react'
-import type { Product, ProductOption, Settings, ScheduleDay, DeliveryOption, ServiceMode } from '@/app/food/types'
+import type { Product, ProductOption, Menu, Settings, ScheduleDay, DeliveryOption, ServiceMode } from '@/app/food/types'
 import { generateSlots } from '@/app/food/utils'
 import StaffShell from '@/app/components/food/staff-shell'
 
@@ -336,7 +336,12 @@ function ProductForm({ form, editingId, saving, uploading, uploadError, dragOver
 // ── DashboardPage ────────────────────────────────────────────────────────────
 export default function DashboardPage() {
   const [tab, setTab] = useState<Tab>('products')
-  const [products, setProducts] = useState<Product[]>([])
+  const [menus, setMenus] = useState<Menu[]>([])
+  // the menu currently open for editing (independent of the one served to customers)
+  const [selectedMenuId, setSelectedMenuId] = useState<string | null>(null)
+  const [deleteMenuId, setDeleteMenuId] = useState<string | null>(null)
+  // menu name as it was when the field gained focus, so blur only saves real edits
+  const menuNameAtFocus = useRef('')
   const [editingId, setEditingId] = useState<string | null>(null)
   const [form, setForm] = useState<FormState>(EMPTY_PRODUCT)
   const [showAddForm, setShowAddForm] = useState(false)
@@ -361,10 +366,23 @@ export default function DashboardPage() {
   const [settingsMsg, setSettingsMsg] = useState('')
 
   useEffect(() => {
-    fetch('/api/food/products').then(r => r.json()).then(setProducts)
+    fetch('/api/food/menus').then(r => r.json()).then(d => { if (Array.isArray(d)) setMenus(d) }).catch(() => {})
     fetch('/api/food/settings').then(r => r.json()).then(s => setSettings(prev => ({ ...prev, ...s })))
     fetch('/api/food/auth').then(r => r.json()).then(d => { if (d.user) setCredUser(d.user) }).catch(() => {})
   }, [])
+
+  // open the served menu by default; also recovers if the edited one is deleted
+  useEffect(() => {
+    if (menus.length === 0) return
+    if (selectedMenuId && menus.some(m => m.id === selectedMenuId)) return
+    setSelectedMenuId(menus.find(m => m.id === settings.activeMenuId)?.id ?? menus[0].id)
+  }, [menus, settings.activeMenuId, selectedMenuId])
+
+  const selectedMenu = menus.find(m => m.id === selectedMenuId) ?? null
+  const products = selectedMenu?.products ?? []
+  // the menu actually served — the server falls back to the first one when the
+  // saved id points nowhere (e.g. that menu was deleted)
+  const servedMenuId = menus.find(m => m.id === settings.activeMenuId)?.id ?? menus[0]?.id ?? null
 
   async function saveCredentials() {
     if (!credUser.trim() || !credPass) { setCredMsg('יש להזין שם וסיסמה'); return }
@@ -378,13 +396,42 @@ export default function DashboardPage() {
     setTimeout(() => setCredMsg(''), 2500)
   }
 
-  async function saveProducts(updated: Product[]) {
+  async function persistMenus(updated: Menu[]) {
     setSaving(true)
-    await fetch('/api/food/products', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ products: updated }) })
-    setProducts(updated)
+    setMenus(updated)
+    await fetch('/api/food/menus', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ menus: updated }) })
     setSaving(false)
     setProductMsg('נשמר')
     setTimeout(() => setProductMsg(''), 2000)
+  }
+
+  function saveProducts(updated: Product[]) {
+    if (!selectedMenu) return
+    persistMenus(menus.map(m => m.id === selectedMenu.id ? { ...m, products: updated } : m))
+  }
+
+  function selectMenu(id: string) {
+    setSelectedMenuId(id)
+    setEditingId(null)
+    setShowAddForm(false)
+    setForm(EMPTY_PRODUCT)
+  }
+
+  function addMenu() {
+    const menu: Menu = { id: crypto.randomUUID(), name: `תפריט ${menus.length + 1}`, products: [] }
+    persistMenus([...menus, menu])
+    selectMenu(menu.id)
+  }
+
+  // name edits stay local while typing, and are persisted when the field loses focus
+  function renameSelectedMenu(name: string) {
+    setMenus(ms => ms.map(m => m.id === selectedMenuId ? { ...m, name } : m))
+  }
+
+  function deleteMenu(id: string) {
+    const remaining = menus.filter(m => m.id !== id)
+    if (selectedMenuId === id) setSelectedMenuId(remaining[0]?.id ?? null)
+    persistMenus(remaining)
   }
 
   function handleAddProduct() {
@@ -507,6 +554,69 @@ export default function DashboardPage() {
 
         {tab === 'products' && (
           <div className="space-y-3 pb-10">
+            {/* menu switcher — each menu holds its own set of products */}
+            <div className="flex flex-wrap items-center gap-1.5">
+              {menus.map(m => (
+                <button
+                  key={m.id}
+                  onClick={() => selectMenu(m.id)}
+                  className={`flex items-center gap-1.5 px-3 py-2 rounded-lg border text-sm font-medium transition ${
+                    m.id === selectedMenuId
+                      ? 'bg-gray-900 border-gray-900 text-white'
+                      : 'bg-white border-gray-200 text-gray-600 hover:border-gray-400'
+                  }`}
+                >
+                  <span>{m.name || 'תפריט ללא שם'}</span>
+                  {m.id === servedMenuId && (
+                    <span className={`w-1.5 h-1.5 rounded-full ${m.id === selectedMenuId ? 'bg-green-400' : 'bg-green-500'}`} />
+                  )}
+                </button>
+              ))}
+              <button
+                onClick={addMenu}
+                className="flex items-center gap-1 px-3 py-2 rounded-lg border border-dashed border-gray-300 text-gray-500 text-sm font-medium hover:border-gray-500 hover:text-gray-700 transition"
+              >
+                <Plus size={13} />
+                תפריט חדש
+              </button>
+            </div>
+
+            {menus.length === 0 && (
+              <div className="text-center py-20">
+                <p className="text-gray-400 text-sm">אין תפריטים עדיין</p>
+                <p className="text-gray-300 text-xs mt-1">צרו תפריט כדי להוסיף אליו מוצרים</p>
+              </div>
+            )}
+
+            {selectedMenu && (
+              <>
+            <div className="bg-white rounded-xl border border-gray-100 p-4 space-y-2">
+              <label className="block text-xs font-medium text-gray-500">שם התפריט</label>
+              <div className="flex items-center gap-2">
+                <input
+                  type="text"
+                  value={selectedMenu.name}
+                  onChange={e => renameSelectedMenu(e.target.value)}
+                  onFocus={e => { menuNameAtFocus.current = e.target.value }}
+                  onBlur={e => { if (e.target.value !== menuNameAtFocus.current) persistMenus(menus) }}
+                  placeholder="שם התפריט"
+                  className="flex-1 border border-gray-200 rounded-lg px-3 py-2.5 text-gray-800 text-right text-sm focus:outline-none focus:ring-2 focus:ring-gray-900"
+                />
+                <button
+                  onClick={() => setDeleteMenuId(selectedMenu.id)}
+                  className="p-2.5 rounded-lg border border-gray-200 text-gray-400 hover:text-red-500 hover:border-red-200 transition flex-shrink-0"
+                  aria-label="מחק תפריט"
+                >
+                  <Trash2 size={15} />
+                </button>
+              </div>
+              <p className="text-xs text-gray-400">
+                {selectedMenu.id === servedMenuId
+                  ? 'זה התפריט המוצג ללקוחות כרגע.'
+                  : 'התפריט אינו מוצג — ניתן להחליף בלשונית הגדרות.'}
+              </p>
+            </div>
+
             <div className="flex items-center justify-between">
               {productMsg && <span className="text-xs text-green-600 font-medium">{productMsg}</span>}
               {!showAddForm && editingId === null && (
@@ -578,6 +688,8 @@ export default function DashboardPage() {
                 )}
               </div>
             ))}
+              </>
+            )}
           </div>
         )}
 
@@ -596,6 +708,37 @@ export default function DashboardPage() {
                   <span className={`absolute top-1 left-1 w-4 h-4 bg-white rounded-full shadow transition-transform ${settings.open ? 'translate-x-6' : 'translate-x-0'}`} />
                 </button>
               </div>
+            </div>
+
+            <div className="bg-white rounded-xl border border-gray-100 p-4 space-y-3">
+              <div>
+                <p className="text-sm font-semibold text-gray-800">תפריט מוצג</p>
+                <p className="text-xs text-gray-400 mt-0.5">התפריט שהלקוחות והמלצרים רואים. שאר התפריטים נשמרים ומוכנים להחלפה.</p>
+              </div>
+              {menus.length === 0 ? (
+                <p className="text-xs text-gray-300 text-center py-2">אין תפריטים — צרו תפריט בלשונית מוצרים</p>
+              ) : (
+                <div className="space-y-2">
+                  {menus.map(m => {
+                    const active = servedMenuId === m.id
+                    const availableCount = m.products.filter(p => p.available).length
+                    return (
+                      <button
+                        key={m.id}
+                        onClick={() => setSettings(s => ({ ...s, activeMenuId: m.id }))}
+                        className={`w-full flex items-center justify-between gap-2 px-3 py-2.5 rounded-lg border text-right transition ${
+                          active ? 'bg-gray-900 border-gray-900 text-white' : 'bg-white border-gray-200 text-gray-700 hover:border-gray-400'
+                        }`}
+                      >
+                        <span className="text-sm font-medium truncate">{m.name || 'תפריט ללא שם'}</span>
+                        <span className={`text-xs flex-shrink-0 ${active ? 'text-gray-300' : 'text-gray-400'}`}>
+                          {availableCount} פריטים זמינים
+                        </span>
+                      </button>
+                    )
+                  })}
+                </div>
+              )}
             </div>
 
             <div className="bg-white rounded-xl border border-gray-100 p-4 space-y-3">
@@ -811,6 +954,31 @@ export default function DashboardPage() {
           </div>
         )}
       </div>
+
+      {deleteMenuId && (
+        <div className="fixed inset-0 bg-black/40 flex items-end sm:items-center justify-center z-50 px-4 pb-6 sm:pb-0">
+          <div className="bg-white rounded-2xl p-6 w-full max-w-sm">
+            <p className="text-gray-900 font-semibold mb-1">מחיקת תפריט</p>
+            <p className="text-gray-400 text-sm mb-5">
+              {menus.find(m => m.id === deleteMenuId)?.products.length ?? 0} מוצרים יימחקו יחד עם התפריט. פעולה זו אינה ניתנת לביטול.
+            </p>
+            <div className="flex gap-3">
+              <button
+                onClick={() => { deleteMenu(deleteMenuId); setDeleteMenuId(null) }}
+                className="flex-1 bg-red-600 hover:bg-red-700 text-white font-semibold py-3 rounded-xl text-sm transition"
+              >
+                מחק
+              </button>
+              <button
+                onClick={() => setDeleteMenuId(null)}
+                className="flex-1 border border-gray-200 text-gray-600 font-medium py-3 rounded-xl text-sm hover:bg-gray-50 transition"
+              >
+                ביטול
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {deleteId && (
         <div className="fixed inset-0 bg-black/40 flex items-end sm:items-center justify-center z-50 px-4 pb-6 sm:pb-0">

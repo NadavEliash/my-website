@@ -189,15 +189,15 @@ return (
             <Link href='/code_portfolio' className="block max-w-60 bg-gray-100 text-gray-900 p-4 px-10 rounded-full mx-auto text-center font-bold text-lg mt-4">Code portfolio</Link>
             </div>
             <div className="fixed bottom-0 right-0 flex w-[100%] pb-4 gap-2 md:gap-8 flex-col items-end justify-center md:flex-row md:mt-10 ">
-                <Link href="https://drive.google.com/file/d/1ZaJTI-GByj5o4FIRtB2yXsgm92WZ_dIa/view?usp=drive_link" className="w-12 h-12 md:w-[76px] md:h-[76px] flex flex-col items-center p-1 md:px-3 md:py-1 md:m-1 md:mb-0 bg-black/60 rounded-full border-solid border-2 border-gray-900">
+                <Link href="https://drive.google.com/file/d/1ZaJTI-GByj5o4FIRtB2yXsgm92WZ_dIa/view?usp=drive_link" target="_blank" className="w-12 h-12 md:w-[76px] md:h-[76px] flex flex-col items-center p-1 md:px-3 md:py-1 md:m-1 md:mb-0 bg-black/60 rounded-full border-solid border-2 border-gray-900">
                     <Image src="https://www.svgrepo.com/show/384666/career-detail-document-file-info-job.svg" alt="CV" width={60} height={60} className="invert w-16 h-16">
                     </Image>
                     <h1 className="hidden md:block text-sm text-white">cv</h1>
                 </Link>
-                <Link href="https://github.com/NadavEliash" className="w-12 md:w-20 md:h-20 rounded-full bg-gray-200 border-solid border-2 border-gray-900 p-1">
+                <Link href="https://github.com/NadavEliash" target="_blank" className="w-12 md:w-20 md:h-20 rounded-full bg-gray-200 border-solid border-2 border-gray-900 p-1">
                     <Image src="https://www.svgrepo.com/show/450156/github.svg" alt="github" width={60} height={60} className="rounded-full w-full h-full"></Image>
                 </Link>
-                <Link href="https://www.linkedin.com/in/nadav-eliash/" className="w-12 md:w-20 md:h-20 rounded-full ">
+                <Link href="https://www.linkedin.com/in/nadav-eliash/" target="_blank" className="w-12 md:w-20 md:h-20 rounded-full ">
                     <Image src="https://www.svgrepo.com/show/452051/linkedin.svg" alt="linkedin" width={60} height={60} className="rounded-full w-full h-full bg-blue-900"></Image>
                 </Link>
             </div>

@@ -142,7 +142,6 @@ export default function Projects() {
             onTouchMove={handleTouch}
         >
             <h1 className={`hidden md:block absolute top-20 left-1/2 -translate-x-1/2 text-2xl sm:text-7xl text-center ${dongle.className} ${fadeOut && 'animate-[opacity_1s_linear] opacity-0'}`}>Welcome to my Code Portfolio!</h1>
-            <div className="absolute md:hidden w-[38px] h-[38px] bg-black/80 top-[5px] left-[5px] rounded-xl z-40"></div>
 
             {projects && projects.map((project, idx) =>
                 idx === currentView ? <CodeProject key={idx} project={project} /> : <div key={idx}></div>

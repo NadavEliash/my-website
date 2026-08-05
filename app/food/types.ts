@@ -28,6 +28,14 @@ export type Product = {
   options?: ProductOption[]
 }
 
+// products live inside a menu; the admin picks which single menu is served
+// (settings.activeMenuId) while the others stay in the dashboard, ready to swap in
+export type Menu = {
+  id: string
+  name: string
+  products: Product[]
+}
+
 export type ScheduleDay = {
   id: string
   date: string        // "YYYY-MM-DD"
@@ -49,6 +57,7 @@ export type ServiceMode = 'takeaway' | 'in-house'
 export type Settings = {
   open: boolean
   serviceMode?: ServiceMode  // defaults to 'takeaway'
+  activeMenuId?: string      // menu shown to customers; empty falls back to the first menu
   bitPhone?: string
   payboxPhone?: string
   scheduleDays?: ScheduleDay[]

@@ -87,7 +87,7 @@ export default function Navbar() {
                         </div>}
                 </div>
             </nav>}
-            {!hide && <Menu className={`md:hidden ${display ? 'opacity-0' : 'opacity-100'} transition-opacity absolute flex left-2 top-2 w-8 h-8 text-black z-50 bg-gray-100/80 rounded-lg p-1`} onClick={() => setDisplay(!display)} />}
+            {!hide && <Menu className={`md:hidden ${display ? 'opacity-0' : 'opacity-100'} transition-opacity absolute flex left-4 top-4 w-10 h-10 text-black z-50 bg-gray-400/80 rounded-lg p-1`} onClick={() => setDisplay(!display)} />}
             {!hide && <div className={`${display ? 'opacity-1' : 'opacity-0 pointer-events-none'} transition-all duration-500 absolute top-0 w-full h-full bg-[rgba(16,16,37,.6)] z-40 md:hidden`}
                 onClick={() => setDisplay(!display)}></div>}
         </>
