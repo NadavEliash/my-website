@@ -9,7 +9,7 @@ const ploni = localFont({
   ],
 })
 
-const title = "הזמנת אוכל אונליין"
+const title = "הזמנות אונליין"
 const description = "בוחרים מהתפריט, קובעים זמן איסוף ומשלמים — הכול מהנייד."
 
 export const metadata: Metadata = {

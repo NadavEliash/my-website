@@ -2,6 +2,7 @@
 
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
+import Link from 'next/link'
 import { registerHost } from '@/app/components/bnb/api'
 import { saveSession } from '@/app/components/bnb/dashboard/login-gate'
 import { Eye, EyeOff, Loader2 } from 'lucide-react'
@@ -114,9 +115,9 @@ export default function SignInPage() {
         </form>
 
         <p className="text-center text-xs text-gray-400 mt-6">
-          <a href="/deadseabnb/dashboard" className="hover:text-gray-600 transition-colors">כבר יש לי חשבון</a>
+          <Link href="/deadseabnb/dashboard" className="hover:text-gray-600 transition-colors">כבר יש לי חשבון</Link>
           {' · '}
-          <a href="/deadseabnb" className="hover:text-gray-600 transition-colors">חזרה לרשימה</a>
+          <Link href="/deadseabnb" className="hover:text-gray-600 transition-colors">חזרה לרשימה</Link>
         </p>
       </div>
     </div>

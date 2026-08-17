@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import Image from 'next/image'
+import Link from 'next/link'
 import { fetchAllHosts } from './api'
 import type { Host, Lang } from './types'
 import { Star, MapPin, Loader2, AlertCircle, Wifi, Wind, UtensilsCrossed, Car, Waves, Eye } from 'lucide-react'
@@ -42,15 +43,15 @@ export default function ListingView() {
       {/* ── Header ── */}
       <header className="sticky top-0 z-40 bg-white border-b border-gray-100 shadow-sm">
         <div className="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
-          <a href="/deadseabnb" className="text-lg font-bold tracking-tight flex items-center gap-2">
+          <Link href="/deadseabnb" className="text-lg font-bold tracking-tight flex items-center gap-2">
             <span className="text-[#E05A3A]">◆</span>
             {isRtl ? 'נכסים להשכרה' : 'Vacation Rentals'}
-          </a>
+          </Link>
           <div className="flex items-center gap-3">
-            <a href="/deadseabnb/dashboard"
+            <Link href="/deadseabnb/dashboard"
               className="text-sm text-gray-500 border border-gray-200 rounded-full px-4 py-1.5 hover:bg-gray-50 transition-colors">
               {isRtl ? 'כניסת מארחים' : 'Host Login'}
-            </a>
+            </Link>
             <button
               onClick={() => setLang(l => l === 'he' ? 'en' : 'he')}
               className="text-xs font-semibold px-3 py-1.5 rounded-lg border border-gray-200 hover:bg-gray-50 transition-colors text-gray-600">

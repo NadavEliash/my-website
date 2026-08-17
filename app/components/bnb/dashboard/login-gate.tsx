@@ -1,6 +1,7 @@
 'use client'
 
 import { useState } from 'react'
+import Link from 'next/link'
 import { login } from '../api'
 import { Eye, EyeOff, Loader2 } from 'lucide-react'
 
@@ -99,7 +100,7 @@ export default function LoginGate({ onAuth }: Props) {
         </form>
 
         <p className="text-center text-xs text-gray-400 mt-6">
-          <a href="/deadseabnb/signin" className="hover:text-gray-600 transition-colors">מארח חדש? הרשם כאן</a>
+          <Link href="/deadseabnb/signin" className="hover:text-gray-600 transition-colors">מארח חדש? הרשם כאן</Link>
         </p>
       </div>
     </div>

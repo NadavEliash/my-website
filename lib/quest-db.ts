@@ -3,7 +3,6 @@ import { MongoClient } from 'mongodb'
 const uri = process.env.MONGODB_BNB_URI
 
 declare global {
-  // eslint-disable-next-line no-var
   var _questClientPromise: Promise<MongoClient> | undefined
 }
 

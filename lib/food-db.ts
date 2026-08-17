@@ -4,7 +4,6 @@ import type { Menu, Product } from '@/app/food/types'
 const uri = process.env.MONGODB_BNB_URI!
 
 declare global {
-  // eslint-disable-next-line no-var
   var _foodClientPromise: Promise<MongoClient> | undefined
 }
 
