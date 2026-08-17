@@ -9,7 +9,25 @@
       "Read(//c/Users/nadave/AppData/Roaming/nvm/**)",
       "Read(//c/Users/nadave/**)",
       "Bash(\"/c/Users/nadave/AppData/Roaming/nvm/nvm.exe\" list *)",
-      "PowerShell(nvm list)"
+      "PowerShell(nvm list)",
+      "Bash(curl -sS -o /dev/null -w \"gstatic woff2: HTTP %{http_code} in %{time_total}s\\\\n\" \"https://fonts.gstatic.com/s/opensans/v44/memFYaGs126MiZpBA-UvWbX2vVnXBbObj2OVZyOOSr4dVJWUgsjZ0EwsQaPuWBIXazFH0FkuF6juKbEhW--g.woff2\")",
+      "Bash(curl -sS -o /dev/null -w \"googleapis css2: HTTP %{http_code}\\\\n\" \"https://fonts.googleapis.com/css2?family=Open+Sans&display=swap\")",
+      "Bash(curl -sS -A \"Mozilla/5.0 \\(Windows NT 10.0; Win64; x64\\) AppleWebKit/537.36 \\(KHTML, like Gecko\\) Chrome/120.0 Safari/537.36\" \"https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;600;700;800&display=swap&subset=hebrew,latin\")",
+      "Bash(rm -rf .next)",
+      "Bash(node -p \"require\\('next/package.json'\\).version\")",
+      "Bash(node -e ' *)",
+      "Bash(curl -sS -A 'Mozilla/5.0 \\(Macintosh; Intel Mac OS X 10_15_7\\) AppleWebKit/537.36 \\(KHTML, like Gecko\\) Chrome/104.0.0.0 Safari/537.36' 'https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;600;700;800&display=swap' -o /tmp/ns.css)",
+      "Bash(python -c \"import fontTools; print\\('fonttools', fontTools.version\\)\")",
+      "Bash(pip --version)",
+      "Bash(python -m venv C:/Users/nadave/AppData/Local/Temp/claude/c--Users-nadave-Documents-my-website/0de27365-cf1f-41b2-bf9f-b60cc27c7512/scratchpad/venv)",
+      "Bash(C:/Users/nadave/AppData/Local/Temp/claude/c--Users-nadave-Documents-my-website/0de27365-cf1f-41b2-bf9f-b60cc27c7512/scratchpad/venv/Scripts/pip.exe install *)",
+      "Bash(curl -sSL -o C:/Users/nadave/AppData/Local/Temp/claude/c--Users-nadave-Documents-my-website/0de27365-cf1f-41b2-bf9f-b60cc27c7512/scratchpad/OpenSans-var.ttf https://raw.githubusercontent.com/google/fonts/main/ofl/opensans/OpenSans%5Bwdth%2Cwght%5D.ttf)",
+      "Bash(curl -sSL -o C:/Users/nadave/AppData/Local/Temp/claude/c--Users-nadave-Documents-my-website/0de27365-cf1f-41b2-bf9f-b60cc27c7512/scratchpad/OFL.txt https://raw.githubusercontent.com/google/fonts/main/ofl/opensans/OFL.txt)",
+      "Bash(awk '{print $5, $9}')",
+      "Bash(C:/Users/nadave/AppData/Local/Temp/claude/c--Users-nadave-Documents-my-website/0de27365-cf1f-41b2-bf9f-b60cc27c7512/scratchpad/venv/Scripts/python.exe -)",
+      "Bash(cp C:/Users/nadave/AppData/Local/Temp/claude/c--Users-nadave-Documents-my-website/0de27365-cf1f-41b2-bf9f-b60cc27c7512/scratchpad/open-sans-latin-hebrew.woff2 fonts/open-sans-latin-hebrew.woff2)",
+      "Bash(cp C:/Users/nadave/AppData/Local/Temp/claude/c--Users-nadave-Documents-my-website/0de27365-cf1f-41b2-bf9f-b60cc27c7512/scratchpad/OFL.txt fonts/open-sans-OFL.txt)",
+      "Bash(awk '{printf \"%8.1f KB  %s\\\\n\", $5/1024, $9}')"
     ]
   }
 }

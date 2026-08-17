@@ -1,14 +1,12 @@
 'use client'
 
 import { useEffect, useMemo, useRef, useState } from 'react'
-import { Open_Sans } from 'next/font/google'
+import { openSans } from '@/app/quest/fonts'
 import type { Question, Quiz, QuizMeta } from '@/app/quest/types'
 import { QUESTIONS_PER_GAME, pickQuestions, otherQuizzes } from '@/app/quest/utils'
 import OpeningScreen from '@/app/components/quest/opening-screen'
 import QuestionScreen from '@/app/components/quest/question-screen'
 import EndingScreen from '@/app/components/quest/ending-screen'
-
-const openSans = Open_Sans({ subsets: ['hebrew', 'latin'], weight: ['400', '600', '700', '800'] })
 
 type Screen = 'opening' | 'question' | 'ending'
 type Result = 'correct' | 'wrong' | null

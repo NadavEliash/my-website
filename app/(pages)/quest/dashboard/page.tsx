@@ -1,11 +1,9 @@
 'use client'
 
 import { useEffect, useState } from 'react'
-import { Open_Sans } from 'next/font/google'
 import { Plus, Trash2, Save, Loader2 } from 'lucide-react'
+import { openSans } from '@/app/quest/fonts'
 import type { Question, Quiz, QuizMeta } from '@/app/quest/types'
-
-const openSans = Open_Sans({ subsets: ['hebrew', 'latin'], weight: ['400', '600', '700', '800'] })
 
 export default function QuestDashboard() {
   const [metas, setMetas] = useState<QuizMeta[]>([])
