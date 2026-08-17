@@ -4,7 +4,12 @@
       "PowerShell(npx tsc --noEmit -p tsconfig.json)",
       "Bash(npm --version)",
       "Bash(npm run *)",
-      "Bash(timeout 25 node server/server.js)"
+      "Bash(timeout 25 node server/server.js)",
+      "Bash(which nvm *)",
+      "Read(//c/Users/nadave/AppData/Roaming/nvm/**)",
+      "Read(//c/Users/nadave/**)",
+      "Bash(\"/c/Users/nadave/AppData/Roaming/nvm/nvm.exe\" list *)",
+      "PowerShell(nvm list)"
     ]
   }
 }
