@@ -27,7 +27,10 @@
       "Bash(C:/Users/nadave/AppData/Local/Temp/claude/c--Users-nadave-Documents-my-website/0de27365-cf1f-41b2-bf9f-b60cc27c7512/scratchpad/venv/Scripts/python.exe -)",
       "Bash(cp C:/Users/nadave/AppData/Local/Temp/claude/c--Users-nadave-Documents-my-website/0de27365-cf1f-41b2-bf9f-b60cc27c7512/scratchpad/open-sans-latin-hebrew.woff2 fonts/open-sans-latin-hebrew.woff2)",
       "Bash(cp C:/Users/nadave/AppData/Local/Temp/claude/c--Users-nadave-Documents-my-website/0de27365-cf1f-41b2-bf9f-b60cc27c7512/scratchpad/OFL.txt fonts/open-sans-OFL.txt)",
-      "Bash(awk '{printf \"%8.1f KB  %s\\\\n\", $5/1024, $9}')"
+      "Bash(awk '{printf \"%8.1f KB  %s\\\\n\", $5/1024, $9}')",
+      "Bash(node -e *)",
+      "Bash(git fetch *)",
+      "WebFetch(domain:github.com)"
     ]
   }
 }
